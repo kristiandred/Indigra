@@ -113,7 +113,20 @@
             margin-right: 5px;
             border: 1px solid #ddd;
         }
+        .sync-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background-color: #333;
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+        }
     </style>
+    <!-- Добавляем Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
 </head>
 <body>
     <h1>Свободные дни</h1>
@@ -148,12 +161,30 @@
         </div>
     </div>
 
+    <div id="sync-status" class="sync-status hidden">Синхронизация...</div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Конфигурация Firebase
+            const firebaseConfig = {
+                apiKey: "AIzaSyDZgQfQ3z3QZQZQZQZQZQZQZQZQZQZQZQZQ",
+                authDomain: "your-project-id.firebaseapp.com",
+                databaseURL: "https://your-project-id.firebaseio.com",
+                projectId: "your-project-id",
+                storageBucket: "your-project-id.appspot.com",
+                messagingSenderId: "123456789012",
+                appId: "1:123456789012:web:abcdefghijklmnopqrstuv"
+            };
+            
+            // Инициализация Firebase
+            firebase.initializeApp(firebaseConfig);
+            const database = firebase.database();
+            
             const HYBRID_PASSWORD = 'Slonim60';
             const daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
             const numbers = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4];
             const container = document.getElementById('days-container');
+            const syncStatus = document.getElementById('sync-status');
             const today = new Date();
             const todayDayOfWeek = today.getDay();
             
@@ -164,54 +195,80 @@
             const cancelBtn = document.getElementById('cancel-btn');
             
             let isHybrid = false;
-            let selectedNumbers = JSON.parse(localStorage.getItem('selectedNumbers')) || {};
+            let selectedNumbers = {};
             let currentDateKey = getDateKey();
             
             function getDateKey() {
                 const date = new Date();
-                return `${date.getFullYear()}-${date.getMonth() + 1}`;
+                return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
             }
             
-            function getDeviceInfo() {
-                const userAgent = navigator.userAgent;
-                let deviceName = 'Неизвестное устройство';
-                
-                if (userAgent.match(/Android/i)) {
-                    deviceName = 'Android устройство';
-                } else if (userAgent.match(/iPhone|iPad|iPod/i)) {
-                    deviceName = 'Apple устройство';
-                } else if (userAgent.match(/Windows/i)) {
-                    deviceName = 'Windows устройство';
-                } else if (userAgent.match(/Macintosh/i)) {
-                    deviceName = 'Mac устройство';
-                } else if (userAgent.match(/Linux/i)) {
-                    deviceName = 'Linux устройство';
-                }
-                
-                return deviceName;
+            function showSyncStatus(message) {
+                syncStatus.textContent = message;
+                syncStatus.classList.remove('hidden');
+                setTimeout(() => syncStatus.classList.add('hidden'), 2000);
             }
             
-            function saveData() {
-                const device = getDeviceInfo();
-                const timestamp = new Date().toLocaleString();
+            function saveDataToFirebase() {
+                if (!isHybrid) return;
                 
-                localStorage.setItem('hybridStatus', isHybrid ? 'true' : 'false');
-                localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+                syncStatus.textContent = "Сохранение...";
+                syncStatus.classList.remove('hidden');
                 
-                // Для отладки можно вывести в консоль
-                console.log(`Устройство: ${device}, время: ${timestamp}`);
+                database.ref('selectedNumbers/' + currentDateKey).set(selectedNumbers)
+                    .then(() => {
+                        showSyncStatus("Сохранено");
+                        localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+                    })
+                    .catch((error) => {
+                        showSyncStatus("Ошибка сохранения");
+                        console.error("Ошибка сохранения:", error);
+                    });
             }
             
-            function loadData() {
-                const savedHybridStatus = localStorage.getItem('hybridStatus');
-                if (savedHybridStatus === 'true') {
-                    isHybrid = true;
-                }
+            function loadDataFromFirebase() {
+                syncStatus.textContent = "Загрузка...";
+                syncStatus.classList.remove('hidden');
                 
-                const savedNumbers = localStorage.getItem('selectedNumbers');
-                if (savedNumbers) {
-                    selectedNumbers = JSON.parse(savedNumbers);
-                }
+                database.ref('selectedNumbers/' + currentDateKey).once('value')
+                    .then((snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            selectedNumbers = data;
+                            localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+                            showSyncStatus("Данные загружены");
+                        } else {
+                            // Если данных нет в Firebase, пробуем загрузить из localStorage
+                            const savedNumbers = localStorage.getItem('selectedNumbers');
+                            if (savedNumbers) {
+                                selectedNumbers = JSON.parse(savedNumbers);
+                            }
+                            showSyncStatus("Используются локальные данные");
+                        }
+                        createDaysInterface();
+                    })
+                    .catch((error) => {
+                        console.error("Ошибка загрузки:", error);
+                        showSyncStatus("Ошибка загрузки");
+                        
+                        // В случае ошибки загружаем из localStorage
+                        const savedNumbers = localStorage.getItem('selectedNumbers');
+                        if (savedNumbers) {
+                            selectedNumbers = JSON.parse(savedNumbers);
+                        }
+                        createDaysInterface();
+                    });
+            }
+            
+            function setupRealtimeUpdates() {
+                database.ref('selectedNumbers/' + currentDateKey).on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        selectedNumbers = data;
+                        localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+                        createDaysInterface();
+                    }
+                });
             }
             
             function createDaysInterface() {
@@ -271,7 +328,7 @@
                                     delete selectedNumbers[key];
                                 }
                                 
-                                saveData();
+                                saveDataToFirebase();
                             });
                         }
                         
@@ -292,8 +349,7 @@
                 const newDateKey = getDateKey();
                 if (newDateKey !== currentDateKey) {
                     currentDateKey = newDateKey;
-                    saveData();
-                    createDaysInterface();
+                    loadDataFromFirebase();
                 }
             }
             
@@ -313,15 +369,21 @@
                     hybridLogin.classList.add('hidden');
                     hybridPasswordInput.value = '';
                     
-                    saveData();
+                    localStorage.setItem('hybridStatus', 'true');
                     createDaysInterface();
                 } else {
                     alert('Неверный пароль!');
                 }
             });
             
-            loadData();
-            createDaysInterface();
+            // Инициализация
+            const savedHybridStatus = localStorage.getItem('hybridStatus');
+            if (savedHybridStatus === 'true') {
+                isHybrid = true;
+            }
+            
+            loadDataFromFirebase();
+            setupRealtimeUpdates();
             setInterval(checkDateChange, 60000);
         });
     </script>
