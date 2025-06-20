@@ -10,19 +10,13 @@
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-            position: relative;
         }
         .day-container {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         .day-title {
             font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .number-wrapper {
-            display: inline-block;
-            text-align: center;
-            margin: 2px;
+            margin-bottom: 10px;
         }
         .number {
             display: inline-block;
@@ -30,259 +24,91 @@
             height: 30px;
             line-height: 30px;
             text-align: center;
+            margin: 5px;
             background-color: #4CAF50;
             color: white;
             border-radius: 50%;
             cursor: pointer;
         }
-        .number-label {
-            font-size: 10px;
-            margin-top: 2px;
-        }
         .number.special {
             background-color: #008522;
         }
         .number.selected {
-            background-color: #f44336 !important;
+            background-color: #f44336;
         }
-        .number.readonly {
-            cursor: default;
-            opacity: 0.7;
-        }
-        .hybrid-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 5px 10px;
-            background-color: #FF9800;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .hybrid-login {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .hybrid-login-content {
-            background-color: white;
-            padding: 20px;
+        .legend {
+            margin: 20px 0;
+            padding: 10px;
+            background: #f5f5f5;
             border-radius: 5px;
-            width: 300px;
-        }
-        .hybrid-login input {
-            width: 100%;
-            padding: 8px;
-            margin: 10px 0;
-            box-sizing: border-box;
-        }
-        .hybrid-login button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        .hidden {
-            display: none;
-        }
-        .color-legend {
-            display: flex;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
-        .color-item {
-            display: flex;
-            align-items: center;
-            margin-right: 15px;
-        }
-        .color-box {
-            width: 20px;
-            height: 20px;
-            margin-right: 5px;
-            border: 1px solid #ddd;
         }
     </style>
 </head>
 <body>
     <h1>Свободные дни</h1>
     
-    <button id="hybrid-btn" class="hybrid-btn">🔰 Гибрид</button>
-    
-    <div class="color-legend">
-        <div class="color-item">
-            <div class="color-box" style="background-color: #4CAF50;"></div>
-            <span>Свободная машина (7/24)</span>
-        </div>
-        <div class="color-item">
-            <div class="color-box" style="background-color: #f44336;"></div>
-            <span>Машина занята</span>
-        </div>
-        <div class="color-item">
-            <div class="color-box" style="background-color: #008522;"></div>
-            <span>Свободная машина (8/28)</span>
-        </div>
+    <div class="legend">
+        <p><span style="color:#4CAF50">■</span> Свободная машина (7/24)</p>
+        <p><span style="color:#f44336">■</span> Машина занята</p>
+        <p><span style="color:#008522">■</span> Свободная машина (8/28)</p>
     </div>
     
-    <div id="days-container">
-        <!-- Дни недели будут добавлены здесь JavaScript -->
-    </div>
-
-    <div id="hybrid-login" class="hybrid-login hidden">
-        <div class="hybrid-login-content">
-            <h3>Вход для администратора</h3>
-            <input type="password" id="hybrid-password" placeholder="Введите пароль">
-            <button id="login-btn">Войти</button>
-            <button id="cancel-btn">Отмена</button>
-        </div>
-    </div>
+    <div id="days-container"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const HYBRID_PASSWORD = 'Slonim60';
             const daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
-            const numbers = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4];
             const container = document.getElementById('days-container');
-            const today = new Date();
-            const todayDayOfWeek = today.getDay();
             
-            const hybridBtn = document.getElementById('hybrid-btn');
-            const hybridLogin = document.getElementById('hybrid-login');
-            const hybridPasswordInput = document.getElementById('hybrid-password');
-            const loginBtn = document.getElementById('login-btn');
-            const cancelBtn = document.getElementById('cancel-btn');
+            // Загружаем сохраненные данные или создаем пустой объект
+            let selectedDays = JSON.parse(localStorage.getItem('selectedDays')) || {};
             
-            let isHybrid = false;
-            let selectedNumbers = JSON.parse(localStorage.getItem('selectedNumbers')) || {};
-            
-            function saveData() {
-                localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
-                localStorage.setItem('hybridStatus', isHybrid ? 'true' : 'false');
-            }
-            
-            function loadData() {
-                const savedHybridStatus = localStorage.getItem('hybridStatus');
-                if (savedHybridStatus === 'true') {
-                    isHybrid = true;
-                }
-                
-                const savedNumbers = localStorage.getItem('selectedNumbers');
-                if (savedNumbers) {
-                    selectedNumbers = JSON.parse(savedNumbers);
-                }
-            }
-            
-            function createDaysInterface() {
+            // Создаем интерфейс
+            function createInterface() {
                 container.innerHTML = '';
                 
-                daysOfWeek.forEach((dayName, dayIndex) => {
+                daysOfWeek.forEach((day, index) => {
                     const dayContainer = document.createElement('div');
                     dayContainer.className = 'day-container';
                     
                     const dayTitle = document.createElement('div');
                     dayTitle.className = 'day-title';
-                    
-                    const dayDate = new Date(today);
-                    let diff = dayIndex - todayDayOfWeek + 1;
-                    if (todayDayOfWeek === 0) diff = dayIndex + 1;
-                    if (diff < 0) diff += 7;
-                    dayDate.setDate(today.getDate() + diff);
-                    
-                    const dateStr = dayDate.toLocaleDateString('ru-RU');
-                    dayTitle.textContent = `${dayName} ${dateStr}`;
+                    dayTitle.textContent = day;
                     dayContainer.appendChild(dayTitle);
                     
-                    numbers.forEach((num, numIndex) => {
-                        const wrapper = document.createElement('div');
-                        wrapper.className = 'number-wrapper';
+                    // Создаем 12 кнопок для каждого дня
+                    for (let i = 1; i <= 12; i++) {
+                        const number = document.createElement('div');
+                        number.className = 'number';
+                        number.textContent = Math.ceil(i/3); // 1,1,1,2,2,2,3,3,3,4,4,4
                         
-                        const numberElement = document.createElement('div');
-                        numberElement.className = 'number';
-                        numberElement.textContent = num;
-                        numberElement.dataset.day = dayIndex;
-                        numberElement.dataset.num = num;
-                        numberElement.dataset.index = numIndex;
-                        
-                        if ((numIndex + 1) % 3 === 0) {
-                            numberElement.classList.add('special');
+                        // Каждая 3-я кнопка - особенная
+                        if (i % 3 === 0) {
+                            number.classList.add('special');
                         }
                         
-                        const key = `${dayIndex}_${num}_${numIndex}`;
-                        if (selectedNumbers[key]) {
-                            numberElement.classList.add('selected');
+                        // Проверяем, выбрана ли кнопка
+                        const key = `${index}_${i}`;
+                        if (selectedDays[key]) {
+                            number.classList.add('selected');
                         }
                         
-                        if (!isHybrid) {
-                            numberElement.classList.add('readonly');
-                        } else {
-                            numberElement.addEventListener('click', function() {
-                                const day = this.dataset.day;
-                                const num = this.dataset.num;
-                                const numIndex = this.dataset.index;
-                                const key = `${day}_${num}_${numIndex}`;
-                                
-                                this.classList.toggle('selected');
-                                
-                                if (this.classList.contains('selected')) {
-                                    selectedNumbers[key] = true;
-                                } else {
-                                    delete selectedNumbers[key];
-                                }
-                                
-                                saveData();
-                            });
-                        }
+                        // Добавляем обработчик клика
+                        number.addEventListener('click', function() {
+                            this.classList.toggle('selected');
+                            selectedDays[key] = this.classList.contains('selected');
+                            localStorage.setItem('selectedDays', JSON.stringify(selectedDays));
+                        });
                         
-                        const label = document.createElement('div');
-                        label.className = 'number-label';
-                        label.textContent = (numIndex + 1) % 3 === 0 ? '8/28' : '7/24';
-                        
-                        wrapper.appendChild(numberElement);
-                        wrapper.appendChild(label);
-                        dayContainer.appendChild(wrapper);
-                    });
+                        dayContainer.appendChild(number);
+                    }
                     
                     container.appendChild(dayContainer);
                 });
             }
             
-            hybridBtn.addEventListener('click', function() {
-                hybridLogin.classList.remove('hidden');
-            });
-            
-            cancelBtn.addEventListener('click', function() {
-                hybridLogin.classList.add('hidden');
-                hybridPasswordInput.value = '';
-            });
-            
-            loginBtn.addEventListener('click', function() {
-                const password = hybridPasswordInput.value;
-                if (password === HYBRID_PASSWORD) {
-                    isHybrid = true;
-                    hybridLogin.classList.add('hidden');
-                    hybridPasswordInput.value = '';
-                    
-                    saveData();
-                    createDaysInterface();
-                } else {
-                    alert('Неверный пароль!');
-                }
-            });
-            
-            // Инициализация
-            loadData();
-            createDaysInterface();
+            // Инициализируем интерфейс
+            createInterface();
         });
     </script>
 </body>
