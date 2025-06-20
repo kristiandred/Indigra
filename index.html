@@ -1,3 +1,4 @@
+<!--меняем-->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -7,48 +8,37 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
+            max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-            font-size: 16px;
+            position: relative;
         }
         .day-container {
-            margin-bottom: 25px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 8px;
+            margin-bottom: 15px;
         }
         .day-title {
             font-weight: bold;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        .numbers-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+            margin-bottom: 5px;
         }
         .number-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            display: inline-block;
+            text-align: center;
+            margin: 2px;
         }
         .number {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
             background-color: #4CAF50;
             color: white;
             border-radius: 50%;
             cursor: pointer;
-            font-weight: bold;
-            margin-bottom: 5px;
         }
         .number-label {
-            font-size: 12px;
-            color: #555;
+            font-size: 10px;
+            margin-top: 2px;
         }
         .number.special {
             background-color: #008522;
@@ -56,247 +46,387 @@
         .number.selected {
             background-color: #f44336 !important;
         }
-        .legend {
-            margin: 25px 0;
-            padding: 15px;
-            background: #f0f0f0;
-            border-radius: 8px;
+        .number.readonly {
+            cursor: default;
+            opacity: 0.7;
         }
-        .legend-item {
+        .hybrid-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 5px 10px;
+            background-color: #FF9800;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .hybrid-login {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .hybrid-login-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 300px;
+        }
+        .hybrid-login input {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        .hybrid-login button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        .color-legend {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        .color-item {
             display: flex;
             align-items: center;
-            margin: 10px 0;
+            margin-right: 15px;
         }
-        .legend-color {
+        .color-box {
             width: 20px;
             height: 20px;
-            margin-right: 10px;
-            border-radius: 50%;
+            margin-right: 5px;
+            border: 1px solid #ddd;
         }
-        .sync-notice {
+        .sync-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
             color: #666;
-            font-style: italic;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        .admin-panel {
-            margin-top: 30px;
-            padding: 15px;
-            background: #fff8e1;
-            border-radius: 8px;
-        }
-        .admin-controls {
-            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <h1>Свободные дни</h1>
     
-    <div class="legend">
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #4CAF50;"></div>
-            <span>Свободная машина (7/24)</span>
+    <button id="hybrid-btn" class="hybrid-btn">🔰 Гибрид</button>
+    
+    <div class="color-legend">
+        <div class="color-item">
+            <div class="color-box" style="background-color: #4CAF50;"></div>
+            <span>Свободный день</span>
         </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #f44336;"></div>
-            <span>Машина занята</span>
+        <div class="color-item">
+            <div class="color-box" style="background-color: #f44336;"></div>
+            <span>Выбранный день</span>
         </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #008522;"></div>
-            <span>Свободная машина (8/28)</span>
+        <div class="color-item">
+            <div class="color-box" style="background-color: #027f92;"></div>
+            <span>Особый день (каждая 3-я кнопка)</span>
         </div>
     </div>
     
-    <div id="days-container"></div>
-    
-    <div class="admin-panel">
-        <h3>Администрирование</h3>
-        <div class="admin-controls">
-            <button id="reset-btn">Сбросить все выборы</button>
-            <button id="select-all-btn">Выбрать все</button>
-        </div>
-        <p class="sync-notice">Изменения сохраняются автоматически. Для синхронизации между устройствами обновите страницы.</p>
+    <div id="days-container">
+        <!-- Дни недели будут добавлены здесь JavaScript -->
     </div>
+
+    <div id="hybrid-login" class="hybrid-login hidden">
+        <div class="hybrid-login-content">
+            <h3>Вход для администратора</h3>
+            <input type="password" id="hybrid-password" placeholder="Введите пароль">
+            <button id="login-btn">Войти</button>
+            <button id="cancel-btn">Отмена</button>
+        </div>
+    </div>
+
+    <div id="sync-status" class="sync-status"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const HYBRID_PASSWORD = 'Slonim60';
             const daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
+            const numbers = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4];
             const container = document.getElementById('days-container');
-            const resetBtn = document.getElementById('reset-btn');
-            const selectAllBtn = document.getElementById('select-all-btn');
+            const today = new Date();
+            const todayDayOfWeek = today.getDay();
             
-            // Ключ для хранения базовой даты в localStorage
-            const BASE_DATE_KEY = 'hybridDaysBaseDate';
-            const SELECTED_NUMBERS_KEY = 'selectedNumbers';
+            const hybridBtn = document.getElementById('hybrid-btn');
+            const hybridLogin = document.getElementById('hybrid-login');
+            const hybridPasswordInput = document.getElementById('hybrid-password');
+            const loginBtn = document.getElementById('login-btn');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const syncStatus = document.getElementById('sync-status');
             
-            // Инициализация базовой даты
-            function initBaseDate() {
-                const savedDate = localStorage.getItem(BASE_DATE_KEY);
-                if (!savedDate) {
-                    // Устанавливаем текущую дату как базовую
-                    const today = new Date();
-                    localStorage.setItem(BASE_DATE_KEY, today.toISOString());
-                    return today;
-                }
-                
-                const baseDate = new Date(savedDate);
-                const now = new Date();
-                
-                // Проверяем, прошли ли сутки с базовой даты
-                if (now - baseDate >= 24 * 60 * 60 * 1000) {
-                    // Добавляем 7 дней к базовой дате
-                    const newBaseDate = new Date(baseDate);
-                    newBaseDate.setDate(newBaseDate.getDate() + 7);
-                    localStorage.setItem(BASE_DATE_KEY, newBaseDate.toISOString());
-                    return newBaseDate;
-                }
-                
-                return baseDate;
+            let isHybrid = false;
+            let selectedNumbers = JSON.parse(localStorage.getItem('selectedNumbers')) || {};
+            let currentDateKey = getDateKey();
+            let lastSyncTime = 0;
+            let syncInterval;
+            
+            // URL для хранения данных (используем бесплатный сервис JSONBin.io)
+            const JSONBIN_BIN_ID = 'YOUR_JSONBIN_BIN_ID'; // Замените на ваш реальный ID
+            const JSONBIN_API_KEY = 'YOUR_JSONBIN_API_KEY'; // Замените на ваш реальный API ключ
+            const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+            
+            function getDateKey() {
+                const date = new Date();
+                return `${date.getFullYear()}-${date.getMonth() + 1}`;
             }
             
-            // Получаем актуальную базовую дату
-            const baseDate = initBaseDate();
+            function getDeviceInfo() {
+                const userAgent = navigator.userAgent;
+                let deviceName = 'Неизвестное устройство';
+                
+                if (userAgent.match(/Android/i)) {
+                    deviceName = 'Android устройство';
+                } else if (userAgent.match(/iPhone|iPad|iPod/i)) {
+                    deviceName = 'Apple устройство';
+                } else if (userAgent.match(/Windows/i)) {
+                    deviceName = 'Windows устройство';
+                } else if (userAgent.match(/Macintosh/i)) {
+                    deviceName = 'Mac устройство';
+                } else if (userAgent.match(/Linux/i)) {
+                    deviceName = 'Linux устройство';
+                }
+                
+                return deviceName;
+            }
             
-            // Загружаем сохраненные данные
-            let selectedNumbers = JSON.parse(localStorage.getItem(SELECTED_NUMBERS_KEY)) || {};
+            function updateSyncStatus(message) {
+                syncStatus.textContent = message;
+                console.log(message);
+            }
             
-            // Функция для сохранения данных
+            async function saveDataToServer() {
+                if (!isHybrid) return;
+                
+                const data = {
+                    selectedNumbers: selectedNumbers,
+                    lastUpdated: Date.now()
+                };
+                
+                try {
+                    const response = await fetch(JSONBIN_URL, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Master-Key': JSONBIN_API_KEY,
+                            'X-Bin-Versioning': 'false'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    if (response.ok) {
+                        updateSyncStatus('Данные успешно сохранены на сервер');
+                        lastSyncTime = Date.now();
+                    } else {
+                        updateSyncStatus('Ошибка при сохранении на сервер');
+                    }
+                } catch (error) {
+                    updateSyncStatus('Ошибка сети при сохранении на сервер');
+                    console.error('Ошибка при сохранении на сервер:', error);
+                }
+            }
+            
+            async function loadDataFromServer() {
+                try {
+                    const response = await fetch(JSONBIN_URL + '/latest', {
+                        headers: {
+                            'X-Master-Key': JSONBIN_API_KEY
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        const serverData = result.record;
+                        
+                        if (serverData.lastUpdated > lastSyncTime) {
+                            selectedNumbers = serverData.selectedNumbers || {};
+                            lastSyncTime = serverData.lastUpdated;
+                            
+                            localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+                            updateSyncStatus('Данные успешно загружены с сервера');
+                            
+                            createDaysInterface();
+                            return true;
+                        }
+                    } else {
+                        updateSyncStatus('Ошибка при загрузке с сервера');
+                    }
+                } catch (error) {
+                    updateSyncStatus('Ошибка сети при загрузке с сервера');
+                    console.error('Ошибка при загрузке с сервера:', error);
+                }
+                return false;
+            }
+            
             function saveData() {
-                localStorage.setItem(SELECTED_NUMBERS_KEY, JSON.stringify(selectedNumbers));
-                // Для отладки
-                console.log('Данные сохранены:', selectedNumbers);
+                const device = getDeviceInfo();
+                const timestamp = new Date().toLocaleString();
+                
+                localStorage.setItem('hybridStatus', isHybrid ? 'true' : 'false');
+                localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+                
+                // Для администраторов сохраняем изменения на сервер
+                if (isHybrid) {
+                    saveDataToServer();
+                }
+                
+                // Для отладки можно вывести в консоль
+                console.log(`Устройство: ${device}, время: ${timestamp}`);
             }
             
-            // Функция для создания интерфейса
-            function createInterface() {
+            function loadData() {
+                const savedHybridStatus = localStorage.getItem('hybridStatus');
+                if (savedHybridStatus === 'true') {
+                    isHybrid = true;
+                }
+                
+                const savedNumbers = localStorage.getItem('selectedNumbers');
+                if (savedNumbers) {
+                    selectedNumbers = JSON.parse(savedNumbers);
+                }
+                
+                // Загружаем данные с сервера при старте
+                loadDataFromServer();
+            }
+            
+            function createDaysInterface() {
                 container.innerHTML = '';
                 
-                const today = new Date(baseDate);
-                const todayDayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1; // Приводим к 0-6 (ПН-ВС)
-                
-                daysOfWeek.forEach((day, dayIndex) => {
+                daysOfWeek.forEach((dayName, dayIndex) => {
                     const dayContainer = document.createElement('div');
                     dayContainer.className = 'day-container';
                     
                     const dayTitle = document.createElement('div');
                     dayTitle.className = 'day-title';
                     
-                    // Добавляем дату к названию дня
                     const dayDate = new Date(today);
-                    const diff = dayIndex - todayDayOfWeek;
+                    let diff = dayIndex - todayDayOfWeek + 1;
+                    if (todayDayOfWeek === 0) diff = dayIndex + 1;
+                    if (diff < 0) diff += 7;
                     dayDate.setDate(today.getDate() + diff);
-                    const dateStr = dayDate.toLocaleDateString('ru-RU', {day: 'numeric', month: 'numeric'});
                     
-                    dayTitle.textContent = `${day}, ${dateStr}`;
+                    const dateStr = dayDate.toLocaleDateString('ru-RU');
+                    dayTitle.textContent = `${dayName} ${dateStr}`;
                     dayContainer.appendChild(dayTitle);
                     
-                    const numbersRow = document.createElement('div');
-                    numbersRow.className = 'numbers-row';
-                    
-                    // Создаем 12 кнопок (4 группы по 3)
-                    for (let i = 0; i < 12; i++) {
-                        const groupNumber = Math.floor(i / 3) + 1;
-                        const isSpecial = (i + 1) % 3 === 0; // Каждая третья кнопка
-                        
+                    numbers.forEach((num, numIndex) => {
                         const wrapper = document.createElement('div');
                         wrapper.className = 'number-wrapper';
                         
-                        const number = document.createElement('div');
-                        number.className = 'number';
-                        number.textContent = groupNumber;
+                        const numberElement = document.createElement('div');
+                        numberElement.className = 'number';
+                        numberElement.textContent = num;
+                        numberElement.dataset.day = dayIndex;
+                        numberElement.dataset.num = num;
+                        numberElement.dataset.index = numIndex;
                         
-                        if (isSpecial) {
-                            number.classList.add('special');
+                        if ((numIndex + 1) % 3 === 0) {
+                            numberElement.classList.add('special');
                         }
                         
-                        const key = `${dayIndex}_${i}`;
+                        const key = `${dayIndex}_${num}_${numIndex}`;
                         if (selectedNumbers[key]) {
-                            number.classList.add('selected');
+                            numberElement.classList.add('selected');
                         }
                         
-                        number.addEventListener('click', function() {
-                            this.classList.toggle('selected');
-                            selectedNumbers[key] = this.classList.contains('selected');
-                            saveData();
-                        });
+                        if (!isHybrid) {
+                            numberElement.classList.add('readonly');
+                        } else {
+                            numberElement.addEventListener('click', function() {
+                                const day = this.dataset.day;
+                                const num = this.dataset.num;
+                                const numIndex = this.dataset.index;
+                                const key = `${day}_${num}_${numIndex}`;
+                                
+                                this.classList.toggle('selected');
+                                
+                                if (this.classList.contains('selected')) {
+                                    selectedNumbers[key] = true;
+                                } else {
+                                    delete selectedNumbers[key];
+                                }
+                                
+                                saveData();
+                            });
+                        }
                         
                         const label = document.createElement('div');
                         label.className = 'number-label';
-                        label.textContent = isSpecial ? '8/28' : '7/24';
+                        label.textContent = (numIndex + 1) % 3 === 0 ? '8/28' : '7/24';
                         
-                        wrapper.appendChild(number);
+                        wrapper.appendChild(numberElement);
                         wrapper.appendChild(label);
-                        numbersRow.appendChild(wrapper);
-                    }
+                        dayContainer.appendChild(wrapper);
+                    });
                     
-                    dayContainer.appendChild(numbersRow);
                     container.appendChild(dayContainer);
                 });
             }
             
-            // Функция для сброса всех выборов
-            resetBtn.addEventListener('click', function() {
-                if (confirm('Вы уверены, что хотите сбросить все выборы?')) {
-                    selectedNumbers = {};
+            function checkDateChange() {
+                const newDateKey = getDateKey();
+                if (newDateKey !== currentDateKey) {
+                    currentDateKey = newDateKey;
                     saveData();
-                    createInterface();
-                    alert('Все выборы сброшены!');
-                }
-            });
-            
-            // Функция для выбора всех дней
-            selectAllBtn.addEventListener('click', function() {
-                if (confirm('Вы уверены, что хотите выбрать все дни?')) {
-                    // Создаем ключи для всех дней и слотов
-                    daysOfWeek.forEach((_, dayIndex) => {
-                        for (let i = 0; i < 12; i++) {
-                            const key = `${dayIndex}_${i}`;
-                            selectedNumbers[key] = true;
-                        }
-                    });
-                    saveData();
-                    createInterface();
-                    alert('Все дни выбраны!');
-                }
-            });
-            
-            // Проверяем изменения в localStorage
-            function checkForUpdates() {
-                // Проверяем, не прошли ли сутки с базовой даты
-                const now = new Date();
-                const savedBaseDate = new Date(localStorage.getItem(BASE_DATE_KEY));
-                if (now - savedBaseDate >= 24 * 60 * 60 * 1000) {
-                    // Обновляем базовую дату и пересоздаем интерфейс
-                    const newBaseDate = new Date(savedBaseDate);
-                    newBaseDate.setDate(newBaseDate.getDate() + 7);
-                    localStorage.setItem(BASE_DATE_KEY, newBaseDate.toISOString());
-                    location.reload(); // Перезагружаем страницу для обновления дат
-                    return;
-                }
-                
-                // Проверяем изменения в выбранных номерах
-                const savedData = localStorage.getItem(SELECTED_NUMBERS_KEY);
-                if (savedData && savedData !== JSON.stringify(selectedNumbers)) {
-                    selectedNumbers = JSON.parse(savedData);
-                    createInterface();
-                    console.log('Обновлены данные из хранилища');
+                    createDaysInterface();
                 }
             }
             
-            // Инициализация
-            createInterface();
+            function startSyncInterval() {
+                // Проверяем обновления на сервере каждые 30 секунд
+                syncInterval = setInterval(async () => {
+                    if (!isHybrid) {
+                        await loadDataFromServer();
+                    }
+                }, 30000);
+            }
             
-            // Проверяем изменения каждую секунду
-            setInterval(checkForUpdates, 1000);
+            hybridBtn.addEventListener('click', function() {
+                hybridLogin.classList.remove('hidden');
+            });
             
-            // Также проверяем при возвращении на вкладку
-            window.addEventListener('focus', checkForUpdates);
+            cancelBtn.addEventListener('click', function() {
+                hybridLogin.classList.add('hidden');
+                hybridPasswordInput.value = '';
+            });
             
-            // Для отладки
-            console.log('Приложение запущено');
-            console.log('Базовая дата:', baseDate);
-            console.log('Текущие данные:', selectedNumbers);
+            loginBtn.addEventListener('click', function() {
+                const password = hybridPasswordInput.value;
+                if (password === HYBRID_PASSWORD) {
+                    isHybrid = true;
+                    hybridLogin.classList.add('hidden');
+                    hybridPasswordInput.value = '';
+                    
+                    saveData();
+                    createDaysInterface();
+                } else {
+                    alert('Неверный пароль!');
+                }
+            });
+            
+            loadData();
+            createDaysInterface();
+            startSyncInterval();
+            setInterval(checkDateChange, 60000);
         });
     </script>
 </body>
