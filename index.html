@@ -1,4 +1,3 @@
-<!--меняем-->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -181,8 +180,8 @@
             let syncInterval;
             
             // URL для хранения данных (используем бесплатный сервис JSONBin.io)
-            const JSONBIN_BIN_ID = '6855b1e28960c979a5adf64e'; // Замените на ваш реальный ID
-            const JSONBIN_API_KEY = '$2a$10$kYTmA.l8ZbmoEcy79VIH7ONUENs6g1.iAjGHsfbuNTnCwu3Hujx0C'; // Замените на ваш реальный API ключ
+            const JSONBIN_BIN_ID = '6855b1e28960c979a5adf64e';
+            const JSONBIN_API_KEY = '$2a$10$kYTmA.182bmoEcy79VIH70NUENs6g1.iAjGHSfbuNTnCwu3Hujx0C';
             const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
             
             function getDateKey() {
@@ -228,69 +227,65 @@
                         headers: {
                             'Content-Type': 'application/json',
                             'X-Master-Key': JSONBIN_API_KEY,
-                            'X-Bin-Versioning': 'false'
+                            'X-Bin-Name': 'HybridDaysData'
                         },
                         body: JSON.stringify(data)
                     });
+                    
+                    const result = await response.json();
                     
                     if (response.ok) {
                         updateSyncStatus('Данные успешно сохранены на сервер');
                         lastSyncTime = Date.now();
                     } else {
-                        updateSyncStatus('Ошибка при сохранении на сервер');
+                        updateSyncStatus(`Ошибка сохранения: ${result.message || response.status}`);
                     }
                 } catch (error) {
-                    updateSyncStatus('Ошибка сети при сохранении на сервер');
-                    console.error('Ошибка при сохранении на сервер:', error);
+                    updateSyncStatus('Ошибка сети при сохранении');
+                    console.error('Ошибка сохранения:', error);
                 }
             }
             
             async function loadDataFromServer() {
                 try {
-                    const response = await fetch(JSONBIN_URL + '/latest', {
+                    const response = await fetch(`${JSONBIN_URL}/latest`, {
                         headers: {
-                            'X-Master-Key': JSONBIN_API_KEY
+                            'X-Master-Key': JSONBIN_API_KEY,
+                            'Content-Type': 'application/json'
                         }
                     });
                     
-                    if (response.ok) {
-                        const result = await response.json();
-                        const serverData = result.record;
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    const serverData = result.record;
+                    
+                    if (serverData && serverData.lastUpdated > lastSyncTime) {
+                        selectedNumbers = serverData.selectedNumbers || {};
+                        lastSyncTime = serverData.lastUpdated;
                         
-                        if (serverData.lastUpdated > lastSyncTime) {
-                            selectedNumbers = serverData.selectedNumbers || {};
-                            lastSyncTime = serverData.lastUpdated;
-                            
-                            localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
-                            updateSyncStatus('Данные успешно загружены с сервера');
-                            
-                            createDaysInterface();
-                            return true;
-                        }
-                    } else {
-                        updateSyncStatus('Ошибка при загрузке с сервера');
+                        localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+                        updateSyncStatus('Данные загружены с сервера');
+                        
+                        createDaysInterface();
+                        return true;
                     }
                 } catch (error) {
-                    updateSyncStatus('Ошибка сети при загрузке с сервера');
-                    console.error('Ошибка при загрузке с сервера:', error);
+                    updateSyncStatus(`Ошибка загрузки: ${error.message}`);
+                    console.error('Ошибка загрузки:', error);
                 }
                 return false;
             }
             
             function saveData() {
-                const device = getDeviceInfo();
-                const timestamp = new Date().toLocaleString();
-                
                 localStorage.setItem('hybridStatus', isHybrid ? 'true' : 'false');
                 localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
                 
-                // Для администраторов сохраняем изменения на сервер
                 if (isHybrid) {
                     saveDataToServer();
                 }
-                
-                // Для отладки можно вывести в консоль
-                console.log(`Устройство: ${device}, время: ${timestamp}`);
             }
             
             function loadData() {
@@ -304,7 +299,6 @@
                     selectedNumbers = JSON.parse(savedNumbers);
                 }
                 
-                // Загружаем данные с сервера при старте
                 loadDataFromServer();
             }
             
@@ -382,17 +376,7 @@
                 });
             }
             
-            function checkDateChange() {
-                const newDateKey = getDateKey();
-                if (newDateKey !== currentDateKey) {
-                    currentDateKey = newDateKey;
-                    saveData();
-                    createDaysInterface();
-                }
-            }
-            
             function startSyncInterval() {
-                // Проверяем обновления на сервере каждые 30 секунд
                 syncInterval = setInterval(async () => {
                     if (!isHybrid) {
                         await loadDataFromServer();
@@ -423,10 +407,10 @@
                 }
             });
             
+            // Инициализация
             loadData();
             createDaysInterface();
             startSyncInterval();
-            setInterval(checkDateChange, 60000);
         });
     </script>
 </body>
