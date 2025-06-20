@@ -85,6 +85,9 @@
             background: #fff8e1;
             border-radius: 8px;
         }
+        .admin-controls {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -109,7 +112,10 @@
     
     <div class="admin-panel">
         <h3>Администрирование</h3>
-        <button id="reset-btn">Сбросить все выборы</button>
+        <div class="admin-controls">
+            <button id="reset-btn">Сбросить все выборы</button>
+            <button id="select-all-btn">Выбрать все</button>
+        </div>
         <p class="sync-notice">Изменения сохраняются автоматически. Для синхронизации между устройствами обновите страницы.</p>
     </div>
 
@@ -118,13 +124,46 @@
             const daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
             const container = document.getElementById('days-container');
             const resetBtn = document.getElementById('reset-btn');
+            const selectAllBtn = document.getElementById('select-all-btn');
+            
+            // Ключ для хранения базовой даты в localStorage
+            const BASE_DATE_KEY = 'hybridDaysBaseDate';
+            const SELECTED_NUMBERS_KEY = 'selectedNumbers';
+            
+            // Инициализация базовой даты
+            function initBaseDate() {
+                const savedDate = localStorage.getItem(BASE_DATE_KEY);
+                if (!savedDate) {
+                    // Устанавливаем текущую дату как базовую
+                    const today = new Date();
+                    localStorage.setItem(BASE_DATE_KEY, today.toISOString());
+                    return today;
+                }
+                
+                const baseDate = new Date(savedDate);
+                const now = new Date();
+                
+                // Проверяем, прошли ли сутки с базовой даты
+                if (now - baseDate >= 24 * 60 * 60 * 1000) {
+                    // Добавляем 7 дней к базовой дате
+                    const newBaseDate = new Date(baseDate);
+                    newBaseDate.setDate(newBaseDate.getDate() + 7);
+                    localStorage.setItem(BASE_DATE_KEY, newBaseDate.toISOString());
+                    return newBaseDate;
+                }
+                
+                return baseDate;
+            }
+            
+            // Получаем актуальную базовую дату
+            const baseDate = initBaseDate();
             
             // Загружаем сохраненные данные
-            let selectedNumbers = JSON.parse(localStorage.getItem('selectedNumbers')) || {};
+            let selectedNumbers = JSON.parse(localStorage.getItem(SELECTED_NUMBERS_KEY)) || {};
             
             // Функция для сохранения данных
             function saveData() {
-                localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+                localStorage.setItem(SELECTED_NUMBERS_KEY, JSON.stringify(selectedNumbers));
                 // Для отладки
                 console.log('Данные сохранены:', selectedNumbers);
             }
@@ -133,7 +172,7 @@
             function createInterface() {
                 container.innerHTML = '';
                 
-                const today = new Date();
+                const today = new Date(baseDate);
                 const todayDayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1; // Приводим к 0-6 (ПН-ВС)
                 
                 daysOfWeek.forEach((day, dayIndex) => {
@@ -206,9 +245,38 @@
                 }
             });
             
+            // Функция для выбора всех дней
+            selectAllBtn.addEventListener('click', function() {
+                if (confirm('Вы уверены, что хотите выбрать все дни?')) {
+                    // Создаем ключи для всех дней и слотов
+                    daysOfWeek.forEach((_, dayIndex) => {
+                        for (let i = 0; i < 12; i++) {
+                            const key = `${dayIndex}_${i}`;
+                            selectedNumbers[key] = true;
+                        }
+                    });
+                    saveData();
+                    createInterface();
+                    alert('Все дни выбраны!');
+                }
+            });
+            
             // Проверяем изменения в localStorage
             function checkForUpdates() {
-                const savedData = localStorage.getItem('selectedNumbers');
+                // Проверяем, не прошли ли сутки с базовой даты
+                const now = new Date();
+                const savedBaseDate = new Date(localStorage.getItem(BASE_DATE_KEY));
+                if (now - savedBaseDate >= 24 * 60 * 60 * 1000) {
+                    // Обновляем базовую дату и пересоздаем интерфейс
+                    const newBaseDate = new Date(savedBaseDate);
+                    newBaseDate.setDate(newBaseDate.getDate() + 7);
+                    localStorage.setItem(BASE_DATE_KEY, newBaseDate.toISOString());
+                    location.reload(); // Перезагружаем страницу для обновления дат
+                    return;
+                }
+                
+                // Проверяем изменения в выбранных номерах
+                const savedData = localStorage.getItem(SELECTED_NUMBERS_KEY);
                 if (savedData && savedData !== JSON.stringify(selectedNumbers)) {
                     selectedNumbers = JSON.parse(savedData);
                     createInterface();
@@ -227,6 +295,7 @@
             
             // Для отладки
             console.log('Приложение запущено');
+            console.log('Базовая дата:', baseDate);
             console.log('Текущие данные:', selectedNumbers);
         });
     </script>
