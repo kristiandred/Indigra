@@ -125,10 +125,19 @@
             padding: 5px;
             border-radius: 4px;
         }
+        .admin-row {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .admin-row.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <h1>Свободные дни</h1>
+    <h1>Свободные гибриды Indigra</h1>
     
     <button id="hybrid-btn" class="hybrid-btn">🔰 Гибрид</button>
     
@@ -145,6 +154,11 @@
             <div class="color-box" style="background-color: #f44336;"></div>
             <span>Занятая машина</span>
         </div>
+    </div>
+    
+    <div id="admin-row" class="admin-row hidden">
+        <div class="day-title">Администратор (выделить все дни):</div>
+        <!-- Админские кнопки будут добавлены здесь -->
     </div>
     
     <div id="days-container">
@@ -166,8 +180,10 @@
         document.addEventListener('DOMContentLoaded', function() {
             const HYBRID_PASSWORD = 'Slonim60';
             const daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
-            const numbers = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4];
+            const numbers = [1, 1, 1, 2, 2, 2, 3, 3, 3]; // Убрали цифры 4
+            const adminNumbers = [1, 1, 1, 2, 2, 2, 3, 3, 3]; // Отдельный набор для админской строки
             const container = document.getElementById('days-container');
+            const adminRow = document.getElementById('admin-row');
             const today = new Date();
             let todayDayOfWeek = today.getDay(); // 0 - воскресенье, 1 - понедельник и т.д.
             
@@ -316,6 +332,72 @@
                 loadDataFromServer();
             }
             
+            function createAdminRow() {
+                adminRow.innerHTML = '';
+                
+                const title = document.createElement('div');
+                title.className = 'day-title';
+                title.textContent = 'Администратор (выделить все дни):';
+                adminRow.appendChild(title);
+                
+                adminNumbers.forEach((num, numIndex) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'number-wrapper';
+                    
+                    const numberElement = document.createElement('div');
+                    numberElement.className = 'number';
+                    numberElement.textContent = num;
+                    numberElement.dataset.num = num;
+                    numberElement.dataset.index = numIndex;
+                    
+                    if ((numIndex + 1) % 3 === 0) {
+                        numberElement.classList.add('special');
+                    }
+                    
+                    numberElement.addEventListener('click', function() {
+                        const num = this.dataset.num;
+                        const numIndex = this.dataset.index;
+                        
+                        // Находим все кнопки с таким же num и numIndex во всех днях
+                        const allNumberElements = document.querySelectorAll('.number');
+                        let anySelected = false;
+                        
+                        // Сначала проверяем, есть ли уже выделенные кнопки
+                        allNumberElements.forEach(el => {
+                            if (el.dataset.num === num && el.dataset.index === numIndex && el.classList.contains('selected')) {
+                                anySelected = true;
+                            }
+                        });
+                        
+                        // Устанавливаем или снимаем выделение для всех соответствующих кнопок
+                        allNumberElements.forEach(el => {
+                            if (el.dataset.num === num && el.dataset.index === numIndex) {
+                                const day = el.dataset.day;
+                                const key = `${day}_${num}_${numIndex}`;
+                                
+                                if (anySelected) {
+                                    el.classList.remove('selected');
+                                    delete selectedNumbers[key];
+                                } else {
+                                    el.classList.add('selected');
+                                    selectedNumbers[key] = true;
+                                }
+                            }
+                        });
+                        
+                        saveData();
+                    });
+                    
+                    const label = document.createElement('div');
+                    label.className = 'number-label';
+                    label.textContent = (numIndex + 1) % 3 === 0 ? '8/28' : '7/24';
+                    
+                    wrapper.appendChild(numberElement);
+                    wrapper.appendChild(label);
+                    adminRow.appendChild(wrapper);
+                });
+            }
+            
             function createDaysInterface() {
                 container.innerHTML = '';
                 const daysToShow = getDaysStartingFromToday();
@@ -393,6 +475,14 @@
                     
                     container.appendChild(dayContainer);
                 });
+                
+                // Обновляем видимость админской строки
+                if (isHybrid) {
+                    adminRow.classList.remove('hidden');
+                    createAdminRow();
+                } else {
+                    adminRow.classList.add('hidden');
+                }
             }
             
             function startSyncInterval() {
