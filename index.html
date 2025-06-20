@@ -120,6 +120,11 @@
             font-size: 12px;
             color: #666;
         }
+        .today-highlight {
+            background-color: #FFF9C4;
+            padding: 5px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -160,11 +165,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const HYBRID_PASSWORD = 'Slonim60';
-            const daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
+            const daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
             const numbers = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4];
             const container = document.getElementById('days-container');
             const today = new Date();
-            const todayDayOfWeek = today.getDay();
+            let todayDayOfWeek = today.getDay(); // 0 - воскресенье, 1 - понедельник и т.д.
             
             const hybridBtn = document.getElementById('hybrid-btn');
             const hybridLogin = document.getElementById('hybrid-login');
@@ -180,14 +185,13 @@
             let syncInterval;
             
             // URL для хранения данных (используем бесплатный сервис JSONBin.io)
-       // Вставьте актуальные данные из вашего JSONBin.io аккаунта
-const JSONBIN_BIN_ID = '6855b66f8561e97a50285b44'; // Проверьте в интерфейсе
-const JSONBIN_API_KEY = '$2a$10$kYTmA.l8ZbmoEcy79VIH7ONUENs6g1.iAjGHsfbuNTnCwu3Hujx0C'; // Новый ключ
+            const JSONBIN_BIN_ID = '6855b66f8561e97a50285b44';
+            const JSONBIN_API_KEY = '$2a$10$kYTmA.l8ZbmoEcy79VIH7ONUENs6g1.iAjGHsfbuNTnCwu3Hujx0C';
             const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
             
             function getDateKey() {
                 const date = new Date();
-                return `${date.getFullYear()}-${date.getMonth() + 1}`;
+                return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
             }
             
             function getDeviceInfo() {
@@ -212,6 +216,15 @@ const JSONBIN_API_KEY = '$2a$10$kYTmA.l8ZbmoEcy79VIH7ONUENs6g1.iAjGHsfbuNTnCwu3H
             function updateSyncStatus(message) {
                 syncStatus.textContent = message;
                 console.log(message);
+            }
+            
+            function getDaysStartingFromToday() {
+                const reorderedDays = [];
+                for (let i = 0; i < 7; i++) {
+                    const dayIndex = (todayDayOfWeek + i) % 7;
+                    reorderedDays.push(daysOfWeek[dayIndex]);
+                }
+                return reorderedDays;
             }
             
             async function saveDataToServer() {
@@ -305,8 +318,9 @@ const JSONBIN_API_KEY = '$2a$10$kYTmA.l8ZbmoEcy79VIH7ONUENs6g1.iAjGHsfbuNTnCwu3H
             
             function createDaysInterface() {
                 container.innerHTML = '';
+                const daysToShow = getDaysStartingFromToday();
                 
-                daysOfWeek.forEach((dayName, dayIndex) => {
+                daysToShow.forEach((dayName, i) => {
                     const dayContainer = document.createElement('div');
                     dayContainer.className = 'day-container';
                     
@@ -314,13 +328,16 @@ const JSONBIN_API_KEY = '$2a$10$kYTmA.l8ZbmoEcy79VIH7ONUENs6g1.iAjGHsfbuNTnCwu3H
                     dayTitle.className = 'day-title';
                     
                     const dayDate = new Date(today);
-                    let diff = dayIndex - todayDayOfWeek + 1;
-                    if (todayDayOfWeek === 0) diff = dayIndex + 1;
-                    if (diff < 0) diff += 7;
-                    dayDate.setDate(today.getDate() + diff);
+                    dayDate.setDate(today.getDate() + i);
                     
                     const dateStr = dayDate.toLocaleDateString('ru-RU');
                     dayTitle.textContent = `${dayName} ${dateStr}`;
+                    
+                    // Выделяем сегодняшний день
+                    if (i === 0) {
+                        dayTitle.classList.add('today-highlight');
+                    }
+                    
                     dayContainer.appendChild(dayTitle);
                     
                     numbers.forEach((num, numIndex) => {
@@ -330,7 +347,8 @@ const JSONBIN_API_KEY = '$2a$10$kYTmA.l8ZbmoEcy79VIH7ONUENs6g1.iAjGHsfbuNTnCwu3H
                         const numberElement = document.createElement('div');
                         numberElement.className = 'number';
                         numberElement.textContent = num;
-                        numberElement.dataset.day = dayIndex;
+                        const originalDayIndex = (todayDayOfWeek + i) % 7;
+                        numberElement.dataset.day = originalDayIndex;
                         numberElement.dataset.num = num;
                         numberElement.dataset.index = numIndex;
                         
@@ -338,7 +356,7 @@ const JSONBIN_API_KEY = '$2a$10$kYTmA.l8ZbmoEcy79VIH7ONUENs6g1.iAjGHsfbuNTnCwu3H
                             numberElement.classList.add('special');
                         }
                         
-                        const key = `${dayIndex}_${num}_${numIndex}`;
+                        const key = `${originalDayIndex}_${num}_${numIndex}`;
                         if (selectedNumbers[key]) {
                             numberElement.classList.add('selected');
                         }
@@ -385,6 +403,16 @@ const JSONBIN_API_KEY = '$2a$10$kYTmA.l8ZbmoEcy79VIH7ONUENs6g1.iAjGHsfbuNTnCwu3H
                 }, 30000);
             }
             
+            function checkDateChange() {
+                const newDateKey = getDateKey();
+                if (newDateKey !== currentDateKey) {
+                    currentDateKey = newDateKey;
+                    todayDayOfWeek = new Date().getDay();
+                    createDaysInterface();
+                    saveData();
+                }
+            }
+            
             hybridBtn.addEventListener('click', function() {
                 hybridLogin.classList.remove('hidden');
             });
@@ -411,6 +439,7 @@ const JSONBIN_API_KEY = '$2a$10$kYTmA.l8ZbmoEcy79VIH7ONUENs6g1.iAjGHsfbuNTnCwu3H
             // Инициализация
             loadData();
             createDaysInterface();
+            setInterval(checkDateChange, 3600000); // Проверяем изменение даты каждый час
             startSyncInterval();
         });
     </script>
