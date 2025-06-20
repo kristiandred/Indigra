@@ -113,20 +113,7 @@
             margin-right: 5px;
             border: 1px solid #ddd;
         }
-        .sync-status {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            background-color: #333;
-            color: white;
-            border-radius: 4px;
-            font-size: 12px;
-        }
     </style>
-    <!-- Добавляем Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
 </head>
 <body>
     <h1>Свободные дни</h1>
@@ -161,30 +148,12 @@
         </div>
     </div>
 
-    <div id="sync-status" class="sync-status hidden">Синхронизация...</div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Конфигурация Firebase
-            const firebaseConfig = {
-                apiKey: "AIzaSyDZgQfQ3z3QZQZQZQZQZQZQZQZQZQZQZQZQ",
-                authDomain: "your-project-id.firebaseapp.com",
-                databaseURL: "https://your-project-id.firebaseio.com",
-                projectId: "your-project-id",
-                storageBucket: "your-project-id.appspot.com",
-                messagingSenderId: "123456789012",
-                appId: "1:123456789012:web:abcdefghijklmnopqrstuv"
-            };
-            
-            // Инициализация Firebase
-            firebase.initializeApp(firebaseConfig);
-            const database = firebase.database();
-            
             const HYBRID_PASSWORD = 'Slonim60';
             const daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
             const numbers = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4];
             const container = document.getElementById('days-container');
-            const syncStatus = document.getElementById('sync-status');
             const today = new Date();
             const todayDayOfWeek = today.getDay();
             
@@ -195,80 +164,23 @@
             const cancelBtn = document.getElementById('cancel-btn');
             
             let isHybrid = false;
-            let selectedNumbers = {};
-            let currentDateKey = getDateKey();
+            let selectedNumbers = JSON.parse(localStorage.getItem('selectedNumbers')) || {};
             
-            function getDateKey() {
-                const date = new Date();
-                return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+            function saveData() {
+                localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+                localStorage.setItem('hybridStatus', isHybrid ? 'true' : 'false');
             }
             
-            function showSyncStatus(message) {
-                syncStatus.textContent = message;
-                syncStatus.classList.remove('hidden');
-                setTimeout(() => syncStatus.classList.add('hidden'), 2000);
-            }
-            
-            function saveDataToFirebase() {
-                if (!isHybrid) return;
+            function loadData() {
+                const savedHybridStatus = localStorage.getItem('hybridStatus');
+                if (savedHybridStatus === 'true') {
+                    isHybrid = true;
+                }
                 
-                syncStatus.textContent = "Сохранение...";
-                syncStatus.classList.remove('hidden');
-                
-                database.ref('selectedNumbers/' + currentDateKey).set(selectedNumbers)
-                    .then(() => {
-                        showSyncStatus("Сохранено");
-                        localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
-                    })
-                    .catch((error) => {
-                        showSyncStatus("Ошибка сохранения");
-                        console.error("Ошибка сохранения:", error);
-                    });
-            }
-            
-            function loadDataFromFirebase() {
-                syncStatus.textContent = "Загрузка...";
-                syncStatus.classList.remove('hidden');
-                
-                database.ref('selectedNumbers/' + currentDateKey).once('value')
-                    .then((snapshot) => {
-                        const data = snapshot.val();
-                        if (data) {
-                            selectedNumbers = data;
-                            localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
-                            showSyncStatus("Данные загружены");
-                        } else {
-                            // Если данных нет в Firebase, пробуем загрузить из localStorage
-                            const savedNumbers = localStorage.getItem('selectedNumbers');
-                            if (savedNumbers) {
-                                selectedNumbers = JSON.parse(savedNumbers);
-                            }
-                            showSyncStatus("Используются локальные данные");
-                        }
-                        createDaysInterface();
-                    })
-                    .catch((error) => {
-                        console.error("Ошибка загрузки:", error);
-                        showSyncStatus("Ошибка загрузки");
-                        
-                        // В случае ошибки загружаем из localStorage
-                        const savedNumbers = localStorage.getItem('selectedNumbers');
-                        if (savedNumbers) {
-                            selectedNumbers = JSON.parse(savedNumbers);
-                        }
-                        createDaysInterface();
-                    });
-            }
-            
-            function setupRealtimeUpdates() {
-                database.ref('selectedNumbers/' + currentDateKey).on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    if (data) {
-                        selectedNumbers = data;
-                        localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
-                        createDaysInterface();
-                    }
-                });
+                const savedNumbers = localStorage.getItem('selectedNumbers');
+                if (savedNumbers) {
+                    selectedNumbers = JSON.parse(savedNumbers);
+                }
             }
             
             function createDaysInterface() {
@@ -328,7 +240,7 @@
                                     delete selectedNumbers[key];
                                 }
                                 
-                                saveDataToFirebase();
+                                saveData();
                             });
                         }
                         
@@ -343,14 +255,6 @@
                     
                     container.appendChild(dayContainer);
                 });
-            }
-            
-            function checkDateChange() {
-                const newDateKey = getDateKey();
-                if (newDateKey !== currentDateKey) {
-                    currentDateKey = newDateKey;
-                    loadDataFromFirebase();
-                }
             }
             
             hybridBtn.addEventListener('click', function() {
@@ -369,7 +273,7 @@
                     hybridLogin.classList.add('hidden');
                     hybridPasswordInput.value = '';
                     
-                    localStorage.setItem('hybridStatus', 'true');
+                    saveData();
                     createDaysInterface();
                 } else {
                     alert('Неверный пароль!');
@@ -377,14 +281,8 @@
             });
             
             // Инициализация
-            const savedHybridStatus = localStorage.getItem('hybridStatus');
-            if (savedHybridStatus === 'true') {
-                isHybrid = true;
-            }
-            
-            loadDataFromFirebase();
-            setupRealtimeUpdates();
-            setInterval(checkDateChange, 60000);
+            loadData();
+            createDaysInterface();
         });
     </script>
 </body>
