@@ -199,6 +199,7 @@
             let currentDateKey = getDateKey();
             let lastSyncTime = 0;
             let syncInterval;
+            let pageRefreshInterval;
             
             // URL для хранения данных (используем бесплатный сервис JSONBin.io)
             const JSONBIN_BIN_ID = '6855b66f8561e97a50285b44';
@@ -493,15 +494,40 @@
                 }, 30000);
             }
             
-            function checkDateChange() {
-                const newDateKey = getDateKey();
-                if (newDateKey !== currentDateKey) {
-                    currentDateKey = newDateKey;
-                    todayDayOfWeek = new Date().getDay();
-                    createDaysInterface();
-                    saveData();
-                }
+            function startPageRefreshInterval() {
+                pageRefreshInterval = setInterval(() => {
+                    location.reload();
+                }, 15000); // Обновление каждые 15 секунд
             }
+            
+          function checkDateChange() {
+    const newDateKey = getDateKey();
+    if (newDateKey !== currentDateKey) {
+        // Фильтруем selectedNumbers, оставляя только будущие дни
+        const today = new Date();
+        const currentDayIndex = today.getDay(); // 0 (воскресенье) - 6 (суббота)
+        
+        const updatedSelectedNumbers = {};
+        
+        Object.keys(selectedNumbers).forEach(key => {
+            const [dayIndexStr] = key.split('_');
+            const dayIndex = parseInt(dayIndexStr);
+            
+            // Определяем, относится ли день к будущему (включая сегодня)
+            if (dayIndex >= currentDayIndex) {
+                updatedSelectedNumbers[key] = true;
+            }
+        });
+        
+        selectedNumbers = updatedSelectedNumbers;
+        localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+        
+        currentDateKey = newDateKey;
+        todayDayOfWeek = currentDayIndex;
+        createDaysInterface();
+        saveData();
+    }
+}
             
             hybridBtn.addEventListener('click', function() {
                 hybridLogin.classList.remove('hidden');
@@ -531,6 +557,7 @@
             createDaysInterface();
             setInterval(checkDateChange, 3600000); // Проверяем изменение даты каждый час
             startSyncInterval();
+            startPageRefreshInterval(); // Запускаем автоматическое обновление страницы
         });
     </script>
 </body>
