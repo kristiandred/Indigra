@@ -158,7 +158,6 @@
     
     <div id="admin-row" class="admin-row hidden">
         <div class="day-title">Администратор (выделить все дни):</div>
-        <!-- Админские кнопки будут добавлены здесь -->
     </div>
     
     <div id="days-container">
@@ -180,12 +179,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             const HYBRID_PASSWORD = 'Slonim60';
             const daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
-            const numbers = [1, 1, 1, 2, 2, 2, 3, 3, 3]; // Убрали цифры 4
-            const adminNumbers = [1, 1, 1, 2, 2, 2, 3, 3, 3]; // Отдельный набор для админской строки
+            const numbers = [1, 1, 1, 2, 2, 2, 3, 3, 3];
+            const adminNumbers = [1, 1, 1, 2, 2, 2, 3, 3, 3];
             const container = document.getElementById('days-container');
             const adminRow = document.getElementById('admin-row');
             const today = new Date();
-            let todayDayOfWeek = today.getDay(); // 0 - воскресенье, 1 - понедельник и т.д.
+            let todayDayOfWeek = today.getDay();
             
             const hybridBtn = document.getElementById('hybrid-btn');
             const hybridLogin = document.getElementById('hybrid-login');
@@ -199,9 +198,7 @@
             let currentDateKey = getDateKey();
             let lastSyncTime = 0;
             let syncInterval;
-            let pageRefreshInterval;
             
-            // URL для хранения данных (используем бесплатный сервис JSONBin.io)
             const JSONBIN_BIN_ID = '6855b66f8561e97a50285b44';
             const JSONBIN_API_KEY = '$2a$10$kYTmA.l8ZbmoEcy79VIH7ONUENs6g1.iAjGHsfbuNTnCwu3Hujx0C';
             const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
@@ -209,25 +206,6 @@
             function getDateKey() {
                 const date = new Date();
                 return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-            }
-            
-            function getDeviceInfo() {
-                const userAgent = navigator.userAgent;
-                let deviceName = 'Неизвестное устройство';
-                
-                if (userAgent.match(/Android/i)) {
-                    deviceName = 'Android устройство';
-                } else if (userAgent.match(/iPhone|iPad|iPod/i)) {
-                    deviceName = 'Apple устройство';
-                } else if (userAgent.match(/Windows/i)) {
-                    deviceName = 'Windows устройство';
-                } else if (userAgent.match(/Macintosh/i)) {
-                    deviceName = 'Mac устройство';
-                } else if (userAgent.match(/Linux/i)) {
-                    deviceName = 'Linux устройство';
-                }
-                
-                return deviceName;
             }
             
             function updateSyncStatus(message) {
@@ -266,7 +244,7 @@
                     const result = await response.json();
                     
                     if (response.ok) {
-                        updateSyncStatus('Данные успешно сохранены на сервер');
+                        updateSyncStatus('Данные успешно сохранены на сервер: ' + new Date().toLocaleTimeString());
                         lastSyncTime = Date.now();
                     } else {
                         updateSyncStatus(`Ошибка сохранения: ${result.message || response.status}`);
@@ -298,7 +276,7 @@
                         lastSyncTime = serverData.lastUpdated;
                         
                         localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
-                        updateSyncStatus('Данные загружены с сервера');
+                        updateSyncStatus('Данные загружены с сервера: ' + new Date().toLocaleTimeString());
                         
                         createDaysInterface();
                         return true;
@@ -359,18 +337,15 @@
                         const num = this.dataset.num;
                         const numIndex = this.dataset.index;
                         
-                        // Находим все кнопки с таким же num и numIndex во всех днях
                         const allNumberElements = document.querySelectorAll('.number');
                         let anySelected = false;
                         
-                        // Сначала проверяем, есть ли уже выделенные кнопки
                         allNumberElements.forEach(el => {
                             if (el.dataset.num === num && el.dataset.index === numIndex && el.classList.contains('selected')) {
                                 anySelected = true;
                             }
                         });
                         
-                        // Устанавливаем или снимаем выделение для всех соответствующих кнопок
                         allNumberElements.forEach(el => {
                             if (el.dataset.num === num && el.dataset.index === numIndex) {
                                 const day = el.dataset.day;
@@ -416,7 +391,6 @@
                     const dateStr = dayDate.toLocaleDateString('ru-RU');
                     dayTitle.textContent = `${dayName} ${dateStr}`;
                     
-                    // Выделяем сегодняшний день
                     if (i === 0) {
                         dayTitle.classList.add('today-highlight');
                     }
@@ -477,7 +451,6 @@
                     container.appendChild(dayContainer);
                 });
                 
-                // Обновляем видимость админской строки
                 if (isHybrid) {
                     adminRow.classList.remove('hidden');
                     createAdminRow();
@@ -491,43 +464,32 @@
                     if (!isHybrid) {
                         await loadDataFromServer();
                     }
-                }, 30000);
+                }, 5000); // Обновление данных каждые 5 секунд
             }
             
-            function startPageRefreshInterval() {
-                pageRefreshInterval = setInterval(() => {
-                    location.reload();
-                }, 15000); // Обновление каждые 15 секунд
+            function checkDateChange() {
+                const newDateKey = getDateKey();
+                if (newDateKey !== currentDateKey) {
+                    // Сбрасываем только для текущего дня (todayDayOfWeek)
+                    const todayIndex = new Date().getDay();
+                    Object.keys(selectedNumbers).forEach(key => {
+                        const [dayIndexStr] = key.split('_');
+                        const dayIndex = parseInt(dayIndexStr);
+                        
+                        if (dayIndex === todayIndex) {
+                            delete selectedNumbers[key];
+                        }
+                    });
+                    
+                    localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+                    currentDateKey = newDateKey;
+                    todayDayOfWeek = todayIndex;
+                    createDaysInterface();
+                    saveData();
+                    
+                    updateSyncStatus('Дата изменилась, сброшены кнопки для текущего дня');
+                }
             }
-            
-          function checkDateChange() {
-    const newDateKey = getDateKey();
-    if (newDateKey !== currentDateKey) {
-        // Фильтруем selectedNumbers, оставляя только будущие дни
-        const today = new Date();
-        const currentDayIndex = today.getDay(); // 0 (воскресенье) - 6 (суббота)
-        
-        const updatedSelectedNumbers = {};
-        
-        Object.keys(selectedNumbers).forEach(key => {
-            const [dayIndexStr] = key.split('_');
-            const dayIndex = parseInt(dayIndexStr);
-            
-            // Определяем, относится ли день к будущему (включая сегодня)
-            if (dayIndex >= currentDayIndex) {
-                updatedSelectedNumbers[key] = true;
-            }
-        });
-        
-        selectedNumbers = updatedSelectedNumbers;
-        localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
-        
-        currentDateKey = newDateKey;
-        todayDayOfWeek = currentDayIndex;
-        createDaysInterface();
-        saveData();
-    }
-}
             
             hybridBtn.addEventListener('click', function() {
                 hybridLogin.classList.remove('hidden');
@@ -555,9 +517,13 @@
             // Инициализация
             loadData();
             createDaysInterface();
-            setInterval(checkDateChange, 3600000); // Проверяем изменение даты каждый час
-            startSyncInterval();
-            startPageRefreshInterval(); // Запускаем автоматическое обновление страницы
+            setInterval(checkDateChange, 60000); // Проверка смены даты каждую минуту
+            startSyncInterval(); // Запуск обновления данных каждые 5 секунд
+            
+            // Автоматическое обновление страницы каждые 5 секунд
+            setInterval(() => {
+                location.reload();
+            }, 5000);
         });
     </script>
 </body>
