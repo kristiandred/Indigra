@@ -24,6 +24,10 @@
             text-align: center;
             margin: 5px;
         }
+        .number-group {
+            display: inline-block;
+            margin-right: 20px;
+        }
         .number {
             display: inline-block;
             width: 30px;
@@ -397,30 +401,39 @@
                 });
             }
             
-            function createDaysInterface() {
-                container.innerHTML = '';
-                const daysToShow = getDaysStartingFromToday();
+           function createDaysInterface() {
+            container.innerHTML = '';
+            const daysToShow = getDaysStartingFromToday();
+            
+            daysToShow.forEach((dayName, i) => {
+                const dayContainer = document.createElement('div');
+                dayContainer.className = 'day-container';
                 
-                daysToShow.forEach((dayName, i) => {
-                    const dayContainer = document.createElement('div');
-                    dayContainer.className = 'day-container';
+                const dayTitle = document.createElement('div');
+                dayTitle.className = 'day-title';
+                
+                const dayDate = new Date(today);
+                dayDate.setDate(today.getDate() + i);
+                
+                const dateStr = dayDate.toLocaleDateString('ru-RU');
+                dayTitle.textContent = `${dayName} ${dateStr}`;
+                
+                if (i === 0) {
+                    dayTitle.classList.add('today-highlight');
+                }
+                
+                dayContainer.appendChild(dayTitle);
+                
+                // Создаем 3 группы (1, 2, 3)
+                for (let group = 0; group < 3; group++) {
+                    const groupContainer = document.createElement('div');
+                    groupContainer.className = 'number-group';
                     
-                    const dayTitle = document.createElement('div');
-                    dayTitle.className = 'day-title';
-                    
-                    const dayDate = new Date(today);
-                    dayDate.setDate(today.getDate() + i);
-                    
-                    const dateStr = dayDate.toLocaleDateString('ru-RU');
-                    dayTitle.textContent = `${dayName} ${dateStr}`;
-                    
-                    if (i === 0) {
-                        dayTitle.classList.add('today-highlight');
-                    }
-                    
-                    dayContainer.appendChild(dayTitle);
-                    
-                    numbers.forEach((num, numIndex) => {
+                    // Добавляем 3 кнопки в каждую группу
+                    for (let j = 0; j < 3; j++) {
+                        const numIndex = group * 3 + j;
+                        const num = numbers[numIndex];
+                        
                         const wrapper = document.createElement('div');
                         wrapper.className = 'number-wrapper';
                         
@@ -468,19 +481,22 @@
                         
                         wrapper.appendChild(numberElement);
                         wrapper.appendChild(label);
-                        dayContainer.appendChild(wrapper);
-                    });
+                        groupContainer.appendChild(wrapper);
+                    }
                     
-                    container.appendChild(dayContainer);
-                });
-                
-                if (isHybrid) {
-                    adminRow.classList.remove('hidden');
-                    createAdminRow();
-                } else {
-                    adminRow.classList.add('hidden');
+                    dayContainer.appendChild(groupContainer);
                 }
+                
+                container.appendChild(dayContainer);
+            });
+            
+            if (isHybrid) {
+                adminRow.classList.remove('hidden');
+                createAdminRow();
+            } else {
+                adminRow.classList.add('hidden');
             }
+        }
             
             function startSyncInterval() {
                 syncInterval = setInterval(async () => {
