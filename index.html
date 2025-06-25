@@ -30,18 +30,19 @@
         }
         .number {
             display: inline-block;
-            width: 30px;
-            height: 30px;
-            line-height: 30px;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
             text-align: center;
             background-color: #4CAF50;
             color: white;
             border-radius: 50%;
             cursor: pointer;
+            font-size: 18px;
         }
         .number-label {
-            font-size: 12px;
-            margin-top: 2px;
+            font-size: 14px;
+            margin-top: 5px;
             font-weight: bold;
         }
         .number.special {
@@ -143,6 +144,30 @@
         .admin-row.hidden {
             display: none;
         }
+        /* Адаптивность для мобильных устройств */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    
+    .day-container {
+        text-align: center; /* Центрируем содержимое дней */
+    }
+    
+    .number-group {
+        display: block; /* Группы теперь в столбик */
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .number-wrapper {
+        margin: 10px 15px; /* Уменьшаем отступы для мобильных */
+    }
+    
+    .color-legend {
+        justify-content: center; /* Центрируем легенду */
+    }
+}
     </style>
 </head>
 <body>
