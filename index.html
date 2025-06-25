@@ -22,7 +22,7 @@
         .number-wrapper {
             display: inline-block;
             text-align: center;
-            margin: 2px;
+            margin: 5px;
         }
         .number {
             display: inline-block;
@@ -36,8 +36,9 @@
             cursor: pointer;
         }
         .number-label {
-            font-size: 10px;
+            font-size: 12px;
             margin-top: 2px;
+            font-weight: bold;
         }
         .number.special {
             background-color: #008522;
@@ -83,6 +84,10 @@
             padding: 8px;
             margin: 10px 0;
             box-sizing: border-box;
+            border: 1px solid #ddd;
+        }
+        .hybrid-login input[type="password"] {
+            -webkit-text-security: disc;
         }
         .hybrid-login button {
             background-color: #4CAF50;
@@ -177,7 +182,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const HYBRID_PASSWORD = 'Slonim60';
             const daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
             const numbers = [1, 1, 1, 2, 2, 2, 3, 3, 3];
             const adminNumbers = [1, 1, 1, 2, 2, 2, 3, 3, 3];
@@ -201,7 +205,7 @@
             
             const JSONBIN_BIN_ID = '6855b66f8561e97a50285b44';
             const JSONBIN_API_KEY = '$2a$10$kYTmA.l8ZbmoEcy79VIH7ONUENs6g1.iAjGHsfbuNTnCwu3Hujx0C';
-            const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+            const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${685b920d8960c979a5b0ee2c}`;
             
             function getDateKey() {
                 const date = new Date();
@@ -220,6 +224,25 @@
                     reorderedDays.push(daysOfWeek[dayIndex]);
                 }
                 return reorderedDays;
+            }
+            
+            async function checkPassword(password) {
+                try {
+                    const response = await fetch(`${JSONBIN_URL}/latest`, {
+                        headers: {
+                            'X-Master-Key': JSONBIN_API_KEY,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    const result = await response.json();
+                    const serverData = result.record;
+                    
+                    return serverData.adminPassword === password;
+                } catch (error) {
+                    console.error('Ошибка проверки пароля:', error);
+                    return false;
+                }
             }
             
             async function saveDataToServer() {
@@ -464,13 +487,12 @@
                     if (!isHybrid) {
                         await loadDataFromServer();
                     }
-                }, 5000); // Обновление данных каждые 5 секунд
+                }, 5000);
             }
             
             function checkDateChange() {
                 const newDateKey = getDateKey();
                 if (newDateKey !== currentDateKey) {
-                    // Сбрасываем только для текущего дня (todayDayOfWeek)
                     const todayIndex = new Date().getDay();
                     Object.keys(selectedNumbers).forEach(key => {
                         const [dayIndexStr] = key.split('_');
@@ -500,9 +522,11 @@
                 hybridPasswordInput.value = '';
             });
             
-            loginBtn.addEventListener('click', function() {
+            loginBtn.addEventListener('click', async function() {
                 const password = hybridPasswordInput.value;
-                if (password === HYBRID_PASSWORD) {
+                const isValid = await checkPassword(password);
+                
+                if (isValid) {
                     isHybrid = true;
                     hybridLogin.classList.add('hidden');
                     hybridPasswordInput.value = '';
@@ -517,10 +541,9 @@
             // Инициализация
             loadData();
             createDaysInterface();
-            setInterval(checkDateChange, 60000); // Проверка смены даты каждую минуту
-            startSyncInterval(); // Запуск обновления данных каждые 5 секунд
+            setInterval(checkDateChange, 60000);
+            startSyncInterval();
             
-            // Автоматическое обновление страницы каждые 5 секунд
             setInterval(() => {
                 location.reload();
             }, 5000);
