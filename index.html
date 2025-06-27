@@ -280,21 +280,38 @@
                 }
             }
             
+            
             async function saveDataToFirebase() {
-                if (!isHybrid) return;
-                
-                try {
-                    await database.ref('hybridData').set({
-                        selectedNumbers: selectedNumbers,
-                        lastUpdated: Date.now()
-                    });
-                    updateSyncStatus('Данные сохранены: ' + new Date().toLocaleTimeString());
-                    lastSyncTime = Date.now();
-                } catch (error) {
-                    updateSyncStatus('Ошибка сохранения: ' + error.message);
-                    console.error('Ошибка сохранения:', error);
-                }
-            }
+    if (!isHybrid) return;
+    
+    try {
+        const user = auth.currentUser;
+        if (!user) {
+            updateSyncStatus('Ошибка: требуется авторизация');
+            return;
+        }
+
+        await database.ref('hybridData').set({
+            selectedNumbers: selectedNumbers,
+            lastUpdated: Date.now()
+        });
+        
+        updateSyncStatus('Данные сохранены: ' + new Date().toLocaleTimeString());
+        lastSyncTime = Date.now();
+        
+        // Принудительно обновляем интерфейс
+        createDaysInterface();
+        
+    } catch (error) {
+        console.error('Ошибка сохранения:', error);
+        updateSyncStatus('Ошибка сохранения: ' + error.message);
+        
+        // Если ошибка авторизации - предлагаем войти
+        if (error.code === 'PERMISSION_DENIED') {
+            hybridLogin.classList.remove('hidden');
+        }
+    }
+}
             
             function loadDataFromFirebase() {
                 return new Promise((resolve) => {
