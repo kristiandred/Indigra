@@ -144,34 +144,29 @@
         .admin-row.hidden {
             display: none;
         }
-        /* Адаптивность для мобильных устройств */
         @media (max-width: 600px) {
             body {
                 padding: 10px;
             }
-            
             .day-container {
                 text-align: center;
             }
-            
             .number-group {
                 display: block;
                 margin-right: 0;
                 margin-bottom: 15px;
             }
-            
             .number-wrapper {
                 margin: 10px 15px;
             }
-            
             .color-legend {
                 justify-content: center;
             }
         }
     </style>
-    <!-- Добавляем Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 </head>
 <body>
     <h1>Свободные гибриды Индигра</h1>
@@ -204,6 +199,7 @@
     <div id="hybrid-login" class="hybrid-login hidden">
         <div class="hybrid-login-content">
             <h3>Вход для администратора</h3>
+            <input type="email" id="hybrid-email" placeholder="Введите email">
             <input type="password" id="hybrid-password" placeholder="Введите пароль">
             <button id="login-btn">Войти</button>
             <button id="cancel-btn">Отмена</button>
@@ -213,7 +209,7 @@
     <div id="sync-status" class="sync-status"></div>
 
     <script>
-        // Конфигурация Firebase (замените на свою)
+        // Конфигурация Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBar6H-aFq-vB8fFRaB5Ue-zHhBzwwiQf0",
             authDomain: "indigra-578df.firebaseapp.com",
@@ -228,6 +224,7 @@
         // Инициализация Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        const auth = firebase.auth();
 
         document.addEventListener('DOMContentLoaded', function() {
             const daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
@@ -240,6 +237,7 @@
             
             const hybridBtn = document.getElementById('hybrid-btn');
             const hybridLogin = document.getElementById('hybrid-login');
+            const hybridEmailInput = document.getElementById('hybrid-email');
             const hybridPasswordInput = document.getElementById('hybrid-password');
             const loginBtn = document.getElementById('login-btn');
             const cancelBtn = document.getElementById('cancel-btn');
@@ -250,10 +248,9 @@
             let currentDateKey = getDateKey();
             let lastSyncTime = 0;
             let syncInterval;
-            
-            // Пароль администратора (можно хранить в Firebase)
-            const ADMIN_PASSWORD = "admin123";
-            
+            let refreshInterval;
+            let pageRefreshInterval;
+
             function getDateKey() {
                 const date = new Date();
                 return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
@@ -273,9 +270,14 @@
                 return reorderedDays;
             }
             
-            async function checkPassword(password) {
-                // В реальном приложении лучше хранить пароль в Firebase
-                return password === ADMIN_PASSWORD;
+            async function checkPassword(email, password) {
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                    return true;
+                } catch (error) {
+                    console.error('Ошибка входа:', error);
+                    return false;
+                }
             }
             
             async function saveDataToFirebase() {
@@ -286,10 +288,10 @@
                         selectedNumbers: selectedNumbers,
                         lastUpdated: Date.now()
                     });
-                    updateSyncStatus('Данные успешно сохранены в Firebase: ' + new Date().toLocaleTimeString());
+                    updateSyncStatus('Данные сохранены: ' + new Date().toLocaleTimeString());
                     lastSyncTime = Date.now();
                 } catch (error) {
-                    updateSyncStatus('Ошибка сохранения в Firebase: ' + error.message);
+                    updateSyncStatus('Ошибка сохранения: ' + error.message);
                     console.error('Ошибка сохранения:', error);
                 }
             }
@@ -303,7 +305,7 @@
                             lastSyncTime = data.lastUpdated;
                             
                             localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
-                            updateSyncStatus('Данные загружены из Firebase: ' + new Date().toLocaleTimeString());
+                            updateSyncStatus('Данные обновлены: ' + new Date().toLocaleTimeString());
                             
                             createDaysInterface();
                             resolve(true);
@@ -503,7 +505,19 @@
                     if (!isHybrid) {
                         await loadDataFromFirebase();
                     }
-                }, 30000); // Синхронизация каждые 30 секунд
+                }, 30000);
+            }
+            
+            function setupAutoRefresh() {
+                // Обновление данных каждые 5 секунд
+                refreshInterval = setInterval(async () => {
+                    await loadDataFromFirebase();
+                }, 5000);
+
+                // Полная перезагрузка страницы каждые 5 минут
+                pageRefreshInterval = setInterval(() => {
+                    location.reload();
+                }, 300000);
             }
             
             function checkDateChange() {
@@ -535,30 +549,43 @@
             
             cancelBtn.addEventListener('click', function() {
                 hybridLogin.classList.add('hidden');
+                hybridEmailInput.value = '';
                 hybridPasswordInput.value = '';
             });
             
             loginBtn.addEventListener('click', async function() {
+                const email = hybridEmailInput.value;
                 const password = hybridPasswordInput.value;
-                const isValid = await checkPassword(password);
+                const isValid = await checkPassword(email, password);
                 
                 if (isValid) {
                     isHybrid = true;
                     hybridLogin.classList.add('hidden');
+                    hybridEmailInput.value = '';
                     hybridPasswordInput.value = '';
                     
                     saveData();
                     createDaysInterface();
                 } else {
-                    alert('Неверный пароль!');
+                    alert('Неверные email или пароль!');
                 }
             });
-            
+
+            // Проверяем аутентификацию при загрузке
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    isHybrid = true;
+                    adminRow.classList.remove('hidden');
+                    createDaysInterface();
+                }
+            });
+
             // Инициализация
             loadData();
             createDaysInterface();
             setInterval(checkDateChange, 60000);
             startSyncInterval();
+            setupAutoRefresh();
         });
     </script>
 </body>
