@@ -145,30 +145,33 @@
             display: none;
         }
         /* Адаптивность для мобильных устройств */
-@media (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
-    
-    .day-container {
-        text-align: center; /* Центрируем содержимое дней */
-    }
-    
-    .number-group {
-        display: block; /* Группы теперь в столбик */
-        margin-right: 0;
-        margin-bottom: 15px;
-    }
-    
-    .number-wrapper {
-        margin: 10px 15px; /* Уменьшаем отступы для мобильных */
-    }
-    
-    .color-legend {
-        justify-content: center; /* Центрируем легенду */
-    }
-}
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .day-container {
+                text-align: center;
+            }
+            
+            .number-group {
+                display: block;
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .number-wrapper {
+                margin: 10px 15px;
+            }
+            
+            .color-legend {
+                justify-content: center;
+            }
+        }
     </style>
+    <!-- Добавляем Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 <body>
     <h1>Свободные гибриды Индигра</h1>
@@ -210,6 +213,22 @@
     <div id="sync-status" class="sync-status"></div>
 
     <script>
+        // Конфигурация Firebase (замените на свою)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBar6H-aFq-vB8fFRaB5Ue-zHhBzwwiQf0",
+            authDomain: "indigra-578df.firebaseapp.com",
+            databaseURL: "https://indigra-578df-default-rtdb.firebaseio.com",
+            projectId: "indigra-578df",
+            storageBucket: "indigra-578df.appspot.com",
+            messagingSenderId: "819436341016",
+            appId: "1:819436341016:web:c3e2029ce5f0b8055d806d",
+            measurementId: "G-T6VNYJLXBN"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         document.addEventListener('DOMContentLoaded', function() {
             const daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
             const numbers = [1, 1, 1, 2, 2, 2, 3, 3, 3];
@@ -232,9 +251,8 @@
             let lastSyncTime = 0;
             let syncInterval;
             
-            const JSONBIN_BIN_ID = '6855b1e28960c979a5adf64e';
-            const JSONBIN_API_KEY = '$2a$10$kYTmA.l8ZbmoEcy79VIH7ONUENs6g1.iAjGHsfbuNTnCwu3Hujx0C';
-            const JSONBIN_URL = `https://api.jsonbin.io/v3/b/685b920d8960c979a5b0ee2c`;
+            // Пароль администратора (можно хранить в Firebase)
+            const ADMIN_PASSWORD = "admin123";
             
             function getDateKey() {
                 const date = new Date();
@@ -256,88 +274,47 @@
             }
             
             async function checkPassword(password) {
-                try {
-                    const response = await fetch(`${JSONBIN_URL}/latest`, {
-                        headers: {
-                            'X-Master-Key': JSONBIN_API_KEY,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    
-                    const result = await response.json();
-                    const serverData = result.record;
-                    
-                    return serverData.adminPassword === password;
-                } catch (error) {
-                    console.error('Ошибка проверки пароля:', error);
-                    return false;
-                }
+                // В реальном приложении лучше хранить пароль в Firebase
+                return password === ADMIN_PASSWORD;
             }
             
-            async function saveDataToServer() {
+            async function saveDataToFirebase() {
                 if (!isHybrid) return;
                 
-                const data = {
-                    selectedNumbers: selectedNumbers,
-                    lastUpdated: Date.now()
-                };
-                
                 try {
-                    const response = await fetch(JSONBIN_URL, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Master-Key': JSONBIN_API_KEY,
-                            'X-Bin-Name': 'HybridDaysData'
-                        },
-                        body: JSON.stringify(data)
+                    await database.ref('hybridData').set({
+                        selectedNumbers: selectedNumbers,
+                        lastUpdated: Date.now()
                     });
-                    
-                    const result = await response.json();
-                    
-                    if (response.ok) {
-                        updateSyncStatus('Данные успешно сохранены на сервер: ' + new Date().toLocaleTimeString());
-                        lastSyncTime = Date.now();
-                    } else {
-                        updateSyncStatus(`Ошибка сохранения: ${result.message || response.status}`);
-                    }
+                    updateSyncStatus('Данные успешно сохранены в Firebase: ' + new Date().toLocaleTimeString());
+                    lastSyncTime = Date.now();
                 } catch (error) {
-                    updateSyncStatus('Ошибка сети при сохранении');
+                    updateSyncStatus('Ошибка сохранения в Firebase: ' + error.message);
                     console.error('Ошибка сохранения:', error);
                 }
             }
             
-            async function loadDataFromServer() {
-                try {
-                    const response = await fetch(`${JSONBIN_URL}/latest`, {
-                        headers: {
-                            'X-Master-Key': JSONBIN_API_KEY,
-                            'Content-Type': 'application/json'
+            function loadDataFromFirebase() {
+                return new Promise((resolve) => {
+                    database.ref('hybridData').on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data && data.lastUpdated > lastSyncTime) {
+                            selectedNumbers = data.selectedNumbers || {};
+                            lastSyncTime = data.lastUpdated;
+                            
+                            localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+                            updateSyncStatus('Данные загружены из Firebase: ' + new Date().toLocaleTimeString());
+                            
+                            createDaysInterface();
+                            resolve(true);
                         }
+                        resolve(false);
+                    }, (error) => {
+                        updateSyncStatus(`Ошибка загрузки: ${error.message}`);
+                        console.error('Ошибка загрузки:', error);
+                        resolve(false);
                     });
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    
-                    const result = await response.json();
-                    const serverData = result.record;
-                    
-                    if (serverData && serverData.lastUpdated > lastSyncTime) {
-                        selectedNumbers = serverData.selectedNumbers || {};
-                        lastSyncTime = serverData.lastUpdated;
-                        
-                        localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
-                        updateSyncStatus('Данные загружены с сервера: ' + new Date().toLocaleTimeString());
-                        
-                        createDaysInterface();
-                        return true;
-                    }
-                } catch (error) {
-                    updateSyncStatus(`Ошибка загрузки: ${error.message}`);
-                    console.error('Ошибка загрузки:', error);
-                }
-                return false;
+                });
             }
             
             function saveData() {
@@ -345,7 +322,7 @@
                 localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
                 
                 if (isHybrid) {
-                    saveDataToServer();
+                    saveDataToFirebase();
                 }
             }
             
@@ -360,7 +337,7 @@
                     selectedNumbers = JSON.parse(savedNumbers);
                 }
                 
-                loadDataFromServer();
+                loadDataFromFirebase();
             }
             
             function createAdminRow() {
@@ -426,109 +403,107 @@
                 });
             }
             
-           function createDaysInterface() {
-            container.innerHTML = '';
-            const daysToShow = getDaysStartingFromToday();
-            
-            daysToShow.forEach((dayName, i) => {
-                const dayContainer = document.createElement('div');
-                dayContainer.className = 'day-container';
+            function createDaysInterface() {
+                container.innerHTML = '';
+                const daysToShow = getDaysStartingFromToday();
                 
-                const dayTitle = document.createElement('div');
-                dayTitle.className = 'day-title';
-                
-                const dayDate = new Date(today);
-                dayDate.setDate(today.getDate() + i);
-                
-                const dateStr = dayDate.toLocaleDateString('ru-RU');
-                dayTitle.textContent = `${dayName} ${dateStr}`;
-                
-                if (i === 0) {
-                    dayTitle.classList.add('today-highlight');
-                }
-                
-                dayContainer.appendChild(dayTitle);
-                
-                // Создаем 3 группы (1, 2, 3)
-                for (let group = 0; group < 3; group++) {
-                    const groupContainer = document.createElement('div');
-                    groupContainer.className = 'number-group';
+                daysToShow.forEach((dayName, i) => {
+                    const dayContainer = document.createElement('div');
+                    dayContainer.className = 'day-container';
                     
-                    // Добавляем 3 кнопки в каждую группу
-                    for (let j = 0; j < 3; j++) {
-                        const numIndex = group * 3 + j;
-                        const num = numbers[numIndex];
-                        
-                        const wrapper = document.createElement('div');
-                        wrapper.className = 'number-wrapper';
-                        
-                        const numberElement = document.createElement('div');
-                        numberElement.className = 'number';
-                        numberElement.textContent = num;
-                        const originalDayIndex = (todayDayOfWeek + i) % 7;
-                        numberElement.dataset.day = originalDayIndex;
-                        numberElement.dataset.num = num;
-                        numberElement.dataset.index = numIndex;
-                        
-                        if ((numIndex + 1) % 3 === 0) {
-                            numberElement.classList.add('special');
-                        }
-                        
-                        const key = `${originalDayIndex}_${num}_${numIndex}`;
-                        if (selectedNumbers[key]) {
-                            numberElement.classList.add('selected');
-                        }
-                        
-                        if (!isHybrid) {
-                            numberElement.classList.add('readonly');
-                        } else {
-                            numberElement.addEventListener('click', function() {
-                                const day = this.dataset.day;
-                                const num = this.dataset.num;
-                                const numIndex = this.dataset.index;
-                                const key = `${day}_${num}_${numIndex}`;
-                                
-                                this.classList.toggle('selected');
-                                
-                                if (this.classList.contains('selected')) {
-                                    selectedNumbers[key] = true;
-                                } else {
-                                    delete selectedNumbers[key];
-                                }
-                                
-                                saveData();
-                            });
-                        }
-                        
-                        const label = document.createElement('div');
-                        label.className = 'number-label';
-                        label.textContent = (numIndex + 1) % 3 === 0 ? '8/28' : '7/24';
-                        
-                        wrapper.appendChild(numberElement);
-                        wrapper.appendChild(label);
-                        groupContainer.appendChild(wrapper);
+                    const dayTitle = document.createElement('div');
+                    dayTitle.className = 'day-title';
+                    
+                    const dayDate = new Date(today);
+                    dayDate.setDate(today.getDate() + i);
+                    
+                    const dateStr = dayDate.toLocaleDateString('ru-RU');
+                    dayTitle.textContent = `${dayName} ${dateStr}`;
+                    
+                    if (i === 0) {
+                        dayTitle.classList.add('today-highlight');
                     }
                     
-                    dayContainer.appendChild(groupContainer);
-                }
+                    dayContainer.appendChild(dayTitle);
+                    
+                    for (let group = 0; group < 3; group++) {
+                        const groupContainer = document.createElement('div');
+                        groupContainer.className = 'number-group';
+                        
+                        for (let j = 0; j < 3; j++) {
+                            const numIndex = group * 3 + j;
+                            const num = numbers[numIndex];
+                            
+                            const wrapper = document.createElement('div');
+                            wrapper.className = 'number-wrapper';
+                            
+                            const numberElement = document.createElement('div');
+                            numberElement.className = 'number';
+                            numberElement.textContent = num;
+                            const originalDayIndex = (todayDayOfWeek + i) % 7;
+                            numberElement.dataset.day = originalDayIndex;
+                            numberElement.dataset.num = num;
+                            numberElement.dataset.index = numIndex;
+                            
+                            if ((numIndex + 1) % 3 === 0) {
+                                numberElement.classList.add('special');
+                            }
+                            
+                            const key = `${originalDayIndex}_${num}_${numIndex}`;
+                            if (selectedNumbers[key]) {
+                                numberElement.classList.add('selected');
+                            }
+                            
+                            if (!isHybrid) {
+                                numberElement.classList.add('readonly');
+                            } else {
+                                numberElement.addEventListener('click', function() {
+                                    const day = this.dataset.day;
+                                    const num = this.dataset.num;
+                                    const numIndex = this.dataset.index;
+                                    const key = `${day}_${num}_${numIndex}`;
+                                    
+                                    this.classList.toggle('selected');
+                                    
+                                    if (this.classList.contains('selected')) {
+                                        selectedNumbers[key] = true;
+                                    } else {
+                                        delete selectedNumbers[key];
+                                    }
+                                    
+                                    saveData();
+                                });
+                            }
+                            
+                            const label = document.createElement('div');
+                            label.className = 'number-label';
+                            label.textContent = (numIndex + 1) % 3 === 0 ? '8/28' : '7/24';
+                            
+                            wrapper.appendChild(numberElement);
+                            wrapper.appendChild(label);
+                            groupContainer.appendChild(wrapper);
+                        }
+                        
+                        dayContainer.appendChild(groupContainer);
+                    }
+                    
+                    container.appendChild(dayContainer);
+                });
                 
-                container.appendChild(dayContainer);
-            });
-            
-            if (isHybrid) {
-                adminRow.classList.remove('hidden');
-                createAdminRow();
-            } else {
-                adminRow.classList.add('hidden');
+                if (isHybrid) {
+                    adminRow.classList.remove('hidden');
+                    createAdminRow();
+                } else {
+                    adminRow.classList.add('hidden');
+                }
             }
-        }
             
             function startSyncInterval() {
                 syncInterval = setInterval(async () => {
                     if (!isHybrid) {
-                        await loadDataFromServer();
+                        await loadDataFromFirebase();
                     }
-                }, 5000);
+                }, 30000); // Синхронизация каждые 30 секунд
             }
             
             function checkDateChange() {
@@ -584,10 +559,6 @@
             createDaysInterface();
             setInterval(checkDateChange, 60000);
             startSyncInterval();
-            
-            setInterval(() => {
-                location.reload();
-            }, 5000);
         });
     </script>
 </body>
