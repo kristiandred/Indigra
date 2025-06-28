@@ -437,7 +437,7 @@ async function initFirebase() {
         if (logoutBtn) logoutBtn.classList.remove('hidden');
         updateSyncStatus('Администратор вошел в систему');
         
-        await loadInitialData(); // Изменено с loadDataFromFirebase
+       await loadInitialData(); // Изменено с loadDataFromFirebase
         createDaysInterface();
     } else {
         isHybrid = false;
@@ -521,19 +521,6 @@ async function loadInitialData() {
                 }
             }
             
-            function loadData() {
-                const savedHybridStatus = localStorage.getItem('hybridStatus');
-                if (savedHybridStatus === 'true') {
-                    isHybrid = true;
-                }
-                
-                const savedNumbers = localStorage.getItem('selectedNumbers');
-                if (savedNumbers) {
-                    selectedNumbers = JSON.parse(savedNumbers);
-                }
-                
-                loadDataFromFirebase();
-            }
             
             function createAdminRow() {
                 adminRow.innerHTML = '';
@@ -696,7 +683,7 @@ async function loadInitialData() {
             function startSyncInterval() {
                 syncInterval = setInterval(async () => {
                     if (!isHybrid) {
-                        await loadDataFromFirebase();
+                        await loadInitialData();
                     }
                 }, 30000);
             }
@@ -792,7 +779,7 @@ async function loadInitialData() {
                     if (logoutBtn) logoutBtn.classList.remove('hidden');
                     updateSyncStatus('Администратор вошел в систему');
                     
-                    await loadDataFromFirebase();
+                    await loadInitialData();
                     createDaysInterface();
                 } else {
                     isHybrid = false;
@@ -801,7 +788,7 @@ async function loadInitialData() {
                     if (logoutBtn) logoutBtn.classList.add('hidden');
                     
                     try {
-                        await loadDataFromFirebase();
+                         await loadInitialData();
                     } catch (e) {
                         console.error('Ошибка загрузки данных:', e);
                     }
@@ -812,8 +799,8 @@ async function loadInitialData() {
                 }
             });
 
-            // Инициализация
-           initFirebase().then(() => {
+          // Инициализация
+initFirebase().then(() => {
     loadInitialData().then(() => {
         createDaysInterface();
         setInterval(checkDateChange, 60000);
