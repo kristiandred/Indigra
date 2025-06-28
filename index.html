@@ -216,9 +216,9 @@
     <script>
         const ADMIN_UIDS = ['DegfORMmNnQB09KJG3NOd1Cf61D2'];
         // Конфигурация Firebase
-       // Конфигурация Firebase
+       // Конфигурация Firebase (проверьте ключ на корректность)
 const firebaseConfig = {
-    apiKey: "AIzaSyBar6H-aFq-vB8fFRaB5Ue-zHhBzwwiQf0",
+    apiKey: "AIzaSyBar6H-aFq-vB8fFRaB5Ue-zHhBzwwiQf0", // Убедитесь в правильности ключа
     authDomain: "indigra-578df.firebaseapp.com",
     databaseURL: "https://indigra-578df-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "indigra-578df",
@@ -228,16 +228,33 @@ const firebaseConfig = {
     measurementId: "G-T6VNYJLXBN"
 };
 
+
 // Инициализация Firebase
 let app, auth, database;
-try {
-    app = firebase.initializeApp(firebaseConfig);
-    auth = firebase.auth();
-    database = firebase.database();
-    console.log("Firebase инициализирован успешно");
-} catch (error) {
-    console.error("Ошибка инициализации Firebase:", error);
+// Инициализация Firebase с обработкой ошибок
+function initializeFirebase() {
+    try {
+        // Проверяем, не инициализировано ли уже приложение
+        if (!firebase.apps.length) {
+            app = firebase.initializeApp(firebaseConfig);
+        } else {
+            app = firebase.app();
+        }
+        auth = firebase.auth();
+        database = firebase.database();
+        
+        // Устанавливаем таймаут для операций Firebase
+        database.goOnline();
+        firebase.auth().settings.appVerificationDisabledForTesting = false;
+        
+        console.log("Firebase инициализирован успешно");
+        return true;
+    } catch (error) {
+        console.error("Ошибка инициализации Firebase:", error);
+        return false;
+    }
 }
+
 
         document.addEventListener('DOMContentLoaded', function() {
             const daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
@@ -308,7 +325,41 @@ try {
                     console.error("Ошибка при установке persistence:", error);
                 }
             }
-            
+            async function authenticateUser(email, password) {
+    try {
+        // Валидация ввода
+        if (typeof email !== 'string' || typeof password !== 'string') {
+            throw new Error("Неверный формат данных");
+        }
+        
+        email = email.trim();
+        if (!email || !password) {
+            throw new Error("Email и пароль обязательны");
+        }
+
+        // Устанавливаем persistence
+        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        
+        // Выполняем вход с таймаутом
+        const loginPromise = auth.signInWithEmailAndPassword(email, password);
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error("Timeout exceeded")), 10000);
+        
+        const userCredential = await Promise.race([loginPromise, timeoutPromise]);
+        const user = userCredential.user;
+        
+        if (!user || !ADMIN_UIDS.includes(user.uid)) {
+            await auth.signOut();
+            throw new Error("Доступ разрешен только администратору");
+        }
+        
+        return user;
+    } catch (error) {
+        console.error('Ошибка аутентификации:', error);
+        throw error;
+    }
+}
+
             // Исправленная функция checkPassword
 async function checkPassword(email, password) {
     try {
@@ -700,6 +751,34 @@ async function checkAutoLogin() {
                     }
                 }, 30000);
             }
+
+            function getAuthErrorMessage(error) {
+    if (!error) return 'Неизвестная ошибка';
+    
+    // Обработка внутренних ошибок Firebase
+    if (error.code === 'auth/internal-error') {
+        try {
+            const errorObj = JSON.parse(error.message);
+            if (errorObj.error?.message === 'INVALID_LOGIN_CREDENTIALS') {
+                return 'Неверные учетные данные';
+            }
+        } catch (e) {
+            console.log('Не удалось разобрать сообщение об ошибке:', e);
+        }
+    }
+    
+    // Стандартные ошибки Firebase
+    switch(error.code) {
+        case 'auth/wrong-password': return 'Неверный пароль';
+        case 'auth/user-not-found': return 'Пользователь не найден';
+        case 'auth/invalid-email': return 'Неверный формат email';
+        case 'auth/too-many-requests': return 'Слишком много попыток. Попробуйте позже';
+        case 'auth/user-disabled': return 'Аккаунт заблокирован';
+        case 'auth/network-request-failed': return 'Ошибка сети. Проверьте подключение';
+        default: return error.message || 'Ошибка при входе';
+    }
+}
+
             
             function checkDateChange() {
                 const newDateKey = getDateKey();
