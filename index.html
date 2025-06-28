@@ -322,32 +322,40 @@ auth.onAuthStateChanged(async (user) => {
 });
             
             
-           async function saveDataToFirebase() {
+          async function saveDataToFirebase() {
     try {
         const user = auth.currentUser;
         if (!user || user.email !== 'a.indigra@gmail.com') {
             updateSyncStatus('Ошибка: требуется авторизация администратора');
             hybridLogin.classList.remove('hidden');
-            return;
+            return false;
         }
 
-        await database.ref('hybridData').set({
+        const updateData = {
             selectedNumbers: selectedNumbers,
             lastUpdated: Date.now(),
             updatedBy: user.email
-        });
+        };
+
+        await database.ref('hybridData').set(updateData);
         
         updateSyncStatus('Данные сохранены: ' + new Date().toLocaleTimeString());
         lastSyncTime = Date.now();
+        return true;
         
     } catch (error) {
         console.error('Ошибка сохранения:', error);
-        updateSyncStatus('Ошибка сохранения: ' + error.message);
         
         if (error.code === 'PERMISSION_DENIED') {
-            alert('Недостаточно прав. Пожалуйста, войдите как администратор.');
+            updateSyncStatus('Недостаточно прав. Пожалуйста, войдите как администратор.');
             hybridLogin.classList.remove('hidden');
+        } else if (error.code === 'NETWORK_ERROR') {
+            updateSyncStatus('Ошибка сети. Изменения не сохранены на сервере.');
+        } else {
+            updateSyncStatus('Ошибка сохранения: ' + error.message);
         }
+        
+        return false;
     }
 }
             
