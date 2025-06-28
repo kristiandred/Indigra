@@ -351,31 +351,59 @@ auth.onAuthStateChanged(async (user) => {
     }
 }
             
-          async function loadDataFromFirebase() {
-    return new Promise((resolve) => {
-        database.ref('hybridData').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
+         async function loadDataFromFirebase() {
+    try {
+        // Получаем данные из Firebase без проверки авторизации
+        const snapshot = await database.ref('hybridData').once('value');
+        const data = snapshot.val();
+
+        // Если данные получены
+        if (data) {
+            // Обновляем локальные данные только если серверные новее
+            if (!lastSyncTime || data.lastUpdated > lastSyncTime) {
                 selectedNumbers = data.selectedNumbers || {};
-                lastSyncTime = data.lastUpdated || 0;
+                lastSyncTime = data.lastUpdated;
                 
+                // Сохраняем в localStorage
                 localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
-                updateSyncStatus('Данные обновлены: ' + new Date().toLocaleTimeString());
+                localStorage.setItem('lastSyncTime', lastSyncTime.toString());
                 
-                createDaysInterface();
-                resolve(true);
-            }
-            resolve(false);
-        }, (error) => {
-            if (error.code === 'PERMISSION_DENIED') {
-                updateSyncStatus('Для просмотра данных требуется войти в систему');
+                updateSyncStatus('Данные обновлены: ' + new Date(data.lastUpdated).toLocaleTimeString());
+                return true;
             } else {
-                updateSyncStatus(`Ошибка загрузки: ${error.message}`);
+                updateSyncStatus('Данные актуальны');
+                return false;
             }
-            console.error('Ошибка загрузки:', error);
-            resolve(false);
-        });
-    });
+        } else {
+            updateSyncStatus('Нет данных на сервере');
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+        
+        // Обработка различных типов ошибок
+        if (error.code === 'PERMISSION_DENIED') {
+            // Если нет прав на чтение - пробуем загрузить из localStorage
+            const savedData = localStorage.getItem('selectedNumbers');
+            if (savedData) {
+                selectedNumbers = JSON.parse(savedData);
+                updateSyncStatus('Используются локальные данные (требуется авторизация для обновления)');
+                return false;
+            }
+            updateSyncStatus('Ошибка: Нет прав доступа к данным');
+        } else if (error.code === 'NETWORK_ERROR') {
+            updateSyncStatus('Ошибка сети. Используются локальные данные');
+            const savedData = localStorage.getItem('selectedNumbers');
+            if (savedData) {
+                selectedNumbers = JSON.parse(savedData);
+            }
+        } else {
+            updateSyncStatus('Ошибка загрузки данных: ' + error.message);
+        }
+        
+        return false;
+    }
 }
             
             function saveData() {
