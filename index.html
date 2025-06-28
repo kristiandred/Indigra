@@ -277,6 +277,15 @@
                 }
                 return reorderedDays;
             }
+
+            async function initFirebase() {
+    try {
+        await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        console.log("Persistence установлен на LOCAL");
+    } catch (error) {
+        console.error("Ошибка при установке persistence:", error);
+    }
+}
             
            async function checkPassword(email, password) {
     try {
@@ -341,6 +350,45 @@
         // 9. Показываем пользователю понятное сообщение
         alert(errorMessage);
         return false;
+    }
+}
+
+            function checkAuthState() {
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user && localStorage.getItem('adminAuthenticated') === 'true') {
+            const userId = user.uid;
+            const ADMIN_UIDS = ['abc123xyz456', 'def456uvw789'];
+            
+            if (ADMIN_UIDS.includes(userId)) {
+                console.log("Пользователь уже авторизован");
+                // Здесь можно обновить UI для авторизованного пользователя
+                document.getElementById('hybrid-btn').classList.add('hidden');
+                document.getElementById('logout-btn').classList.remove('hidden');
+                return;
+            }
+        }
+        
+        // Если не авторизован
+        firebase.auth().signOut();
+        localStorage.removeItem('adminAuthenticated');
+    });
+}
+
+            document.addEventListener('DOMContentLoaded', () => {
+    checkAuthState();
+});
+
+// Функция выхода
+async function logout() {
+    try {
+        await firebase.auth().signOut();
+        localStorage.removeItem('adminAuthenticated');
+        console.log("Успешный выход");
+        // Обновляем UI
+        document.getElementById('hybrid-btn').classList.remove('hidden');
+        document.getElementById('logout-btn').classList.add('hidden');
+    } catch (error) {
+        console.error("Ошибка при выходе:", error);
     }
 }
 
