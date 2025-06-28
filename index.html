@@ -270,44 +270,69 @@
                 return reorderedDays;
             }
             
-            async function checkPassword(email, password) {
-                try {
-                    await auth.signInWithEmailAndPassword(email, password);
-                    return true;
-                } catch (error) {
-                    console.error('Ошибка входа:', error);
-                    return false;
-                }
-            }
+           async function checkPassword(email, password) {
+    try {
+        // Устанавливаем постоянную сессию
+        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        
+        // Проверяем, что вошел именно администратор
+        if (userCredential.user.uid === 'qaMVUSQVZkWStGlgowl1QVM...') {
+            return true;
+        } else {
+            await auth.signOut(); // Если не админ - разлогиниваем
+            return false;
+        }
+    } catch (error) {
+        console.error('Ошибка входа:', error);
+        return false;
+    }
+}
+
+// Обновленный обработчик состояния аутентификации
+auth.onAuthStateChanged((user) => {
+    if (user && user.uid === 'qaMVUSQVZkWStGlgowl1QVM...') {
+        isHybrid = true;
+        adminRow.classList.remove('hidden');
+        document.getElementById('hybrid-btn').classList.add('hidden');
+        updateSyncStatus('Администратор вошел в систему');
+        createDaysInterface();
+    } else {
+        isHybrid = false;
+        adminRow.classList.add('hidden');
+        document.getElementById('hybrid-btn').classList.remove('hidden');
+        createDaysInterface();
+    }
+});
             
             
-            async function saveDataToFirebase() {
+           async function saveDataToFirebase() {
     if (!isHybrid) return;
     
     try {
         const user = auth.currentUser;
-        if (!user) {
-            updateSyncStatus('Ошибка: требуется авторизация');
+        if (!user || user.uid !== 'qaMVUSQVZkWStGlgowl1QVM...') {
+            updateSyncStatus('Ошибка: требуется авторизация администратора');
+            hybridLogin.classList.remove('hidden');
             return;
         }
 
         await database.ref('hybridData').set({
             selectedNumbers: selectedNumbers,
-            lastUpdated: Date.now()
+            lastUpdated: Date.now(),
+            updatedBy: user.uid
         });
         
         updateSyncStatus('Данные сохранены: ' + new Date().toLocaleTimeString());
         lastSyncTime = Date.now();
-        
-        // Принудительно обновляем интерфейс
         createDaysInterface();
         
     } catch (error) {
         console.error('Ошибка сохранения:', error);
         updateSyncStatus('Ошибка сохранения: ' + error.message);
         
-        // Если ошибка авторизации - предлагаем войти
         if (error.code === 'PERMISSION_DENIED') {
+            alert('У вас нет прав для изменения данных. Пожалуйста, войдите как администратор.');
             hybridLogin.classList.remove('hidden');
         }
     }
@@ -604,6 +629,16 @@
             startSyncInterval();
             setupAutoRefresh();
         });
+        document.getElementById('logout-btn').addEventListener('click', async function() {
+    try {
+        await auth.signOut();
+        updateSyncStatus('Администратор вышел из системы');
+    } catch (error) {
+        console.error('Ошибка выхода:', error);
+    }
+});
     </script>
+    <button id="logout-btn" class="hybrid-btn hidden" style="right: 120px;">🚪 Выйти</button>
+    
 </body>
 </html>
