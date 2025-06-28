@@ -437,7 +437,7 @@ async function initFirebase() {
         if (logoutBtn) logoutBtn.classList.remove('hidden');
         updateSyncStatus('Администратор вошел в систему');
         
-        await loadDataFromFirebase();
+        await loadInitialData(); // Изменено с loadDataFromFirebase
         createDaysInterface();
     } else {
         isHybrid = false;
@@ -446,7 +446,7 @@ async function initFirebase() {
         if (logoutBtn) logoutBtn.classList.add('hidden');
         
         try {
-            await loadDataFromFirebase();
+            await loadInitialData(); // Изменено с loadDataFromFirebase
         } catch (e) {
             console.error('Ошибка загрузки данных:', e);
         }
@@ -813,11 +813,10 @@ async function loadInitialData() {
             });
 
             // Инициализация
-            initFirebase().then(() => {
-        loadInitialData().then(() => {
-            createDaysInterface();
-            setInterval(checkDateChange, 60000);
-        });
+           initFirebase().then(() => {
+    loadInitialData().then(() => {
+        createDaysInterface();
+        setInterval(checkDateChange, 60000);
     });
 });
     </script>
