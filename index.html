@@ -294,18 +294,15 @@
                 return reorderedDays;
             }
 
-            // В функции initFirebase добавьте:
-async function initFirebase() {
-    try {
-        await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-        console.log("Persistence установлен на LOCAL");
-        
-        // Инициализация прослушивания изменений
-        setupRealtimeUpdates();
-    } catch (error) {
-        console.error("Ошибка при установке persistence:", error);
-    }
-}
+            async function initFirebase() {
+                try {
+                    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                    console.log("Persistence установлен на LOCAL");
+                    setupRealtimeUpdates();
+                } catch (error) {
+                    console.error("Ошибка при установке persistence:", error);
+                }
+            }
             
             async function checkPassword(email, password) {
                 try {
@@ -319,12 +316,7 @@ async function initFirebase() {
                     const userId = userCredential.user.uid;
                     console.log("User UID:", userId);
                     
-                    const ADMIN_UIDS = [
-                        'DegfORMmNnQB09KJG3NOd1Cf61D2'  // UID администратора
-                    ];
-                    
                     if (ADMIN_UIDS.includes(userId)) {
-                        // Сохраняем информацию об устройстве, если выбрана опция "запомнить"
                         if (rememberDeviceCheckbox.checked) {
                             localStorage.setItem('adminDevice', getDeviceId());
                             localStorage.setItem('adminEmail', email.trim());
@@ -373,144 +365,107 @@ async function initFirebase() {
                 const currentDeviceId = getDeviceId();
                 const savedEmail = localStorage.getItem('adminEmail');
                 
-                // Проверяем, что сохраненное устройство совпадает с текущим
                 if (savedDeviceId && savedDeviceId === currentDeviceId && savedEmail) {
-                    // Показываем сообщение о попытке автоматического входа
                     updateSyncStatus('Попытка автоматического входа...');
-                    
-                    // Заполняем email для удобства пользователя
                     hybridEmailInput.value = savedEmail;
-                    
-                    // Показываем форму входа (пользователю нужно только ввести пароль)
                     hybridLogin.classList.remove('hidden');
                     hybridPasswordInput.focus();
-                    
                     return true;
                 }
                 return false;
             }
 
-          async function saveDataToFirebase() {
-    try {
-        const user = auth.currentUser;
-        
-        if (!user || !ADMIN_UIDS.includes(user.uid)) {
-            updateSyncStatus('Ошибка: требуется авторизация администратора');
-            hybridLogin.classList.remove('hidden');
-            return false;
-        }
+            async function saveDataToFirebase() {
+                try {
+                    const user = auth.currentUser;
+                    
+                    if (!user || !ADMIN_UIDS.includes(user.uid)) {
+                        updateSyncStatus('Ошибка: требуется авторизация администратора');
+                        hybridLogin.classList.remove('hidden');
+                        return false;
+                    }
 
-        const updateData = {
-            selectedNumbers: selectedNumbers,
-            lastUpdated: Date.now(),
-            updatedBy: user.email,
-            updatedFromDevice: getDeviceId()
-        };
+                    const updateData = {
+                        selectedNumbers: selectedNumbers,
+                        lastUpdated: Date.now(),
+                        updatedBy: user.email,
+                        updatedFromDevice: getDeviceId()
+                    };
 
-        await database.ref('hybridData').set(updateData);
-        
-        updateSyncStatus('Данные сохранены: ' + new Date().toLocaleTimeString());
-        lastSyncTime = Date.now();
-        return true;
-        
-    } catch (error) {
-        console.error('Ошибка сохранения:', error);
-        
-        if (error.code === 'PERMISSION_DENIED') {
-            updateSyncStatus('Недостаточно прав. Пожалуйста, войдите как администратор.');
-            hybridLogin.classList.remove('hidden');
-        } else if (error.code === 'NETWORK_ERROR') {
-            updateSyncStatus('Ошибка сети. Изменения не сохранены на сервере.');
-        } else {
-            updateSyncStatus('Ошибка сохранения: ' + error.message);
-        }
-        
-        return false;
-    }
-}
-
-            auth.onAuthStateChanged(async (user) => {
-    if (user && ADMIN_UIDS.includes(user.uid)) {
-        isHybrid = true;
-        adminRow.classList.remove('hidden');
-        if (hybridBtn) hybridBtn.classList.add('hidden');
-        if (logoutBtn) logoutBtn.classList.remove('hidden');
-        updateSyncStatus('Администратор вошел в систему');
-        
-       await loadInitialData(); // Изменено с loadDataFromFirebase
-        createDaysInterface();
-    } else {
-        isHybrid = false;
-        adminRow.classList.add('hidden');
-        if (hybridBtn) hybridBtn.classList.remove('hidden');
-        if (logoutBtn) logoutBtn.classList.add('hidden');
-        
-        try {
-            await loadInitialData(); // Изменено с loadDataFromFirebase
-        } catch (e) {
-            console.error('Ошибка загрузки данных:', e);
-        }
-        createDaysInterface();
-        
-        checkAutoLogin();
-    }
-});
-            
-           function setupRealtimeUpdates() {
-    // Останавливаем предыдущие интервалы
-    if (refreshInterval) clearInterval(refreshInterval);
-    if (pageRefreshInterval) clearInterval(pageRefreshInterval);
-    if (syncInterval) clearInterval(syncInterval);
-
-    // Подписываемся на изменения в базе данных
-    database.ref('hybridData').on('value', (snapshot) => {
-        const data = snapshot.val();
-        
-        if (data) {
-            if (!lastSyncTime || data.lastUpdated > lastSyncTime) {
-                selectedNumbers = data.selectedNumbers || {};
-                lastSyncTime = data.lastUpdated;
-                
-                localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
-                localStorage.setItem('lastSyncTime', lastSyncTime.toString());
-                
-                updateSyncStatus('Данные обновлены: ' + new Date(data.lastUpdated).toLocaleTimeString());
-                createDaysInterface();
+                    await database.ref('hybridData').set(updateData);
+                    
+                    updateSyncStatus('Данные сохранены: ' + new Date().toLocaleTimeString());
+                    lastSyncTime = Date.now();
+                    return true;
+                    
+                } catch (error) {
+                    console.error('Ошибка сохранения:', error);
+                    
+                    if (error.code === 'PERMISSION_DENIED') {
+                        updateSyncStatus('Недостаточно прав. Пожалуйста, войдите как администратор.');
+                        hybridLogin.classList.remove('hidden');
+                    } else if (error.code === 'NETWORK_ERROR') {
+                        updateSyncStatus('Ошибка сети. Изменения не сохранены на сервере.');
+                    } else {
+                        updateSyncStatus('Ошибка сохранения: ' + error.message);
+                    }
+                    
+                    return false;
+                }
             }
-        } else {
-            updateSyncStatus('Нет данных на сервере');
-        }
-    }, (error) => {
-        console.error('Ошибка прослушивания:', error);
-        updateSyncStatus('Ошибка подключения к серверу');
-    });
-}
 
-// Удалите старую функцию loadDataFromFirebase и замените её на эту:
-async function loadInitialData() {
-    try {
-        const snapshot = await database.ref('hybridData').once('value');
-        const data = snapshot.val();
+            function setupRealtimeUpdates() {
+                if (refreshInterval) clearInterval(refreshInterval);
+                if (pageRefreshInterval) clearInterval(pageRefreshInterval);
+                if (syncInterval) clearInterval(syncInterval);
 
-        if (data) {
-            selectedNumbers = data.selectedNumbers || {};
-            lastSyncTime = data.lastUpdated;
-            
-            localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
-            localStorage.setItem('lastSyncTime', lastSyncTime.toString());
-            
-            updateSyncStatus('Данные загружены: ' + new Date(data.lastUpdated).toLocaleTimeString());
-            return true;
-        } else {
-            updateSyncStatus('Нет данных на сервере');
-            return false;
-        }
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-        updateSyncStatus('Ошибка загрузки данных');
-        return false;
-    }
-}
+                database.ref('hybridData').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    
+                    if (data) {
+                        if (!lastSyncTime || data.lastUpdated > lastSyncTime) {
+                            selectedNumbers = data.selectedNumbers || {};
+                            lastSyncTime = data.lastUpdated;
+                            
+                            localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+                            localStorage.setItem('lastSyncTime', lastSyncTime.toString());
+                            
+                            updateSyncStatus('Данные обновлены: ' + new Date(data.lastUpdated).toLocaleTimeString());
+                            createDaysInterface();
+                        }
+                    } else {
+                        updateSyncStatus('Нет данных на сервере');
+                    }
+                }, (error) => {
+                    console.error('Ошибка прослушивания:', error);
+                    updateSyncStatus('Ошибка подключения к серверу');
+                });
+            }
+
+            async function loadInitialData() {
+                try {
+                    const snapshot = await database.ref('hybridData').once('value');
+                    const data = snapshot.val();
+
+                    if (data) {
+                        selectedNumbers = data.selectedNumbers || {};
+                        lastSyncTime = data.lastUpdated;
+                        
+                        localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+                        localStorage.setItem('lastSyncTime', lastSyncTime.toString());
+                        
+                        updateSyncStatus('Данные загружены: ' + new Date(data.lastUpdated).toLocaleTimeString());
+                        return true;
+                    } else {
+                        updateSyncStatus('Нет данных на сервере');
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки:', error);
+                    updateSyncStatus('Ошибка загрузки данных');
+                    return false;
+                }
+            }
             
             function saveData() {
                 localStorage.setItem('hybridStatus', isHybrid ? 'true' : 'false');
@@ -520,7 +475,6 @@ async function loadInitialData() {
                     saveDataToFirebase();
                 }
             }
-            
             
             function createAdminRow() {
                 adminRow.innerHTML = '';
@@ -688,8 +642,6 @@ async function loadInitialData() {
                 }, 30000);
             }
             
-           
-            
             function checkDateChange() {
                 const newDateKey = getDateKey();
                 if (newDateKey !== currentDateKey) {
@@ -717,7 +669,6 @@ async function loadInitialData() {
             if (hybridBtn) {
                 hybridBtn.addEventListener('click', function() {
                     hybridLogin.classList.remove('hidden');
-                    // Проверяем, есть ли сохраненный email для этого устройства
                     const savedEmail = localStorage.getItem('adminEmail');
                     if (savedEmail) {
                         hybridEmailInput.value = savedEmail;
@@ -756,7 +707,6 @@ async function loadInitialData() {
                 logoutBtn.addEventListener('click', async function() {
                     try {
                         await auth.signOut();
-                        // Удаляем информацию о запомненном устройстве при выходе
                         localStorage.removeItem('adminDevice');
                         localStorage.removeItem('adminEmail');
                         updateSyncStatus('Администратор вышел из системы');
@@ -768,48 +718,18 @@ async function loadInitialData() {
                 });
             }
 
-            // Обработчик состояния аутентификации
-            auth.onAuthStateChanged(async (user) => {
-                const ADMIN_UIDS = ['DegfORMmNnQB09KJG3NOd1Cf61D2'];
-                
-                if (user && ADMIN_UIDS.includes(user.uid)) {
-                    isHybrid = true;
-                    adminRow.classList.remove('hidden');
-                    if (hybridBtn) hybridBtn.classList.add('hidden');
-                    if (logoutBtn) logoutBtn.classList.remove('hidden');
-                    updateSyncStatus('Администратор вошел в систему');
-                    
-                    await loadInitialData();
+            // Инициализация
+            initFirebase().then(() => {
+                loadInitialData().then(() => {
                     createDaysInterface();
-                } else {
-                    isHybrid = false;
-                    adminRow.classList.add('hidden');
-                    if (hybridBtn) hybridBtn.classList.remove('hidden');
-                    if (logoutBtn) logoutBtn.classList.add('hidden');
-                    
-                    try {
-                         await loadInitialData();
-                    } catch (e) {
-                        console.error('Ошибка загрузки данных:', e);
-                    }
-                    createDaysInterface();
-                    
-                    // Проверяем возможность автоматического входа
-                    checkAutoLogin();
-                }
+                    setInterval(checkDateChange, 60000);
+                }).catch(error => {
+                    console.error("Ошибка загрузки данных:", error);
+                });
+            }).catch(error => {
+                console.error("Ошибка инициализации Firebase:", error);
             });
-
-// Инициализация
-initFirebase().then(() => {
-    loadInitialData().then(() => {
-        createDaysInterface();
-        setInterval(checkDateChange, 60000);
-    }).catch(error => {
-        console.error("Ошибка загрузки данных:", error);
-    });
-}).catch(error => {
-    console.error("Ошибка инициализации Firebase:", error);
-});
+        });
     </script>
 </body>
 </html>
