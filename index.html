@@ -166,9 +166,9 @@
     </style>
    <!-- Firebase SDK должен загружаться первым -->
 <!-- В секции head добавьте эти скрипты -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 <body>
     <h1>Свободные гибриды Индигра</h1>
@@ -210,30 +210,30 @@
 
     <div id="sync-status" class="sync-status"></div>
 
-    <script>
+   <script>
         // Конфигурация Firebase
-       // Конфигурация Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBar6H-aFq-vB8fFRaB5Ue-zHhBzwwiQf0",
-  authDomain: "indigra-578df.firebaseapp.com",
-  databaseURL: "https://indigra-578df-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "indigra-578df",
-  storageBucket: "indigra-578df.appspot.com",
-  messagingSenderId: "819436341016",
-  appId: "1:819436341016:web:c3e2029ce5f0b8055d806d",
-  measurementId: "G-T6VNYJLXBN"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyBar6H-aFq-vB8fFRaB5Ue-zHhBzwwiQf0",
+            authDomain: "indigra-578df.firebaseapp.com",
+            databaseURL: "https://indigra-578df-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "indigra-578df",
+            storageBucket: "indigra-578df.appspot.com",
+            messagingSenderId: "819436341016",
+            appId: "1:819436341016:web:c3e2029ce5f0b8055d806d",
+            measurementId: "G-T6VNYJLXBN"
+        };
 
-// Инициализация Firebase
-let app, auth, database;
-try {
-  app = firebase.initializeApp(firebaseConfig);
-  auth = firebase.auth();
-  database = firebase.database();
-  console.log("Firebase инициализирован успешно");
-} catch (error) {
-  console.error("Ошибка инициализации Firebase:", error);
-}
+ // Инициализация Firebase
+        let app, auth, database;
+        try {
+            app = firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            database = firebase.database();
+            console.log("Firebase инициализирован успешно");
+        } catch (error) {
+            console.error("Ошибка инициализации Firebase:", error);
+        }
+
 
         document.addEventListener('DOMContentLoaded', function() {
             const daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
@@ -279,63 +279,64 @@ try {
                 return reorderedDays;
             }
             
-           async function checkPassword(email, password) {
-    try {
-        // Устанавливаем постоянную сессию
-        await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-        
-        // Пытаемся войти
-        const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
-        
-        // Проверяем email администратора
-        if (userCredential.user.email === 'a.indigra@gmail.com') {
-            return true;
-        }
-        
-        // Если не админ - выходим
-        await firebase.auth().signOut();
-        return false;
-    } catch (error) {
-        console.error('Ошибка входа:', error);
-        // Показываем конкретное сообщение об ошибке
-        if (error.code === 'auth/wrong-password') {
-            alert('Неверный пароль!');
-        } else if (error.code === 'auth/user-not-found') {
-            alert('Пользователь с таким email не найден!');
-        } else {
-            alert('Ошибка входа: ' + error.message);
-        }
-        return false;
-    }
-}
+        async function checkPassword(email, password) {
+                try {
+                    // Устанавливаем постоянную сессию
+                    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                    
+                    // Пытаемся войти
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                    
+                    // Проверяем email администратора
+                    if (userCredential.user.email === 'a.indigra@gmail.com') {
+                        return true;
+                    }
+                    
+                    // Если не админ - выходим
+                    await auth.signOut();
+                    return false;
+                } catch (error) {
+                    console.error('Ошибка входа:', error);
+                    // Показываем конкретное сообщение об ошибке
+                    if (error.code === 'auth/wrong-password') {
+                        alert('Неверный пароль!');
+                    } else if (error.code === 'auth/user-not-found') {
+                        alert('Пользователь с таким email не найден!');
+                    } else {
+                        alert('Ошибка входа: ' + error.message);
+                    }
+                    return false;
+                }
+            }
 
 // Обновленный обработчик состояния аутентификации
-auth.onAuthStateChanged(async (user) => {
-    if (user && user.email === 'a.indigra@gmail.com') {
-        isHybrid = true;
-        adminRow.classList.remove('hidden');
-        document.getElementById('hybrid-btn').classList.add('hidden');
-        document.getElementById('logout-btn').classList.remove('hidden');
-        updateSyncStatus('Администратор вошел в систему');
-        
-        // Загружаем данные после успешной аутентификации
-        await loadDataFromFirebase();
-        createDaysInterface();
-    } else {
-        isHybrid = false;
-        adminRow.classList.add('hidden');
-        document.getElementById('hybrid-btn').classList.remove('hidden');
-        document.getElementById('logout-btn').classList.add('hidden');
-        
-        // Пытаемся загрузить данные для просмотра
-        try {
-            await loadDataFromFirebase();
-        } catch (e) {
-            console.error('Ошибка загрузки данных:', e);
-        }
-        createDaysInterface();
-    }
-});
+// Обновленный обработчик состояния аутентификации
+            auth.onAuthStateChanged(async (user) => {
+                if (user && user.email === 'a.indigra@gmail.com') {
+                    isHybrid = true;
+                    adminRow.classList.remove('hidden');
+                    document.getElementById('hybrid-btn').classList.add('hidden');
+                    document.getElementById('logout-btn').classList.remove('hidden');
+                    updateSyncStatus('Администратор вошел в систему');
+                    
+                    // Загружаем данные после успешной аутентификации
+                    await loadDataFromFirebase();
+                    createDaysInterface();
+                } else {
+                    isHybrid = false;
+                    adminRow.classList.add('hidden');
+                    document.getElementById('hybrid-btn').classList.remove('hidden');
+                    document.getElementById('logout-btn').classList.add('hidden');
+                    
+                    // Пытаемся загрузить данные для просмотра
+                    try {
+                        await loadDataFromFirebase();
+                    } catch (e) {
+                        console.error('Ошибка загрузки данных:', e);
+                    }
+                    createDaysInterface();
+                }
+            });
             
             
           async function saveDataToFirebase() {
@@ -506,7 +507,10 @@ auth.onAuthStateChanged(async (user) => {
                         saveData();
                     });
                     
-                    const label = document.createElement('div');
+                   const element = document.getElementById('elementId');
+if (element) {
+    element.addEventListener('click', function() {
+  
                     label.className = 'number-label';
                     label.textContent = (numIndex + 1) % 3 === 0 ? '8/28' : '7/24';
                     
@@ -514,7 +518,11 @@ auth.onAuthStateChanged(async (user) => {
                     wrapper.appendChild(label);
                     adminRow.appendChild(wrapper);
                 });
-            }
+            }      // ваш код
+    });
+} else {
+    console.error('Элемент не найден!');
+}
             
             function createDaysInterface() {
                 container.innerHTML = '';
@@ -699,15 +707,16 @@ auth.onAuthStateChanged(async (user) => {
             setupAutoRefresh();
         });
         document.getElementById('logout-btn').addEventListener('click', async function() {
-    try {
-        await auth.signOut();
-        updateSyncStatus('Администратор вышел из системы');
-    } catch (error) {
-        console.error('Ошибка выхода:', error);
-    }
-});
+                try {
+                    await auth.signOut();
+                    updateSyncStatus('Администратор вышел из системы');
+                } catch (error) {
+                    console.error('Ошибка выхода:', error);
+                }
+            });
+        });
     </script>
-    <button id="logout-btn" class="hybrid-btn hidden" style="right: 120px;">🚪 Выйти</button>
+     <button id="logout-btn" class="hybrid-btn hidden" style="right: 120px;">🚪 Выйти</button>
     
 </body>
 </html>
