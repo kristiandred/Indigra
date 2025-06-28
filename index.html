@@ -799,12 +799,16 @@ async function loadInitialData() {
                 }
             });
 
-          // Инициализация
+// Инициализация
 initFirebase().then(() => {
     loadInitialData().then(() => {
         createDaysInterface();
         setInterval(checkDateChange, 60000);
+    }).catch(error => {
+        console.error("Ошибка загрузки данных:", error);
     });
+}).catch(error => {
+    console.error("Ошибка инициализации Firebase:", error);
 });
     </script>
 </body>
