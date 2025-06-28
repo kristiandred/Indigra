@@ -282,10 +282,10 @@ try {
            async function checkPassword(email, password) {
     try {
         // Устанавливаем постоянную сессию
-        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         
         // Пытаемся войти
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
         
         // Проверяем email администратора
         if (userCredential.user.email === 'a.indigra@gmail.com') {
@@ -293,10 +293,18 @@ try {
         }
         
         // Если не админ - выходим
-        await auth.signOut();
+        await firebase.auth().signOut();
         return false;
     } catch (error) {
         console.error('Ошибка входа:', error);
+        // Показываем конкретное сообщение об ошибке
+        if (error.code === 'auth/wrong-password') {
+            alert('Неверный пароль!');
+        } else if (error.code === 'auth/user-not-found') {
+            alert('Пользователь с таким email не найден!');
+        } else {
+            alert('Ошибка входа: ' + error.message);
+        }
         return false;
     }
 }
