@@ -201,6 +201,10 @@
             <h3>Вход для администратора</h3>
             <input type="email" id="hybrid-email" placeholder="Введите email">
             <input type="password" id="hybrid-password" placeholder="Введите пароль">
+            <div style="margin-top: 10px;">
+                <input type="checkbox" id="remember-device" checked>
+                <label for="remember-device">Запомнить это устройство</label>
+            </div>
             <button id="login-btn">Войти</button>
             <button id="cancel-btn">Отмена</button>
         </div>
@@ -250,6 +254,7 @@
             const cancelBtn = document.getElementById('cancel-btn');
             const syncStatus = document.getElementById('sync-status');
             const logoutBtn = document.getElementById('logout-btn');
+            const rememberDeviceCheckbox = document.getElementById('remember-device');
             
             let isHybrid = false;
             let selectedNumbers = JSON.parse(localStorage.getItem('selectedNumbers')) || {};
@@ -258,6 +263,16 @@
             let syncInterval;
             let refreshInterval;
             let pageRefreshInterval;
+
+            // Генерация уникального идентификатора устройства
+            function getDeviceId() {
+                let deviceId = localStorage.getItem('deviceId');
+                if (!deviceId) {
+                    deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('deviceId', deviceId);
+                }
+                return deviceId;
+            }
 
             function getDateKey() {
                 const date = new Date();
@@ -279,156 +294,134 @@
             }
 
             async function initFirebase() {
-    try {
-        await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-        console.log("Persistence установлен на LOCAL");
-    } catch (error) {
-        console.error("Ошибка при установке persistence:", error);
-    }
-}
-            
-           async function checkPassword(email, password) {
-    try {
-        // 1. Проверка входных данных
-        if (!email || !password) {
-            throw new Error("Email и пароль обязательны");
-        }
-
-        // 2. Установка постоянной сессии
-        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-        
-        // 3. Попытка аутентификации
-        const userCredential = await auth.signInWithEmailAndPassword(email.trim(), password);
-        
-        // 4. Получаем UID аутентифицированного пользователя
-        const userId = userCredential.user.uid;
-        console.log("User UID:", userId); // Для отладки
-        
-        // 5. Список UID администраторов (лучше вынести в конфиг)
-        const ADMIN_UIDS = [
-            'DegfORMmNnQB09KJG3NOd1Cf61D2'  // UID второго администратора
-        ];
-        
-        // 6. Проверка прав администратора
-        if (ADMIN_UIDS.includes(userId)) {
-            return true;
-        }
-        
-        // 7. Если не админ - разлогиниваем
-        await auth.signOut();
-        alert('Доступ разрешен только администратору');
-        return false;
-        
-    } catch (error) {
-        console.error('Ошибка аутентификации:', error);
-        
-        // 8. Детальная обработка ошибок Firebase
-        let errorMessage = 'Ошибка входа';
-        
-        switch(error.code) {
-            case 'auth/wrong-password':
-                errorMessage = 'Неверный пароль';
-                break;
-            case 'auth/user-not-found':
-                errorMessage = 'Пользователь не найден';
-                break;
-            case 'auth/invalid-email':
-                errorMessage = 'Неверный формат email';
-                break;
-            case 'auth/too-many-requests':
-                errorMessage = 'Слишком много попыток. Попробуйте позже';
-                break;
-            case 'auth/user-disabled':
-                errorMessage = 'Аккаунт заблокирован';
-                break;
-            default:
-                if (error.message.includes("INVALID_LOGIN_CREDENTIALS")) {
-                    errorMessage = 'Неверные учетные данные';
+                try {
+                    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                    console.log("Persistence установлен на LOCAL");
+                } catch (error) {
+                    console.error("Ошибка при установке persistence:", error);
                 }
-        }
-        
-        // 9. Показываем пользователю понятное сообщение
-        alert(errorMessage);
-        return false;
-    }
-}
-
-            function checkAuthState() {
-    firebase.auth().onAuthStateChanged((user) => {
-        if (user && localStorage.getItem('adminAuthenticated') === 'true') {
-            const userId = user.uid;
-            const ADMIN_UIDS = ['abc123xyz456', 'def456uvw789'];
-            
-            if (ADMIN_UIDS.includes(userId)) {
-                console.log("Пользователь уже авторизован");
-                // Здесь можно обновить UI для авторизованного пользователя
-                document.getElementById('hybrid-btn').classList.add('hidden');
-                document.getElementById('logout-btn').classList.remove('hidden');
-                return;
             }
-        }
-        
-        // Если не авторизован
-        firebase.auth().signOut();
-        localStorage.removeItem('adminAuthenticated');
-    });
-}
+            
+            async function checkPassword(email, password) {
+                try {
+                    if (!email || !password) {
+                        throw new Error("Email и пароль обязательны");
+                    }
 
-            document.addEventListener('DOMContentLoaded', () => {
-    checkAuthState();
-});
+                    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                    
+                    const userCredential = await auth.signInWithEmailAndPassword(email.trim(), password);
+                    const userId = userCredential.user.uid;
+                    console.log("User UID:", userId);
+                    
+                    const ADMIN_UIDS = [
+                        'DegfORMmNnQB09KJG3NOd1Cf61D2'  // UID администратора
+                    ];
+                    
+                    if (ADMIN_UIDS.includes(userId)) {
+                        // Сохраняем информацию об устройстве, если выбрана опция "запомнить"
+                        if (rememberDeviceCheckbox.checked) {
+                            localStorage.setItem('adminDevice', getDeviceId());
+                            localStorage.setItem('adminEmail', email.trim());
+                        }
+                        return true;
+                    }
+                    
+                    await auth.signOut();
+                    alert('Доступ разрешен только администратору');
+                    return false;
+                    
+                } catch (error) {
+                    console.error('Ошибка аутентификации:', error);
+                    
+                    let errorMessage = 'Ошибка входа';
+                    
+                    switch(error.code) {
+                        case 'auth/wrong-password':
+                            errorMessage = 'Неверный пароль';
+                            break;
+                        case 'auth/user-not-found':
+                            errorMessage = 'Пользователь не найден';
+                            break;
+                        case 'auth/invalid-email':
+                            errorMessage = 'Неверный формат email';
+                            break;
+                        case 'auth/too-many-requests':
+                            errorMessage = 'Слишком много попыток. Попробуйте позже';
+                            break;
+                        case 'auth/user-disabled':
+                            errorMessage = 'Аккаунт заблокирован';
+                            break;
+                        default:
+                            if (error.message.includes("INVALID_LOGIN_CREDENTIALS")) {
+                                errorMessage = 'Неверные учетные данные';
+                            }
+                    }
+                    
+                    alert(errorMessage);
+                    return false;
+                }
+            }
 
-// Функция выхода
-async function logout() {
-    try {
-        await firebase.auth().signOut();
-        localStorage.removeItem('adminAuthenticated');
-        console.log("Успешный выход");
-        // Обновляем UI
-        document.getElementById('hybrid-btn').classList.remove('hidden');
-        document.getElementById('logout-btn').classList.add('hidden');
-    } catch (error) {
-        console.error("Ошибка при выходе:", error);
-    }
-}
-
-             async function saveDataToFirebase() {
-        try {
-            const user = auth.currentUser;
-            if (!user || user.email !== 'andreiborovik123@gmail.com') {
-                updateSyncStatus('Ошибка: требуется авторизация администратора');
-                hybridLogin.classList.remove('hidden');
+            function checkAutoLogin() {
+                const savedDeviceId = localStorage.getItem('adminDevice');
+                const currentDeviceId = getDeviceId();
+                const savedEmail = localStorage.getItem('adminEmail');
+                
+                // Проверяем, что сохраненное устройство совпадает с текущим
+                if (savedDeviceId && savedDeviceId === currentDeviceId && savedEmail) {
+                    // Показываем сообщение о попытке автоматического входа
+                    updateSyncStatus('Попытка автоматического входа...');
+                    
+                    // Заполняем email для удобства пользователя
+                    hybridEmailInput.value = savedEmail;
+                    
+                    // Показываем форму входа (пользователю нужно только ввести пароль)
+                    hybridLogin.classList.remove('hidden');
+                    hybridPasswordInput.focus();
+                    
+                    return true;
+                }
                 return false;
             }
 
-            const updateData = {
-                selectedNumbers: selectedNumbers,
-                lastUpdated: Date.now(),
-                updatedBy: user.email
-            };
+            async function saveDataToFirebase() {
+                try {
+                    const user = auth.currentUser;
+                    if (!user || !ADMIN_UIDS.includes(user.uid)) {
+                        updateSyncStatus('Ошибка: требуется авторизация администратора');
+                        hybridLogin.classList.remove('hidden');
+                        return false;
+                    }
 
-            await database.ref('hybridData').set(updateData);
-            
-            updateSyncStatus('Данные сохранены: ' + new Date().toLocaleTimeString());
-            lastSyncTime = Date.now();
-            return true;
-            
-        } catch (error) {
-            console.error('Ошибка сохранения:', error);
-            
-            if (error.code === 'PERMISSION_DENIED') {
-                updateSyncStatus('Недостаточно прав. Пожалуйста, войдите как администратор.');
-                hybridLogin.classList.remove('hidden');
-            } else if (error.code === 'NETWORK_ERROR') {
-                updateSyncStatus('Ошибка сети. Изменения не сохранены на сервере.');
-            } else {
-                updateSyncStatus('Ошибка сохранения: ' + error.message);
+                    const updateData = {
+                        selectedNumbers: selectedNumbers,
+                        lastUpdated: Date.now(),
+                        updatedBy: user.email,
+                        updatedFromDevice: getDeviceId()
+                    };
+
+                    await database.ref('hybridData').set(updateData);
+                    
+                    updateSyncStatus('Данные сохранены: ' + new Date().toLocaleTimeString());
+                    lastSyncTime = Date.now();
+                    return true;
+                    
+                } catch (error) {
+                    console.error('Ошибка сохранения:', error);
+                    
+                    if (error.code === 'PERMISSION_DENIED') {
+                        updateSyncStatus('Недостаточно прав. Пожалуйста, войдите как администратор.');
+                        hybridLogin.classList.remove('hidden');
+                    } else if (error.code === 'NETWORK_ERROR') {
+                        updateSyncStatus('Ошибка сети. Изменения не сохранены на сервере.');
+                    } else {
+                        updateSyncStatus('Ошибка сохранения: ' + error.message);
+                    }
+                    
+                    return false;
+                }
             }
-            
-            return false;
-        }
-    }
-
             
             async function loadDataFromFirebase() {
                 try {
@@ -705,6 +698,12 @@ async function logout() {
             if (hybridBtn) {
                 hybridBtn.addEventListener('click', function() {
                     hybridLogin.classList.remove('hidden');
+                    // Проверяем, есть ли сохраненный email для этого устройства
+                    const savedEmail = localStorage.getItem('adminEmail');
+                    if (savedEmail) {
+                        hybridEmailInput.value = savedEmail;
+                        hybridPasswordInput.focus();
+                    }
                 });
             }
             
@@ -738,7 +737,12 @@ async function logout() {
                 logoutBtn.addEventListener('click', async function() {
                     try {
                         await auth.signOut();
+                        // Удаляем информацию о запомненном устройстве при выходе
+                        localStorage.removeItem('adminDevice');
+                        localStorage.removeItem('adminEmail');
                         updateSyncStatus('Администратор вышел из системы');
+                        isHybrid = false;
+                        createDaysInterface();
                     } catch (error) {
                         console.error('Ошибка выхода:', error);
                     }
@@ -747,7 +751,9 @@ async function logout() {
 
             // Обработчик состояния аутентификации
             auth.onAuthStateChanged(async (user) => {
-                if (user && user.email === 'a.indigra@gmail.com') {
+                const ADMIN_UIDS = ['DegfORMmNnQB09KJG3NOd1Cf61D2'];
+                
+                if (user && ADMIN_UIDS.includes(user.uid)) {
                     isHybrid = true;
                     adminRow.classList.remove('hidden');
                     if (hybridBtn) hybridBtn.classList.add('hidden');
@@ -768,10 +774,14 @@ async function logout() {
                         console.error('Ошибка загрузки данных:', e);
                     }
                     createDaysInterface();
+                    
+                    // Проверяем возможность автоматического входа
+                    checkAutoLogin();
                 }
             });
 
             // Инициализация
+            initFirebase();
             loadData();
             createDaysInterface();
             setInterval(checkDateChange, 60000);
