@@ -385,50 +385,49 @@ async function checkAutoLogin() {
         const savedDeviceInfo = localStorage.getItem('adminDevice');
         if (!savedDeviceInfo) return false;
         
-        // Проверяем, является ли сохраненная строка JSON
         let deviceInfo;
         try {
             deviceInfo = JSON.parse(savedDeviceInfo);
+            // Проверяем, что это действительно объект с нужными полями
+            if (!deviceInfo.deviceId || !deviceInfo.email) {
+                throw new Error("Invalid device info format");
+            }
         } catch (e) {
-            // Если это не JSON, значит это старая версия (просто deviceId)
-            // Создаем новый объект с этим deviceId
-            deviceInfo = {
-                deviceId: savedDeviceInfo,
-                email: '',
-                lastLogin: 0
-            };
+            console.log("Неверный формат данных устройства, требуется повторный вход");
+            localStorage.removeItem('adminDevice');
+            return false;
         }
         
         const currentDeviceId = getDeviceId();
-        
         if (deviceInfo.deviceId !== currentDeviceId) {
             console.log("Device ID не совпадает");
             return false;
         }
         
-        // Дополнительная проверка в Firebase
-        const snapshot = await database.ref('adminDevices/' + deviceInfo.deviceId).once('value');
-        const firebaseDeviceInfo = snapshot.val();
-        
-        if (!firebaseDeviceInfo) {
-            console.log("Информация об устройстве не найдена в Firebase");
-            return false;
-        }
-        
-        // Если email не был сохранен в localStorage, берем из Firebase
-        if (!deviceInfo.email && firebaseDeviceInfo.email) {
-            deviceInfo.email = firebaseDeviceInfo.email;
-            localStorage.setItem('adminDevice', JSON.stringify(deviceInfo));
-        }
-        
-        // Пытаемся автоматически войти
-        if (deviceInfo.email) {
-            await auth.signInWithEmailAndPassword(deviceInfo.email, '').catch(() => {
-                throw new Error("Автоматический вход не удался");
-            });
+        try {
+            const snapshot = await database.ref('adminDevices/' + deviceInfo.deviceId).once('value');
+            const firebaseDeviceInfo = snapshot.val();
             
-            // Проверяем, что пользователь администратор
-            const user = auth.currentUser;
+            if (!firebaseDeviceInfo) {
+                console.log("Информация об устройстве не найдена в Firebase");
+                return false;
+            }
+            
+            // Пытаемся автоматически войти
+            const userCredential = await auth.signInWithEmailAndPassword(deviceInfo.email, 'dummy-password')
+                .catch(async (error) => {
+                    if (error.code === 'auth/wrong-password') {
+                        // Это ожидаемо, так как мы не храним пароль
+                        // Проверяем UID пользователя другим способом
+                        const user = auth.currentUser;
+                        if (user && ADMIN_UIDS.includes(user.uid)) {
+                            return { user };
+                        }
+                    }
+                    throw error;
+                });
+            
+            const user = userCredential.user;
             if (user && ADMIN_UIDS.includes(user.uid)) {
                 isHybrid = true;
                 hybridBtn.classList.add('hidden');
@@ -437,11 +436,14 @@ async function checkAutoLogin() {
                 updateSyncStatus('Автоматический вход выполнен');
                 return true;
             }
+            
+            return false;
+        } catch (error) {
+            console.log("Ошибка автоматического входа:", error);
+            return false;
         }
-        
-        return false;
     } catch (error) {
-        console.log("Ошибка автоматического входа:", error);
+        console.log("Ошибка в checkAutoLogin:", error);
         return false;
     }
 }
