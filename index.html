@@ -305,6 +305,7 @@
                     setupRealtimeUpdates();
                 } catch (error) {
                     console.error("Ошибка при установке persistence:", error);
+                    updateSyncStatus("Ошибка инициализации Firebase");
                 }
             }
             
@@ -718,90 +719,95 @@
             }
             
             // Обработчики событий
-            if (hybridBtn) {
-                hybridBtn.addEventListener('click', function() {
-                    hybridLogin.classList.remove('hidden');
+            hybridBtn.addEventListener('click', function() {
+                hybridLogin.classList.remove('hidden');
+                const savedDeviceInfo = localStorage.getItem('adminDevice');
+                if (savedDeviceInfo) {
+                    try {
+                        const deviceInfo = JSON.parse(savedDeviceInfo);
+                        hybridEmailInput.value = deviceInfo.email;
+                        hybridPasswordInput.focus();
+                    } catch (e) {
+                        console.log("Ошибка чтения сохраненных данных устройства", e);
+                    }
+                }
+            });
+            
+            cancelBtn.addEventListener('click', function() {
+                hybridLogin.classList.add('hidden');
+                hybridEmailInput.value = '';
+                hybridPasswordInput.value = '';
+            });
+            
+            loginBtn.addEventListener('click', async function() {
+                const email = hybridEmailInput.value.trim();
+                const password = hybridPasswordInput.value.trim();
+                
+                if (!email || !password) {
+                    alert('Пожалуйста, введите email и пароль');
+                    return;
+                }
+                
+                const isValid = await checkPassword(email, password);
+                
+                if (isValid) {
+                    isHybrid = true;
+                    hybridLogin.classList.add('hidden');
+                    hybridEmailInput.value = '';
+                    hybridPasswordInput.value = '';
+                    
+                    saveData();
+                    createDaysInterface();
+                }
+            });
+
+            logoutBtn.addEventListener('click', async function() {
+                try {
+                    await auth.signOut();
+                    
+                    // Удаляем информацию об устройстве
                     const savedDeviceInfo = localStorage.getItem('adminDevice');
                     if (savedDeviceInfo) {
                         try {
                             const deviceInfo = JSON.parse(savedDeviceInfo);
-                            hybridEmailInput.value = deviceInfo.email;
-                            hybridPasswordInput.focus();
-                        } catch (e) {
-                            console.log("Ошибка чтения сохраненных данных устройства", e);
-                        }
-                    }
-                });
-            }
-            
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', function() {
-                    hybridLogin.classList.add('hidden');
-                    hybridEmailInput.value = '';
-                    hybridPasswordInput.value = '';
-                });
-            }
-            
-            if (loginBtn) {
-                loginBtn.addEventListener('click', async function() {
-                    const email = hybridEmailInput.value;
-                    const password = hybridPasswordInput.value;
-                    const isValid = await checkPassword(email, password);
-                    
-                    if (isValid) {
-                        isHybrid = true;
-                        hybridLogin.classList.add('hidden');
-                        hybridEmailInput.value = '';
-                        hybridPasswordInput.value = '';
-                        
-                        saveData();
-                        createDaysInterface();
-                    }
-                });
-            }
-
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', async function() {
-                    try {
-                        await auth.signOut();
-                        
-                        // Удаляем информацию об устройстве
-                        const savedDeviceInfo = localStorage.getItem('adminDevice');
-                        if (savedDeviceInfo) {
-                            try {
-                                const deviceInfo = JSON.parse(savedDeviceInfo);
-                                if (deviceInfo.deviceId) {
-                                    await database.ref('adminDevices/' + deviceInfo.deviceId).remove()
-                                        .catch(e => console.log("Не удалось удалить устройство из Firebase", e));
-                                }
-                            } catch (e) {
-                                console.log("Ошибка парсинга deviceInfo", e);
+                            if (deviceInfo.deviceId) {
+                                await database.ref('adminDevices/' + deviceInfo.deviceId).remove()
+                                    .catch(e => console.log("Не удалось удалить устройство из Firebase", e));
                             }
+                        } catch (e) {
+                            console.log("Ошибка парсинга deviceInfo", e);
                         }
-                        
-                        localStorage.removeItem('adminDevice');
-                        updateSyncStatus('Администратор вышел из системы');
-                        isHybrid = false;
-                        createDaysInterface();
-                    } catch (error) {
-                        console.error('Ошибка выхода:', error);
-                        alert('Ошибка при выходе: ' + error.message);
                     }
-                });
-            }
+                    
+                    localStorage.removeItem('adminDevice');
+                    updateSyncStatus('Администратор вышел из системы');
+                    isHybrid = false;
+                    createDaysInterface();
+                } catch (error) {
+                    console.error('Ошибка выхода:', error);
+                    alert('Ошибка при выходе: ' + error.message);
+                }
+            });
 
             // Инициализация
-            initFirebase().then(() => {
-                loadInitialData().then(() => {
-                    createDaysInterface();
-                    setInterval(checkDateChange, 60000);
-                    startSyncInterval();
+            try {
+                initFirebase().then(() => {
+                    loadInitialData().then(() => {
+                        createDaysInterface();
+                        setInterval(checkDateChange, 60000);
+                        startSyncInterval();
+                    }).catch(error => {
+                        console.error("Ошибка загрузки данных:", error);
+                        updateSyncStatus("Ошибка загрузки данных");
+                    });
                 }).catch(error => {
-                    console.error("Ошибка загрузки данных:", error);
+                    console.error("Ошибка инициализации Firebase:", error);
+                    updateSyncStatus("Ошибка подключения к Firebase");
                 });
-            }).catch(error => {
-                console.error("Ошибка инициализации Firebase:", error);
-            });
+            } catch (e) {
+                console.error("Глобальная ошибка инициализации:", e);
+                updateSyncStatus("Критическая ошибка при запуске");
+            }
         });
     </script>
 </body>
