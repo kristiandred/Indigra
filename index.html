@@ -298,6 +298,10 @@
                 try {
                     await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
                     console.log("Persistence установлен на LOCAL");
+                    
+                    // Проверка автоматического входа при инициализации
+                    await checkAutoLogin();
+                    
                     setupRealtimeUpdates();
                 } catch (error) {
                     console.error("Ошибка при установке persistence:", error);
@@ -318,8 +322,22 @@
                     
                     if (ADMIN_UIDS.includes(userId)) {
                         if (rememberDeviceCheckbox.checked) {
-                            localStorage.setItem('adminDevice', getDeviceId());
-                            localStorage.setItem('adminEmail', email.trim());
+                            // Сохраняем информацию об устройстве
+                            const deviceInfo = {
+                                deviceId: getDeviceId(),
+                                email: email.trim(),
+                                lastLogin: Date.now()
+                            };
+                            
+                            // Сохраняем в локальное хранилище
+                            localStorage.setItem('adminDevice', JSON.stringify(deviceInfo));
+                            
+                            // Сохраняем в Firebase для дополнительной проверки
+                            await database.ref('adminDevices/' + deviceInfo.deviceId).set({
+                                email: email.trim(),
+                                lastLogin: deviceInfo.lastLogin,
+                                uid: userId
+                            });
                         }
                         return true;
                     }
@@ -360,56 +378,47 @@
                 }
             }
 
-            function checkAutoLogin() {
-                const savedDeviceId = localStorage.getItem('adminDevice');
-                const currentDeviceId = getDeviceId();
-                const savedEmail = localStorage.getItem('adminEmail');
-                
-                if (savedDeviceId && savedDeviceId === currentDeviceId && savedEmail) {
-                    updateSyncStatus('Попытка автоматического входа...');
-                    hybridEmailInput.value = savedEmail;
-                    hybridLogin.classList.remove('hidden');
-                    hybridPasswordInput.focus();
-                    return true;
-                }
-                return false;
-            }
-
-            async function saveDataToFirebase() {
+            async function checkAutoLogin() {
                 try {
-                    const user = auth.currentUser;
+                    const savedDeviceInfo = localStorage.getItem('adminDevice');
+                    if (!savedDeviceInfo) return false;
                     
-                    if (!user || !ADMIN_UIDS.includes(user.uid)) {
-                        updateSyncStatus('Ошибка: требуется авторизация администратора');
-                        hybridLogin.classList.remove('hidden');
+                    const deviceInfo = JSON.parse(savedDeviceInfo);
+                    const currentDeviceId = getDeviceId();
+                    
+                    if (deviceInfo.deviceId !== currentDeviceId) {
+                        console.log("Device ID не совпадает");
                         return false;
                     }
-
-                    const updateData = {
-                        selectedNumbers: selectedNumbers,
-                        lastUpdated: Date.now(),
-                        updatedBy: user.email,
-                        updatedFromDevice: getDeviceId()
-                    };
-
-                    await database.ref('hybridData').set(updateData);
                     
-                    updateSyncStatus('Данные сохранены: ' + new Date().toLocaleTimeString());
-                    lastSyncTime = Date.now();
-                    return true;
+                    // Дополнительная проверка в Firebase
+                    const snapshot = await database.ref('adminDevices/' + deviceInfo.deviceId).once('value');
+                    const firebaseDeviceInfo = snapshot.val();
                     
-                } catch (error) {
-                    console.error('Ошибка сохранения:', error);
-                    
-                    if (error.code === 'PERMISSION_DENIED') {
-                        updateSyncStatus('Недостаточно прав. Пожалуйста, войдите как администратор.');
-                        hybridLogin.classList.remove('hidden');
-                    } else if (error.code === 'NETWORK_ERROR') {
-                        updateSyncStatus('Ошибка сети. Изменения не сохранены на сервере.');
-                    } else {
-                        updateSyncStatus('Ошибка сохранения: ' + error.message);
+                    if (!firebaseDeviceInfo || firebaseDeviceInfo.email !== deviceInfo.email) {
+                        console.log("Информация об устройстве не найдена в Firebase");
+                        return false;
                     }
                     
+                    // Пытаемся автоматически войти
+                    await auth.signInWithEmailAndPassword(deviceInfo.email, '').catch(() => {
+                        throw new Error("Автоматический вход не удался");
+                    });
+                    
+                    // Проверяем, что пользователь администратор
+                    const user = auth.currentUser;
+                    if (user && ADMIN_UIDS.includes(user.uid)) {
+                        isHybrid = true;
+                        hybridBtn.classList.add('hidden');
+                        logoutBtn.classList.remove('hidden');
+                        createDaysInterface();
+                        updateSyncStatus('Автоматический вход выполнен');
+                        return true;
+                    }
+                    
+                    return false;
+                } catch (error) {
+                    console.log("Ошибка автоматического входа:", error);
                     return false;
                 }
             }
@@ -629,8 +638,12 @@
                 if (isHybrid) {
                     adminRow.classList.remove('hidden');
                     createAdminRow();
+                    hybridBtn.classList.add('hidden');
+                    logoutBtn.classList.remove('hidden');
                 } else {
                     adminRow.classList.add('hidden');
+                    hybridBtn.classList.remove('hidden');
+                    logoutBtn.classList.add('hidden');
                 }
             }
             
@@ -669,9 +682,10 @@
             if (hybridBtn) {
                 hybridBtn.addEventListener('click', function() {
                     hybridLogin.classList.remove('hidden');
-                    const savedEmail = localStorage.getItem('adminEmail');
-                    if (savedEmail) {
-                        hybridEmailInput.value = savedEmail;
+                    const savedDeviceInfo = localStorage.getItem('adminDevice');
+                    if (savedDeviceInfo) {
+                        const deviceInfo = JSON.parse(savedDeviceInfo);
+                        hybridEmailInput.value = deviceInfo.email;
                         hybridPasswordInput.focus();
                     }
                 });
@@ -707,8 +721,15 @@
                 logoutBtn.addEventListener('click', async function() {
                     try {
                         await auth.signOut();
+                        
+                        // Удаляем информацию об устройстве
+                        const savedDeviceInfo = localStorage.getItem('adminDevice');
+                        if (savedDeviceInfo) {
+                            const deviceInfo = JSON.parse(savedDeviceInfo);
+                            await database.ref('adminDevices/' + deviceInfo.deviceId).remove();
+                        }
+                        
                         localStorage.removeItem('adminDevice');
-                        localStorage.removeItem('adminEmail');
                         updateSyncStatus('Администратор вышел из системы');
                         isHybrid = false;
                         createDaysInterface();
@@ -723,6 +744,7 @@
                 loadInitialData().then(() => {
                     createDaysInterface();
                     setInterval(checkDateChange, 60000);
+                    startSyncInterval();
                 }).catch(error => {
                     console.error("Ошибка загрузки данных:", error);
                 });
