@@ -294,14 +294,18 @@
                 return reorderedDays;
             }
 
-            async function initFirebase() {
-                try {
-                    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                    console.log("Persistence установлен на LOCAL");
-                } catch (error) {
-                    console.error("Ошибка при установке persistence:", error);
-                }
-            }
+            // В функции initFirebase добавьте:
+async function initFirebase() {
+    try {
+        await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        console.log("Persistence установлен на LOCAL");
+        
+        // Инициализация прослушивания изменений
+        setupRealtimeUpdates();
+    } catch (error) {
+        console.error("Ошибка при установке persistence:", error);
+    }
+}
             
             async function checkPassword(email, password) {
                 try {
@@ -452,54 +456,61 @@
     }
 });
             
-            async function loadDataFromFirebase() {
-                try {
-                    const snapshot = await database.ref('hybridData').once('value');
-                    const data = snapshot.val();
+           function setupRealtimeUpdates() {
+    // Останавливаем предыдущие интервалы
+    if (refreshInterval) clearInterval(refreshInterval);
+    if (pageRefreshInterval) clearInterval(pageRefreshInterval);
+    if (syncInterval) clearInterval(syncInterval);
 
-                    if (data) {
-                        if (!lastSyncTime || data.lastUpdated > lastSyncTime) {
-                            selectedNumbers = data.selectedNumbers || {};
-                            lastSyncTime = data.lastUpdated;
-                            
-                            localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
-                            localStorage.setItem('lastSyncTime', lastSyncTime.toString());
-                            
-                            updateSyncStatus('Данные обновлены: ' + new Date(data.lastUpdated).toLocaleTimeString());
-                            return true;
-                        } else {
-                            updateSyncStatus('Данные актуальны');
-                            return false;
-                        }
-                    } else {
-                        updateSyncStatus('Нет данных на сервере');
-                        return false;
-                    }
-                    
-                } catch (error) {
-                    console.error('Ошибка загрузки:', error);
-                    
-                    if (error.code === 'PERMISSION_DENIED') {
-                        const savedData = localStorage.getItem('selectedNumbers');
-                        if (savedData) {
-                            selectedNumbers = JSON.parse(savedData);
-                            updateSyncStatus('Используются локальные данные (требуется авторизация для обновления)');
-                            return false;
-                        }
-                        updateSyncStatus('Ошибка: Нет прав доступа к данным');
-                    } else if (error.code === 'NETWORK_ERROR') {
-                        updateSyncStatus('Ошибка сети. Используются локальные данные');
-                        const savedData = localStorage.getItem('selectedNumbers');
-                        if (savedData) {
-                            selectedNumbers = JSON.parse(savedData);
-                        }
-                    } else {
-                        updateSyncStatus('Ошибка загрузки данных: ' + error.message);
-                    }
-                    
-                    return false;
-                }
+    // Подписываемся на изменения в базе данных
+    database.ref('hybridData').on('value', (snapshot) => {
+        const data = snapshot.val();
+        
+        if (data) {
+            if (!lastSyncTime || data.lastUpdated > lastSyncTime) {
+                selectedNumbers = data.selectedNumbers || {};
+                lastSyncTime = data.lastUpdated;
+                
+                localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+                localStorage.setItem('lastSyncTime', lastSyncTime.toString());
+                
+                updateSyncStatus('Данные обновлены: ' + new Date(data.lastUpdated).toLocaleTimeString());
+                createDaysInterface();
             }
+        } else {
+            updateSyncStatus('Нет данных на сервере');
+        }
+    }, (error) => {
+        console.error('Ошибка прослушивания:', error);
+        updateSyncStatus('Ошибка подключения к серверу');
+    });
+}
+
+// Удалите старую функцию loadDataFromFirebase и замените её на эту:
+async function loadInitialData() {
+    try {
+        const snapshot = await database.ref('hybridData').once('value');
+        const data = snapshot.val();
+
+        if (data) {
+            selectedNumbers = data.selectedNumbers || {};
+            lastSyncTime = data.lastUpdated;
+            
+            localStorage.setItem('selectedNumbers', JSON.stringify(selectedNumbers));
+            localStorage.setItem('lastSyncTime', lastSyncTime.toString());
+            
+            updateSyncStatus('Данные загружены: ' + new Date(data.lastUpdated).toLocaleTimeString());
+            return true;
+        } else {
+            updateSyncStatus('Нет данных на сервере');
+            return false;
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+        updateSyncStatus('Ошибка загрузки данных');
+        return false;
+    }
+}
             
             function saveData() {
                 localStorage.setItem('hybridStatus', isHybrid ? 'true' : 'false');
@@ -690,15 +701,7 @@
                 }, 30000);
             }
             
-            function setupAutoRefresh() {
-                refreshInterval = setInterval(async () => {
-                    await loadDataFromFirebase();
-                }, 5000);
-
-                pageRefreshInterval = setInterval(() => {
-                    location.reload();
-                }, 300000);
-            }
+           
             
             function checkDateChange() {
                 const newDateKey = getDateKey();
@@ -810,13 +813,13 @@
             });
 
             // Инициализация
-            initFirebase();
-            loadData();
+            initFirebase().then(() => {
+        loadInitialData().then(() => {
             createDaysInterface();
             setInterval(checkDateChange, 60000);
-            startSyncInterval();
-            setupAutoRefresh();
         });
+    });
+});
     </script>
 </body>
 </html>
