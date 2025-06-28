@@ -214,6 +214,7 @@
     <button id="logout-btn" class="hybrid-btn hidden" style="right: 120px;">🚪 Выйти</button>
 
     <script>
+        const ADMIN_UIDS = ['DegfORMmNnQB09KJG3NOd1Cf61D2'];
         // Конфигурация Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBar6H-aFq-vB8fFRaB5Ue-zHhBzwwiQf0",
@@ -385,11 +386,9 @@
                 return false;
             }
 
-           async function saveDataToFirebase() {
+          async function saveDataToFirebase() {
     try {
         const user = auth.currentUser;
-        // Определяем ADMIN_UIDS внутри функции или выносим в глобальную область
-        const ADMIN_UIDS = ['DegfORMmNnQB09KJG3NOd1Cf61D2']; // UID администратора
         
         if (!user || !ADMIN_UIDS.includes(user.uid)) {
             updateSyncStatus('Ошибка: требуется авторизация администратора');
@@ -425,6 +424,33 @@
         return false;
     }
 }
+
+            auth.onAuthStateChanged(async (user) => {
+    if (user && ADMIN_UIDS.includes(user.uid)) {
+        isHybrid = true;
+        adminRow.classList.remove('hidden');
+        if (hybridBtn) hybridBtn.classList.add('hidden');
+        if (logoutBtn) logoutBtn.classList.remove('hidden');
+        updateSyncStatus('Администратор вошел в систему');
+        
+        await loadDataFromFirebase();
+        createDaysInterface();
+    } else {
+        isHybrid = false;
+        adminRow.classList.add('hidden');
+        if (hybridBtn) hybridBtn.classList.remove('hidden');
+        if (logoutBtn) logoutBtn.classList.add('hidden');
+        
+        try {
+            await loadDataFromFirebase();
+        } catch (e) {
+            console.error('Ошибка загрузки данных:', e);
+        }
+        createDaysInterface();
+        
+        checkAutoLogin();
+    }
+});
             
             async function loadDataFromFirebase() {
                 try {
