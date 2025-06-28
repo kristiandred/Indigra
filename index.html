@@ -165,9 +165,10 @@
         }
     </style>
    <!-- Firebase SDK должен загружаться первым -->
+<!-- В секции head добавьте эти скрипты -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="app.js"></script>
 </head>
 <body>
     <h1>Свободные гибриды Индигра</h1>
@@ -211,21 +212,28 @@
 
     <script>
         // Конфигурация Firebase
-       const firebaseConfig = {
+       // Конфигурация Firebase
+const firebaseConfig = {
   apiKey: "AIzaSyBar6H-aFq-vB8fFRaB5Ue-zHhBzwwiQf0",
   authDomain: "indigra-578df.firebaseapp.com",
   databaseURL: "https://indigra-578df-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "indigra-578df",
-  storageBucket: "indigra-578df.firebasestorage.app",
+  storageBucket: "indigra-578df.appspot.com",
   messagingSenderId: "819436341016",
   appId: "1:819436341016:web:c3e2029ce5f0b8055d806d",
   measurementId: "G-T6VNYJLXBN"
 };
 
-        // Инициализация Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const auth = firebase.auth();
+// Инициализация Firebase
+let app, auth, database;
+try {
+  app = firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  database = firebase.database();
+  console.log("Firebase инициализирован успешно");
+} catch (error) {
+  console.error("Ошибка инициализации Firebase:", error);
+}
 
         document.addEventListener('DOMContentLoaded', function() {
             const daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
