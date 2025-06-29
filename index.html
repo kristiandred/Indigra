@@ -163,12 +163,28 @@
                 justify-content: center;
             }
         }
+         .server-error {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f44336;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            z-index: 10000;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 <body>
+     <div class="server-error">
+        ⚠️ Сервер временно недоступен. Приложение работает в ограниченном режиме. Попробуйте обновить страницу позже.
+    </div>
     <h1>Свободные гибриды Индигра</h1>
     
     <button id="hybrid-btn" class="hybrid-btn">🔰 Гибрид</button>
