@@ -4,157 +4,92 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Редактор Excel - ИНДИГРА</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="css/custom.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/zoom.css" />
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        /* Навигационная панель */
-        .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            padding: 1rem 2rem;
-        }
-
-        .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1e3a8a !important;
-        }
-
-        /* Основной контейнер */
-        .admin-container {
-            max-width: 1600px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-
-        /* Карточки таблиц */
-        .table-card {
+        /* Стили для прайс-листа */
+        .price-section {
+            margin-bottom: 40px;
+            padding: 25px;
             background: white;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            margin-bottom: 2rem;
-            overflow: hidden;
-            border: 1px solid #dbeafe;
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--ice-blue);
         }
 
-        .table-header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            color: white;
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
+        .price-section h2 {
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--light-blue);
+            font-weight: 700;
+            font-size: 1.8rem;
         }
 
-        .table-header h3 {
-            margin: 0;
-            font-size: 1.4rem;
+        .price-section h3 {
+            color: var(--primary-blue);
+            margin: 20px 0 15px 0;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            font-size: 1.4rem;
         }
 
-        .table-header .file-name {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-family: monospace;
-        }
-
-        .table-actions {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .btn-action {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        .btn-action:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .btn-action.delete:hover {
-            background: #dc3545;
-        }
-
-        .btn-action.save:hover {
-            background: #28a745;
-        }
-
-        /* Таблица */
-        .table-wrapper {
-            padding: 1.5rem;
-            overflow-x: auto;
-        }
-
-        .editable-table {
+        .price-table {
             width: 100%;
             border-collapse: collapse;
-            border: 2px solid #dbeafe;
+            margin-bottom: 20px;
             border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
         }
 
-        .editable-table th {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            color: #1e3a8a;
+        .price-table thead {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .price-table th {
+            padding: 15px;
             font-weight: 600;
-            padding: 12px;
-            border: 1px solid #90caf9;
+            text-align: left;
+            border: 1px solid rgba(255,255,255,0.1);
             position: relative;
-            min-width: 120px;
         }
 
-        .editable-table td {
-            padding: 8px;
-            border: 1px solid #dbeafe;
+        .price-table td {
+            padding: 12px 15px;
+            border: 1px solid var(--ice-blue);
             background: white;
         }
 
-        .editable-table td.editing {
-            padding: 0;
+        .price-table tbody tr:nth-child(even) td {
+            background: var(--light-gray);
         }
 
-        .editable-table input {
-            width: 100%;
-            padding: 8px;
-            border: 2px solid #3b82f6;
-            border-radius: 4px;
-            font-size: 1rem;
-            outline: none;
-            box-sizing: border-box;
+        .price-table tbody tr:hover td {
+            background: var(--ice-blue);
+            transition: background 0.3s ease;
         }
 
-        .editable-table td:hover {
-            background: #f0f9ff;
-            cursor: pointer;
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .badge-price {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
         }
 
         /* Элементы управления столбцами */
@@ -182,7 +117,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            color: #1e3a8a;
+            color: var(--primary-blue);
             font-size: 14px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             transition: all 0.2s ease;
@@ -193,19 +128,19 @@
         }
 
         .col-btn.add-col:hover {
-            background: #28a745;
+            background: var(--success-green);
             color: white;
         }
 
         .col-btn.delete-col:hover {
-            background: #dc3545;
+            background: var(--danger-red);
             color: white;
         }
 
         /* Кнопки добавления строк */
         .add-row-btn {
             margin-top: 1rem;
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: var(--gradient-success);
             color: white;
             border: none;
             padding: 0.7rem 1.5rem;
@@ -223,6 +158,44 @@
             box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
         }
 
+        /* Редактируемые ячейки */
+        .price-table td.editing {
+            padding: 0;
+        }
+
+        .price-table input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--primary-blue);
+            border-radius: 4px;
+            font-size: 1rem;
+            outline: none;
+            box-sizing: border-box;
+            background: white;
+        }
+
+        .price-table td:hover {
+            background: var(--ice-blue);
+            cursor: pointer;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 0 1rem;
+            }
+            
+            .price-section {
+                padding: 15px;
+            }
+            
+            .price-table th,
+            .price-table td {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+        }
+
         /* Панель добавления таблиц */
         .add-table-panel {
             background: white;
@@ -230,11 +203,11 @@
             padding: 2rem;
             margin: 2rem 0;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            border: 2px dashed #3b82f6;
+            border: 2px dashed var(--primary-blue);
         }
 
         .add-table-panel h4 {
-            color: #1e3a8a;
+            color: var(--primary-blue);
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
@@ -247,7 +220,7 @@
 
         .form-group label {
             font-weight: 600;
-            color: #1e3a8a;
+            color: var(--primary-blue);
             margin-bottom: 0.5rem;
             display: block;
         }
@@ -255,20 +228,20 @@
         .form-control {
             width: 100%;
             padding: 0.8rem;
-            border: 2px solid #dbeafe;
+            border: 2px solid var(--ice-blue);
             border-radius: 8px;
             font-size: 1rem;
             transition: all 0.3s ease;
         }
 
         .form-control:focus {
-            border-color: #3b82f6;
+            border-color: var(--primary-blue);
             outline: none;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            background: var(--gradient-primary);
             border: none;
             padding: 0.8rem 2rem;
             font-weight: 600;
@@ -305,13 +278,13 @@
         }
 
         .modal-content h4 {
-            color: #1e3a8a;
+            color: var(--primary-blue);
             margin-bottom: 1rem;
         }
 
         .modal-content p {
             margin-bottom: 1.5rem;
-            color: #4a5568;
+            color: var(--text-gray);
         }
 
         .modal-actions {
@@ -335,15 +308,15 @@
         }
 
         .notification.success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: var(--gradient-success);
         }
 
         .notification.error {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: var(--gradient-danger);
         }
 
         .notification.info {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            background: var(--gradient-primary);
         }
 
         @keyframes slideIn {
@@ -373,7 +346,7 @@
         }
 
         .btn-action.sync:hover {
-            background: #6c757d;
+            background: var(--text-gray);
         }
 
         /* Статус синхронизации */
@@ -410,38 +383,77 @@
                 padding: 0 1rem;
             }
             
-            .table-header {
-                flex-direction: column;
-                align-items: flex-start;
+            .price-section {
+                padding: 15px;
             }
             
-            .table-actions {
-                width: 100%;
-                justify-content: flex-start;
+            .price-table th,
+            .price-table td {
+                padding: 8px;
+                font-size: 0.9rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Навигация -->
-    <nav class="navbar">
-        <div class="container-fluid">
-            <span class="navbar-brand">
-                <i class="bi bi-table"></i> Редактор Excel - ИНДИГРА
-            </span>
-            <div>
-                <button class="btn btn-outline-primary me-2" onclick="showAddTablePanel()">
-                    <i class="bi bi-plus-lg"></i> Новая таблица
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <div class="navbar-brand-wrapper">
+                    <a class="navbar-brand d-flex align-items-center" href="index.html">
+                        <img src="images/Логотип 1.svg" alt="ИНДИГРА" class="navbar-logo me-2">
+                        <span>ИНДИГРА - Админ-панель</span>
+                    </a>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
                 </button>
-                <a href="AutorithAdmin.html" class="btn btn-outline-danger">
-                    <i class="bi bi-box-arrow-right"></i> Выйти
-                </a>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Главная</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="about.html">О компании</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="products.html">Услуги</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="price.html">Прайс</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="delivery.html">Доставка и оплата</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contact.html">Контакты</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Админ-панель</a>
+                        </li>
+                    </ul>
+                    <div class="ms-lg-3 mt-2 mt-lg-0">
+                        <div class="navbar-phones">
+                            <a href="tel:+375291083083" class="phone-link">📞 +375 29 108-30-83</a>
+                            <a href="tel:+375291697227" class="phone-link">📞 +375 29 169-72-27</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
-    <!-- Основной контейнер -->
-    <div class="admin-container">
+    <main role="main">
+        <!-- Hero Section -->
+        <section class="hero-section delivery-page">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Администрирование таблиц Excel</h1>
+                </div>
+            </div>
+        </section>
+
+        <div class="container py-5">
         <!-- Индикатор загрузки -->
         <div id="loadingIndicator" class="text-center text-white my-5" style="display: none;">
             <div class="spinner-border text-light" role="status">
@@ -481,7 +493,8 @@
                 </button>
             </div>
         </div>
-    </div>
+        </div>
+    </main>
 
     <script>
         // Глобальные переменные
@@ -526,34 +539,36 @@
             ]
         };
 
-        // Загрузка Excel файла (сначала пробуем встроенные данные, потом сервер)
+        // Загрузка Excel файла (сначала пробуем реальные файлы, потом встроенные данные)
         async function loadExcelFile(filename) {
             try {
-                // Сначала пробуем встроенные данные
-                if (embeddedData[filename]) {
-                    console.log(`Используем встроенные данные для ${filename}`);
-                    return embeddedData[filename];
-                }
-                
-                // Если встроенных данных нет, пробуем загрузить с сервера
+                // Сначала пробуем загрузить реальные файлы
                 const response = await fetch(`data/${filename}`);
-                if (!response.ok) {
-                    throw new Error(`Файл ${filename} не найден`);
+                if (response.ok) {
+                    const arrayBuffer = await response.arrayBuffer();
+                    const data = new Uint8Array(arrayBuffer);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const result = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+                    console.log(`Загружены реальные данные из ${filename}:`, result);
+                    return result;
                 }
-                const arrayBuffer = await response.arrayBuffer();
-                const data = new Uint8Array(arrayBuffer);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                return XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
             } catch (error) {
-                console.error(`Ошибка загрузки ${filename}:`, error);
-                // Возвращаем пустую таблицу если файл не найден
-                return [
-                    ['Заголовок 1', 'Заголовок 2', 'Заголовок 3'],
-                    ['', '', ''],
-                    ['', '', '']
-                ];
+                console.log(`Не удалось загрузить ${filename}, используем встроенные данные:`, error);
             }
+            
+            // Если реальные файлы не загрузились, используем встроенные данные
+            if (embeddedData[filename]) {
+                console.log(`Используем встроенные данные для ${filename}`);
+                return embeddedData[filename];
+            }
+            
+            // Возвращаем пустую таблицу если файл не найден
+            return [
+                ['Заголовок 1', 'Заголовок 2', 'Заголовок 3'],
+                ['', '', ''],
+                ['', '', '']
+            ];
         }
 
         // Сохранение в Excel файл на сервере
@@ -864,8 +879,8 @@
             const headers = tableData[0] || [];
             
             let html = `
-                <div class="table-wrapper">
-                    <table class="editable-table">
+                <div class="table-responsive">
+                    <table class="price-table">
                         <thead>
                             <tr>
             `;
@@ -916,10 +931,10 @@
             html += `
                         </tbody>
                     </table>
-                    <button class="add-row-btn" onclick="addRow('${tableId}')">
-                        <i class="bi bi-plus-lg"></i> Добавить строку
-                    </button>
                 </div>
+                <button class="add-row-btn" onclick="addRow('${tableId}')">
+                    <i class="bi bi-plus-lg"></i> Добавить строку
+                </button>
             `;
             
             container.innerHTML = html;
@@ -934,23 +949,22 @@
                 const { filename, title } = window.tableInfo[tableId];
                 
                 html += `
-                    <div class="table-card" id="table-${tableId}">
-                        <div class="table-header">
-                            <h3>
-                                <i class="bi bi-table"></i> ${title}
-                                <span class="file-name">${filename}</span>
-                                <span id="sync-status-${filename}" class="sync-status synced">
+                    <div class="price-section" id="table-${tableId}">
+                        <h2>📊 ${title}</h2>
+                        <h3>📋 Редактирование данных</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <span class="file-name" style="background: var(--gradient-primary); color: white; padding: 5px 10px; border-radius: 20px; font-size: 0.9rem; font-family: monospace;">${filename}</span>
+                            <div style="display: flex; gap: 10px;">
+                                <span id="sync-status-${filename}" class="sync-status synced" style="background: rgba(40, 167, 69, 0.3); color: #155724; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem;">
                                     <i class="bi bi-check-circle"></i> Синхронизировано
                                 </span>
-                            </h3>
-                            <div class="table-actions">
-                                <button class="btn-action save" onclick="saveTable('${tableId}', '${filename}')">
+                                <button class="btn btn-primary btn-sm" onclick="saveTable('${tableId}', '${filename}')" style="padding: 5px 15px;">
                                     <i class="bi bi-save"></i> Сохранить
                                 </button>
-                                <button class="btn-action sync" onclick="syncToGitHub('${filename}')">
-                                    <i class="bi bi-github"></i> Синхронизировать
+                                <button class="btn btn-secondary btn-sm" onclick="syncToGitHub('${filename}')" style="padding: 5px 15px;">
+                                    <i class="bi bi-github"></i> GitHub
                                 </button>
-                                <button class="btn-action delete" onclick="deleteTable('${tableId}', '${filename}')">
+                                <button class="btn btn-danger btn-sm" onclick="deleteTable('${tableId}', '${filename}')" style="padding: 5px 15px;">
                                     <i class="bi bi-trash"></i> Удалить
                                 </button>
                             </div>

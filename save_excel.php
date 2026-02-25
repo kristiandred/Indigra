@@ -1,15 +1,17 @@
 <?php
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
     exit(0);
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Метод не разрешен']);
+    http_response_code(405); // Method Not Allowed
+    echo json_encode(['success' => false, 'message' => 'Метод не разрешен. Используйте POST']);
     exit;
 }
 
@@ -24,7 +26,7 @@ try {
     $data = $input['data'];
     
     // Проверка безопасности имени файла
-    if (!preg_match('/^[a-zA-Z0-9_-]+\.xlsx$/', $filename)) {
+    if (!preg_match('/^[a-zA-Z0-9_-а-яА-ЯёЁ\.xlsx$/', $filename)) {
         throw new Exception('Недопустимое имя файла');
     }
     
@@ -56,6 +58,7 @@ try {
     ]);
     
 } catch (Exception $e) {
+    http_response_code(500);
     echo json_encode([
         'success' => false,
         'message' => $e->getMessage()
