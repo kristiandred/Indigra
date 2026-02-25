@@ -203,6 +203,34 @@
             font-size: 1.2rem;
         }
 
+        .debug-info {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow: auto;
+            display: none;
+        }
+
+        .debug-info.show {
+            display: block;
+        }
+
+        .debug-toggle {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
         /* Скрываем индикаторы масштаба */
         #zoom-indicator,
         .zoom-controls,
@@ -221,7 +249,10 @@
 <body>
     <div class="admin-header">
         <h1>🔧 Панель администратора ИНДИГРА</h1>
-        <a href="AutorithAdmin.html" class="btn-exit">🚪 Выйти</a>
+        <div>
+            <button class="debug-toggle" onclick="toggleDebug()">🐛 Показать отладку</button>
+            <a href="AutorithAdmin.html" class="btn-exit">🚪 Выйти</a>
+        </div>
     </div>
 
     <div class="admin-container">
@@ -232,6 +263,9 @@
             <div class="loading-spinner"></div>
             Загрузка данных из Excel файлов...
         </div>
+
+        <!-- Отладочная информация -->
+        <div id="debugInfo" class="debug-info"></div>
 
         <!-- Контейнер для таблиц -->
         <div id="tablesContainer"></div>
@@ -254,6 +288,67 @@
                 console.error(`Ошибка загрузки ${filename}:`, error);
                 return null;
             }
+        }
+
+        // Функция для отладки - показывает структуру данных
+        function debugData(filename, data) {
+            if (!data) return `❌ ${filename}: нет данных`;
+            
+            let info = `📁 ${filename}:\n`;
+            info += `Строк: ${data.length}\n`;
+            
+            // Показываем первые 5 строк для понимания структуры
+            info += 'Первые 5 строк:\n';
+            for (let i = 0; i < Math.min(5, data.length); i++) {
+                const row = data[i];
+                if (row && row.length > 0) {
+                    const rowPreview = row.map(cell => 
+                        cell !== undefined && cell !== null ? String(cell).substring(0, 20) : 'пусто'
+                    ).join(' | ');
+                    info += `  ${i}: ${rowPreview}\n`;
+                }
+            }
+            
+            // Ищем строки с "МКАД"
+            info += 'Поиск "МКАД":\n';
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
+                if (row && row[0] && String(row[0]).includes('МКАД')) {
+                    info += `  Строка ${i}: ${String(row[0])}\n`;
+                }
+            }
+            
+            return info;
+        }
+
+        // Функция для поиска таблицы по ключевым словам
+        function findTableByKeyword(data, keywords, startFrom = 0) {
+            if (!data) return null;
+            
+            for (let i = startFrom; i < data.length; i++) {
+                const row = data[i];
+                if (!row || !row[0]) continue;
+                
+                const cellValue = String(row[0]).toLowerCase();
+                for (const keyword of keywords) {
+                    if (cellValue.includes(keyword.toLowerCase())) {
+                        // Нашли заголовок, теперь ищем конец таблицы
+                        let endIndex = i + 1;
+                        while (endIndex < data.length) {
+                            const nextRow = data[endIndex];
+                            // Если следующая строка пустая или начинается с нового заголовка
+                            if (!nextRow || !nextRow[0] || 
+                                String(nextRow[0]).trim() === '' ||
+                                (endIndex > i + 1 && String(nextRow[0]).includes(':'))) {
+                                break;
+                            }
+                            endIndex++;
+                        }
+                        return { start: i, end: endIndex };
+                    }
+                }
+            }
+            return null;
         }
 
         // Функция создания таблицы из данных
@@ -285,7 +380,7 @@
                 
                 html += '<tr>';
                 for (let cell of row) {
-                    if (cell !== undefined) {
+                    if (cell !== undefined && cell !== null) {
                         const cellValue = String(cell).trim();
                         if (cellValue !== '') {
                             // Если это цена - оборачиваем в badge
@@ -309,23 +404,28 @@
         }
 
         // Функция создания информационного блока
-        function createInfoBlock(data, startIndex) {
-            let infoText = '';
-            for (let i = startIndex; i < data.length; i++) {
-                const row = data[i];
-                if (row && row[0] && String(row[0]).includes('Рейс АБС')) {
-                    infoText = String(row[0]).trim();
-                    break;
+        function createInfoBlock(data, keywords) {
+            for (let row of data) {
+                if (row && row[0]) {
+                    for (let keyword of keywords) {
+                        if (String(row[0]).includes(keyword)) {
+                            return `<div class="info-box">ℹ️ ${String(row[0]).trim()}</div>`;
+                        }
+                    }
                 }
             }
-            return infoText ? `<div class="info-box">ℹ️ ${infoText}</div>` : '';
+            return '';
         }
 
         // Функция создания предупреждения
-        function createWarningBlock(data) {
+        function createWarningBlock(data, keywords) {
             for (let row of data) {
-                if (row && row[0] && String(row[0]).includes('ЗАКАЗЫ НЕ ПРИНИМАЮТСЯ')) {
-                    return `<div class="warning-box">⚠️ ${String(row[0]).trim()}</div>`;
+                if (row && row[0]) {
+                    for (let keyword of keywords) {
+                        if (String(row[0]).includes(keyword)) {
+                            return `<div class="warning-box">⚠️ ${String(row[0]).trim()}</div>`;
+                        }
+                    }
                 }
             }
             return '';
@@ -335,6 +435,7 @@
         async function loadAllTables() {
             const loadingIndicator = document.getElementById('loadingIndicator');
             const container = document.getElementById('tablesContainer');
+            const debugDiv = document.getElementById('debugInfo');
             
             // Загружаем оба файла
             const [tarifData, nasosData] = await Promise.all([
@@ -343,6 +444,16 @@
             ]);
             
             loadingIndicator.style.display = 'none';
+            
+            // Отладочная информация
+            let debugText = '';
+            if (tarifData) {
+                debugText += debugData('tarif.xlsx', tarifData) + '\n\n';
+            }
+            if (nasosData) {
+                debugText += debugData('Nasos.xlsx', nasosData);
+            }
+            debugDiv.textContent = debugText;
             
             if (!tarifData && !nasosData) {
                 container.innerHTML = '<div class="error-message">❌ Не удалось загрузить файлы tarif.xlsx и Nasos.xlsx</div>';
@@ -356,24 +467,60 @@
                 html += '<div class="table-card">';
                 html += '<h2>🚚 Автобетоносмесители (АБС) <span class="data-source">tarif.xlsx</span></h2>';
                 
-                // Основная таблица
-                html += '<h3>📋 Основные услуги</h3>';
-                const mainTableData = tarifData.slice(0, 12); // Первые 12 строк с услугами
-                html += createTable(mainTableData, 'АБС');
+                // Ищем основную таблицу услуг
+                const mainTableRange = findTableByKeyword(tarifData, ['услуги', 'тарифы', 'цена'], 0);
+                if (mainTableRange) {
+                    html += '<h3>📋 Основные услуги</h3>';
+                    const mainTableData = tarifData.slice(mainTableRange.start, mainTableRange.end);
+                    html += createTable(mainTableData, 'АБС');
+                } else {
+                    // Если не нашли, показываем первые строки
+                    html += '<h3>📋 Основные услуги</h3>';
+                    html += createTable(tarifData.slice(0, 12), 'АБС');
+                }
                 
-                // Дополнительные услуги
-                html += '<h3>⏱️ Дополнительные услуги</h3>';
-                const additionalData = tarifData.slice(12, 15); // Строки с доп. услугами
-                html += createTable(additionalData, 'Дополнительно');
+                // Ищем дополнительные услуги
+                const additionalRange = findTableByKeyword(tarifData, ['дополнительные', 'доп. услуги'], 5);
+                if (additionalRange) {
+                    html += '<h3>⏱️ Дополнительные услуги</h3>';
+                    const additionalData = tarifData.slice(additionalRange.start, additionalRange.end);
+                    html += createTable(additionalData, 'Дополнительно');
+                }
                 
-                // Информация о рейсе
-                const infoBlock = createInfoBlock(tarifData, 15);
+                // Информационные блоки
+                const infoBlock = createInfoBlock(tarifData, ['Рейс', 'Примечание', 'Время']);
                 if (infoBlock) html += infoBlock;
                 
-                // Доставка за МКАД
-                html += '<h3>🛣️ Доставка за пределы МКАД</h3>';
-                const mkdData = tarifData.slice(18, 23); // Строки с МКАД
-                html += createTable(mkdData, 'МКАД');
+                // Ищем таблицу МКАД - ЭТО ВАЖНО!
+                const mkdRange = findTableByKeyword(tarifData, ['МКАД', 'за МКАД', 'доставка за'], 10);
+                if (mkdRange) {
+                    html += '<h3>🛣️ Доставка за пределы МКАД</h3>';
+                    const mkdData = tarifData.slice(mkdRange.start, mkdRange.end);
+                    html += createTable(mkdData, 'МКАД');
+                } else {
+                    // Если не нашли по ключевым словам, пробуем найти по содержимому
+                    html += '<h3>🛣️ Доставка за пределы МКАД</h3>';
+                    // Ищем строки содержащие "МКАД"
+                    const mkdRows = [];
+                    for (let i = 0; i < tarifData.length; i++) {
+                        const row = tarifData[i];
+                        if (row && row[0] && String(row[0]).includes('МКАД')) {
+                            mkdRows.push(row);
+                            // Добавляем следующие строки, пока они не пустые
+                            let j = i + 1;
+                            while (j < tarifData.length && tarifData[j] && tarifData[j][0] && String(tarifData[j][0]).trim() !== '') {
+                                mkdRows.push(tarifData[j]);
+                                j++;
+                            }
+                            break;
+                        }
+                    }
+                    if (mkdRows.length > 0) {
+                        html += createTable(mkdRows, 'МКАД');
+                    } else {
+                        html += '<p>Таблица с доставкой за МКАД не найдена</p>';
+                    }
+                }
                 
                 html += '<div class="last-updated">📅 Данные из tarif.xlsx</div>';
                 html += '</div>';
@@ -384,34 +531,81 @@
                 html += '<div class="table-card">';
                 html += '<h2>🚛 Автобетоносмесители с насосом <span class="data-source">Nasos.xlsx</span></h2>';
                 
-                // Основная таблица
-                html += '<h3>📋 Основные услуги</h3>';
-                const mainTableData = nasosData.slice(0, 9); // Первые 9 строк с услугами
-                html += createTable(mainTableData, 'АБС с насосом');
+                // Ищем основную таблицу услуг
+                const mainTableRange = findTableByKeyword(nasosData, ['услуги', 'тарифы', 'цена'], 0);
+                if (mainTableRange) {
+                    html += '<h3>📋 Основные услуги</h3>';
+                    const mainTableData = nasosData.slice(mainTableRange.start, mainTableRange.end);
+                    html += createTable(mainTableData, 'АБС с насосом');
+                } else {
+                    html += '<h3>📋 Основные услуги</h3>';
+                    html += createTable(nasosData.slice(0, 9), 'АБС с насосом');
+                }
                 
-                // Дополнительные услуги
-                html += '<h3>⏱️ Дополнительные услуги</h3>';
-                const additionalData = nasosData.slice(9, 14); // Строки с доп. услугами
-                html += createTable(additionalData, 'Дополнительно');
+                // Ищем дополнительные услуги
+                const additionalRange = findTableByKeyword(nasosData, ['дополнительные', 'доп. услуги'], 5);
+                if (additionalRange) {
+                    html += '<h3>⏱️ Дополнительные услуги</h3>';
+                    const additionalData = nasosData.slice(additionalRange.start, additionalRange.end);
+                    html += createTable(additionalData, 'Дополнительно');
+                }
                 
                 // Предупреждение о мойке
-                const warningBlock = createWarningBlock(nasosData);
+                const warningBlock = createWarningBlock(nasosData, ['ЗАКАЗЫ НЕ ПРИНИМАЮТСЯ', 'мойка', 'стоп']);
                 if (warningBlock) html += warningBlock;
                 
-                // Информация о рейсе
-                const infoBlock = createInfoBlock(nasosData, 16);
+                // Информационные блоки
+                const infoBlock = createInfoBlock(nasosData, ['Рейс', 'Примечание', 'Время']);
                 if (infoBlock) html += infoBlock;
                 
-                // Доставка за МКАД
-                html += '<h3>🗺️ Доставка за пределы МКАД</h3>';
-                const mkdData = nasosData.slice(22, 27); // Строки с МКАД
-                html += createTable(mkdData, 'МКАД с насосом');
+                // Ищем таблицу МКАД - ЭТО ВАЖНО!
+                const mkdRange = findTableByKeyword(nasosData, ['МКАД', 'за МКАД', 'доставка за'], 15);
+                if (mkdRange) {
+                    html += '<h3>🛣️ Доставка за пределы МКАД</h3>';
+                    const mkdData = nasosData.slice(mkdRange.start, mkdRange.end);
+                    html += createTable(mkdData, 'МКАД с насосом');
+                } else {
+                    // Если не нашли по ключевым словам, пробуем найти по содержимому
+                    html += '<h3>🛣️ Доставка за пределы МКАД</h3>';
+                    // Ищем строки содержащие "МКАД"
+                    const mkdRows = [];
+                    for (let i = 0; i < nasosData.length; i++) {
+                        const row = nasosData[i];
+                        if (row && row[0] && String(row[0]).includes('МКАД')) {
+                            mkdRows.push(row);
+                            // Добавляем следующие строки, пока они не пустые
+                            let j = i + 1;
+                            while (j < nasosData.length && nasosData[j] && nasosData[j][0] && String(nasosData[j][0]).trim() !== '') {
+                                mkdRows.push(nasosData[j]);
+                                j++;
+                            }
+                            break;
+                        }
+                    }
+                    if (mkdRows.length > 0) {
+                        html += createTable(mkdRows, 'МКАД с насосом');
+                    } else {
+                        html += '<p>Таблица с доставкой за МКАД не найдена</p>';
+                    }
+                }
                 
                 html += '<div class="last-updated">📅 Данные из Nasos.xlsx</div>';
                 html += '</div>';
             }
             
             container.innerHTML = html;
+        }
+
+        // Переключение отладочной информации
+        function toggleDebug() {
+            const debugDiv = document.getElementById('debugInfo');
+            debugDiv.classList.toggle('show');
+            const btn = document.querySelector('.debug-toggle');
+            if (debugDiv.classList.contains('show')) {
+                btn.textContent = '🐛 Скрыть отладку';
+            } else {
+                btn.textContent = '🐛 Показать отладку';
+            }
         }
 
         // Проверка авторизации
