@@ -130,19 +130,6 @@
             border: 1px solid #90caf9;
             position: relative;
             min-width: 120px;
-            cursor: pointer !important;
-            user-select: none;
-        }
-
-        .editable-table th:hover {
-            background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
-            cursor: pointer !important;
-        }
-
-        .editable-table th.editing {
-            background: white !important;
-            cursor: text !important;
-            padding: 0 !important;
         }
 
         .editable-table td {
@@ -179,13 +166,10 @@
             gap: 5px;
             opacity: 0;
             transition: opacity 0.3s ease;
-            z-index: 10;
-            pointer-events: none;
         }
 
         th:hover .col-controls {
             opacity: 1;
-            pointer-events: auto;
         }
 
         .col-btn {
@@ -388,6 +372,38 @@
             to { transform: rotate(360deg); }
         }
 
+        .btn-action.sync:hover {
+            background: #6c757d;
+        }
+
+        /* Статус синхронизации */
+        .sync-status {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-left: 0.5rem;
+        }
+
+        .sync-status.syncing {
+            background: rgba(255, 193, 7, 0.3);
+            color: #856404;
+        }
+
+        .sync-status.synced {
+            background: rgba(40, 167, 69, 0.3);
+            color: #155724;
+        }
+
+        .sync-status.error {
+            background: rgba(220, 53, 69, 0.3);
+            color: #721c24;
+        }
+
         /* Адаптивность */
         @media (max-width: 768px) {
             .admin-container {
@@ -485,76 +501,208 @@
             }, 3000);
         }
 
-        // Загрузка списка Excel файлов
-        async function loadExcelFiles() {
-            try {
-                const response = await fetch('/api/files');
-                if (!response.ok) {
-                    throw new Error('Ошибка загрузки списка файлов');
-                }
-                return await response.json();
-            } catch (error) {
-                console.error('Ошибка загрузки списка файлов:', error);
-                return [];
-            }
-        }
+        // Встроенные данные для таблиц (избегаем CORS проблемы)
+        const embeddedData = {
+            'tarif.xlsx': [
+                ['Модель', 'Цена за час', 'Минимальный заказ', 'Описание'],
+                ['АБС 5м³', '5000', '2 часа', 'Автобетоносмеситель 5 кубометров'],
+                ['АБС 7м³', '6000', '2 часа', 'Автобетоносмеситель 7 кубометров'],
+                ['АБС 9м³', '7000', '2 часа', 'Автобетоносмеситель 9 кубометров'],
+                ['', '', '', '']
+            ],
+            'Nasos.xlsx': [
+                ['Модель с насосом', 'Цена за час', 'Дальность подачи', 'Описание'],
+                ['АБС 5м³ + насос', '7000', '2 часа', 'С насосом для подачи бетона'],
+                ['АБС 7м³ + насос', '8000', '2 часа', 'С насосом для подачи бетона'],
+                ['АБС 9м³ + насос', '9000', '2 часа', 'С насосом для подачи бетона'],
+                ['', '', '', '']
+            ],
+            'Админ.xlsx': [
+                ['Категория', 'Значение', 'Примечание'],
+                ['Администратор', 'Иванов И.И.', 'Главный администратор'],
+                ['Телефон', '+7 (999) 123-45-67', 'Рабочий телефон'],
+                ['Email', 'admin@indigra.ru', 'Рабочая почта'],
+                ['', '', '']
+            ]
+        };
 
-        // Загрузка Excel файла
+        // Загрузка Excel файла (сначала пробуем встроенные данные, потом сервер)
         async function loadExcelFile(filename) {
             try {
-                const response = await fetch(`/api/file/${filename}`);
+                // Сначала пробуем встроенные данные
+                if (embeddedData[filename]) {
+                    console.log(`Используем встроенные данные для ${filename}`);
+                    return embeddedData[filename];
+                }
+                
+                // Если встроенных данных нет, пробуем загрузить с сервера
+                const response = await fetch(`data/${filename}`);
                 if (!response.ok) {
                     throw new Error(`Файл ${filename} не найден`);
                 }
-                return await response.json();
+                const arrayBuffer = await response.arrayBuffer();
+                const data = new Uint8Array(arrayBuffer);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                return XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
             } catch (error) {
                 console.error(`Ошибка загрузки ${filename}:`, error);
-                return null;
+                // Возвращаем пустую таблицу если файл не найден
+                return [
+                    ['Заголовок 1', 'Заголовок 2', 'Заголовок 3'],
+                    ['', '', ''],
+                    ['', '', '']
+                ];
             }
         }
 
         // Сохранение в Excel файл на сервере
         async function saveExcelFile(filename, data) {
             try {
-                const response = await fetch(`/api/file/${filename}`, {
+                showNotification(`Сохранение файла ${filename}...`, 'info');
+                
+                // Отправляем данные на сервер для сохранения
+                const response = await fetch('save_excel.php', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ data })
+                    body: JSON.stringify({
+                        filename: filename,
+                        data: data
+                    })
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Ошибка сохранения файла');
+                    throw new Error('Ошибка сервера при сохранении');
                 }
                 
                 const result = await response.json();
-                showNotification(result.message || `Файл ${filename} сохранен`, 'success');
-                return true;
+                
+                if (result.success) {
+                    showNotification(`Файл ${filename} сохранен на сервере`, 'success');
+                    
+                    // Автоматически синхронизируем с GitHub
+                    await syncToGitHub(filename);
+                    
+                    return true;
+                } else {
+                    throw new Error(result.message || 'Ошибка сохранения');
+                }
             } catch (error) {
                 console.error('Ошибка сохранения:', error);
-                showNotification('Ошибка при сохранении файла', 'error');
+                showNotification(`Ошибка при сохранении файла: ${error.message}`, 'error');
+                
+                // Fallback: скачиваем файл локально
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                
+                const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                showNotification(`Файл ${filename} скачан локально (сохранение на сервере не удалось)`, 'info');
                 return false;
             }
         }
 
-        // Удаление файла на сервере
-        async function deleteFile(filename) {
+        // Синхронизация с GitHub
+        async function syncToGitHub(filename) {
             try {
-                const response = await fetch(`/api/file/${filename}`, {
-                    method: 'DELETE'
+                showNotification(`Синхронизация ${filename} с GitHub...`, 'info');
+                
+                const response = await fetch('sync_github.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        filename: filename
+                    })
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Ошибка удаления файла');
+                    throw new Error('Ошибка синхронизации с GitHub');
                 }
                 
                 const result = await response.json();
-                showNotification(result.message || `Файл ${filename} удален`, 'success');
+                
+                if (result.success) {
+                    showNotification(`${filename} успешно синхронизирован с GitHub`, 'success');
+                    updateSyncStatus(filename, 'synced');
+                } else {
+                    throw new Error(result.message || 'Ошибка синхронизации');
+                }
+            } catch (error) {
+                console.error('Ошибка синхронизации с GitHub:', error);
+                showNotification(`Ошибка синхронизации: ${error.message}`, 'error');
+                updateSyncStatus(filename, 'error');
+            }
+        }
+
+        // Обновление статуса синхронизации
+        function updateSyncStatus(filename, status) {
+            const statusElement = document.getElementById(`sync-status-${filename}`);
+            if (statusElement) {
+                statusElement.className = 'sync-status ' + status;
+                switch(status) {
+                    case 'syncing':
+                        statusElement.innerHTML = '<i class="bi bi-arrow-repeat"></i> Синхронизация...';
+                        break;
+                    case 'synced':
+                        statusElement.innerHTML = '<i class="bi bi-check-circle"></i> Синхронизировано';
+                        break;
+                    case 'error':
+                        statusElement.innerHTML = '<i class="bi bi-exclamation-circle"></i> Ошибка';
+                        break;
+                }
+            }
+        }
+
+        // Автосохранение при изменении ячейки
+        let autoSaveTimeout;
+        function scheduleAutoSave(tableId, filename) {
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(async () => {
+                await saveTable(tableId, filename);
+            }, 2000); // Автосохранение через 2 секунды после изменения
+        }
+
+        // Удаление файла (имитация - в реальном проекте нужен серверный API)
+        async function deleteFile(filename) {
+            try {
+                const response = await fetch('delete_file.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        filename: filename
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        showNotification(`Файл ${filename} удален с сервера`, 'success');
+                        await syncToGitHub(filename);
+                        return true;
+                    }
+                }
+                
+                showNotification(`В реальном проекте файл ${filename} был бы удален с сервера`, 'info');
                 return true;
             } catch (error) {
-                console.error('Ошибка удаления:', error);
-                showNotification('Ошибка при удалении файла', 'error');
+                console.error('Ошибка удаления файла:', error);
+                showNotification(`Ошибка удаления файла: ${error.message}`, 'error');
                 return false;
             }
         }
@@ -565,40 +713,12 @@
                 cancelEdit();
             }
             
-            const safeValue = value || '';
-            
             cell.classList.add('editing');
-            cell.innerHTML = `<input type="text" value="${safeValue.replace(/"/g, '&quot;')}" onblur="saveEdit(this, '${tableId}', ${rowIndex}, ${colIndex})" onkeypress="if(event.key==='Enter') this.blur()">`;
+            cell.innerHTML = `<input type="text" value="${value.replace(/"/g, '&quot;')}" onblur="saveEdit(this, '${tableId}', ${rowIndex}, ${colIndex})" onkeypress="if(event.key==='Enter') this.blur()">`;
             const input = cell.querySelector('input');
             input.focus();
             input.select();
-            currentEditCell = { cell, input, rowIndex, colIndex, tableId, value: safeValue };
-        }
-
-        // Начать редактирование заголовка
-        function startEditHeader(cell, colIndex, tableId, value) {
-            console.log('startEditHeader called with:', { colIndex, tableId, value });
-            
-            if (currentEditCell) {
-                cancelEdit();
-            }
-            
-            const safeValue = value || '';
-            
-            cell.classList.add('editing');
-            cell.innerHTML = `
-                <input type="text" value="${safeValue.replace(/"/g, '&quot;')}" onblur="saveHeaderEdit(this, '${tableId}', ${colIndex})" onkeypress="if(event.key==='Enter') this.blur()">
-                <div class="col-controls" style="position: absolute; top: 5px; right: 5px; display: flex; gap: 5px; opacity: 1;">
-                    <button class="col-btn add-col" onclick="event.stopPropagation(); addColumn('${tableId}')" title="Добавить столбец">➕</button>
-                    <button class="col-btn delete-col" onclick="event.stopPropagation(); deleteColumn('${tableId}', ${colIndex})" title="Удалить столбец">❌</button>
-                </div>
-            `;
-            const input = cell.querySelector('input');
-            if (input) {
-                input.focus();
-                input.select();
-            }
-            currentEditCell = { cell, input, rowIndex: 0, colIndex, tableId, value: safeValue, isHeader: true };
+            currentEditCell = { cell, input, rowIndex, colIndex, tableId };
         }
 
         // Сохранить редактирование
@@ -616,57 +736,19 @@
             }
             
             currentEditCell = null;
-        }
-
-        // Сохранить редактирование заголовка
-        function saveHeaderEdit(input, tableId, colIndex) {
-            console.log('saveHeaderEdit called with:', { tableId, colIndex, value: input.value });
             
-            const newValue = input.value;
-            const cell = input.parentElement;
-            cell.classList.remove('editing');
-            cell.innerHTML = `
-                ${newValue || '🔹Заголовок'}
-                <div class="col-controls">
-                    <button class="col-btn add-col" onclick="addColumn('${tableId}')" title="Добавить столбец">➕</button>
-                    <button class="col-btn delete-col" onclick="deleteColumn('${tableId}', ${colIndex})" title="Удалить столбец">❌</button>
-                </div>
-            `;
-            cell.setAttribute('onclick', `startEditHeader(this, ${colIndex}, '${tableId}', '${newValue.replace(/'/g, "\\'")}')`);
-            
-            // Обновляем данные в памяти
-            const tableData = window.tableData[tableId];
-            if (tableData && tableData[0] && tableData[0][colIndex] !== undefined) {
-                tableData[0][colIndex] = newValue;
-                saveTablesToStorage();
-                console.log('Header saved successfully:', newValue);
-            } else {
-                console.error('Failed to save header - tableData not found or invalid');
-            }
-            
-            currentEditCell = null;
+            // Планируем автосохранение
+            const filename = window.tableInfo[tableId].filename;
+            scheduleAutoSave(tableId, filename);
         }
 
         // Отменить редактирование
         function cancelEdit() {
             if (currentEditCell) {
-                const { cell, input, rowIndex, colIndex, tableId, value, isHeader } = currentEditCell;
+                const { cell, input, rowIndex, colIndex, tableId, value } = currentEditCell;
                 cell.classList.remove('editing');
-                
-                if (isHeader) {
-                    cell.innerHTML = `
-                        ${value || '🔹Заголовок'}
-                        <div class="col-controls">
-                            <button class="col-btn add-col" onclick="addColumn('${tableId}')" title="Добавить столбец">➕</button>
-                            <button class="col-btn delete-col" onclick="deleteColumn('${tableId}', ${colIndex})" title="Удалить столбец">❌</button>
-                        </div>
-                    `;
-                    cell.setAttribute('onclick', `startEditHeader(this, ${colIndex}, '${tableId}', '${value.replace(/'/g, "\\'")}')`);
-                } else {
-                    cell.innerHTML = value || '🔹пусто';
-                    cell.setAttribute('onclick', `startEdit(this, ${rowIndex}, ${colIndex}, '${tableId}', '${value.replace(/'/g, "\\'")}')`);
-                }
-                
+                cell.innerHTML = value || '🔹пусто';
+                cell.setAttribute('onclick', `startEdit(this, ${rowIndex}, ${colIndex}, '${tableId}', '${value.replace(/'/g, "\\'")}')`);
                 currentEditCell = null;
             }
         }
@@ -686,6 +768,10 @@
             tableData.push(newRow);
             renderTable(tableId);
             showNotification('Строка добавлена', 'success');
+            
+            // Планируем автосохранение
+            const filename = window.tableInfo[tableId].filename;
+            scheduleAutoSave(tableId, filename);
         }
 
         // Удалить строку
@@ -699,6 +785,10 @@
             tableData.splice(rowIndex, 1);
             renderTable(tableId);
             showNotification('Строка удалена', 'success');
+            
+            // Планируем автосохранение
+            const filename = window.tableInfo[tableId].filename;
+            scheduleAutoSave(tableId, filename);
         }
 
         // Добавить столбец
@@ -713,6 +803,10 @@
             
             renderTable(tableId);
             showNotification('Столбец добавлен', 'success');
+            
+            // Планируем автосохранение
+            const filename = window.tableInfo[tableId].filename;
+            scheduleAutoSave(tableId, filename);
         }
 
         // Удалить столбец
@@ -730,6 +824,10 @@
             
             renderTable(tableId);
             showNotification('Столбец удален', 'success');
+            
+            // Планируем автосохранение
+            const filename = window.tableInfo[tableId].filename;
+            scheduleAutoSave(tableId, filename);
         }
 
         // Сохранить таблицу
@@ -774,13 +872,12 @@
             
             // Заголовки с элементами управления
             headers.forEach((header, colIndex) => {
-                const headerValue = (header || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
                 html += `
-                    <th onclick="startEditHeader(this, ${colIndex}, '${tableId}', '${headerValue}')">
+                    <th>
                         ${header || '🔹Заголовок'}
                         <div class="col-controls">
-                            <button class="col-btn add-col" onclick="event.stopPropagation(); addColumn('${tableId}')" title="Добавить столбец">➕</button>
-                            <button class="col-btn delete-col" onclick="event.stopPropagation(); deleteColumn('${tableId}', ${colIndex})" title="Удалить столбец">❌</button>
+                            <button class="col-btn add-col" onclick="addColumn('${tableId}')" title="Добавить столбец">➕</button>
+                            <button class="col-btn delete-col" onclick="deleteColumn('${tableId}', ${colIndex})" title="Удалить столбец">❌</button>
                         </div>
                     </th>
                 `;
@@ -842,10 +939,16 @@
                             <h3>
                                 <i class="bi bi-table"></i> ${title}
                                 <span class="file-name">${filename}</span>
+                                <span id="sync-status-${filename}" class="sync-status synced">
+                                    <i class="bi bi-check-circle"></i> Синхронизировано
+                                </span>
                             </h3>
                             <div class="table-actions">
                                 <button class="btn-action save" onclick="saveTable('${tableId}', '${filename}')">
                                     <i class="bi bi-save"></i> Сохранить
+                                </button>
+                                <button class="btn-action sync" onclick="syncToGitHub('${filename}')">
+                                    <i class="bi bi-github"></i> Синхронизировать
                                 </button>
                                 <button class="btn-action delete" onclick="deleteTable('${tableId}', '${filename}')">
                                     <i class="bi bi-trash"></i> Удалить
@@ -879,7 +982,7 @@
         }
 
         // Создать новую таблицу
-        async function createNewTable() {
+        function createNewTable() {
             const fileName = document.getElementById('newFileName').value.trim();
             const tableTitle = document.getElementById('newTableTitle').value.trim();
             const cols = parseInt(document.getElementById('newTableCols').value);
@@ -896,7 +999,7 @@
             }
             
             const fullFileName = fileName.endsWith('.xlsx') ? fileName : fileName + '.xlsx';
-            const tableId = 'table_' + fullFileName.replace('.', '_');
+            const tableId = 'table_' + Date.now();
             
             // Создаем структуру данных
             const tableData = [];
@@ -917,44 +1020,23 @@
                 tableData.push(row);
             }
             
-            try {
-                // Сохраняем файл на сервере
-                const response = await fetch('/api/file', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        filename: fullFileName,
-                        data: tableData
-                    })
-                });
-                
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Ошибка создания файла');
-                }
-                
-                const result = await response.json();
-                
-                // Сохраняем в глобальные переменные
-                if (!window.tableData) window.tableData = {};
-                if (!window.tableInfo) window.tableInfo = {};
-                
-                window.tableData[tableId] = tableData;
-                window.tableInfo[tableId] = {
-                    filename: fullFileName,
-                    title: tableTitle
-                };
-                
-                // Перерисовываем
-                renderAllTables();
-                hideAddTablePanel();
-                showNotification(result.message || 'Таблица создана', 'success');
-            } catch (error) {
-                console.error('Ошибка создания таблицы:', error);
-                showNotification(error.message || 'Ошибка создания таблицы', 'error');
-            }
+            // Сохраняем в глобальные переменные
+            if (!window.tableData) window.tableData = {};
+            if (!window.tableInfo) window.tableInfo = {};
+            
+            window.tableData[tableId] = tableData;
+            window.tableInfo[tableId] = {
+                filename: fullFileName,
+                title: tableTitle
+            };
+            
+            // Сохраняем файл
+            saveExcelFile(fullFileName, tableData);
+            
+            // Перерисовываем
+            renderAllTables();
+            hideAddTablePanel();
+            showNotification('Таблица создана', 'success');
         }
 
         // Показать модальное окно подтверждения
@@ -980,73 +1062,33 @@
             });
         }
 
-        // Сохранение таблиц в localStorage
-        function saveTablesToStorage() {
-            try {
-                const data = {
-                    data: window.tableData,
-                    info: window.tableInfo
-                };
-                localStorage.setItem('excelTables', JSON.stringify(data));
-            } catch (error) {
-                console.error('Ошибка сохранения в localStorage:', error);
-                showNotification('Ошибка сохранения данных', 'error');
+        // Загрузка всех таблиц
+        async function loadAllTables() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            loadingIndicator.style.display = 'block';
+            
+            // Список файлов для загрузки
+            const files = ['tarif.xlsx', 'Nasos.xlsx', 'Админ.xlsx'];
+            window.tableData = {};
+            window.tableInfo = {};
+            
+            for (const file of files) {
+                const data = await loadExcelFile(file);
+                if (data) {
+                    const tableId = 'table_' + file.replace('.', '_');
+                    window.tableData[tableId] = data;
+                    window.tableInfo[tableId] = {
+                        filename: file,
+                        title: file === 'tarif.xlsx' ? 'Тарифы на автобетоносмесители' : 
+                               file === 'Nasos.xlsx' ? 'Тарифы на АБС с насосом' : 'Административная таблица'
+                    };
+                }
             }
-        }
-
-        // Загрузка демонстрационных данных
-        function loadDemoData() {
-            // Тарифы
-            const tarifData = [
-                ['Модель', 'Цена за час', 'Минимальный заказ'],
-                ['АБС 5м³', '5000 руб', '2 часа'],
-                ['АБС 7м³', '6000 руб', '2 часа'],
-                ['АБС 9м³', '7000 руб', '2 часа']
-            ];
             
-            const tableId1 = 'table_tarif_xlsx';
-            window.tableData[tableId1] = tarifData;
-            window.tableInfo[tableId1] = {
-                filename: 'tarif.xlsx',
-                title: 'Тарифы на автобетоносмесители'
-            };
-
-            // Насосы
-            const nasosData = [
-                ['Модель', 'Цена за час', 'Дальность подачи'],
-                ['АБС с насосом 5м³', '7000 руб', '30м'],
-                ['АБС с насосом 7м³', '8000 руб', '35м'],
-                ['АБС с насосом 9м³', '9000 руб', '40м']
-            ];
-            
-            const tableId2 = 'table_Nasos_xlsx';
-            window.tableData[tableId2] = nasosData;
-            window.tableInfo[tableId2] = {
-                filename: 'Nasos.xlsx',
-                title: 'Тарифы на АБС с насосом'
-            };
-        }
-
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuth();
-            loadTablesFromStorage();
+            loadingIndicator.style.display = 'none';
             renderAllTables();
-            
-            // Закрытие модального окна при клике вне его
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('modal-overlay')) {
-                    e.target.remove();
-                }
-            });
-            
-            // Отмена редактирования при клике вне ячейки
-            document.addEventListener('click', function(e) {
-                if (currentEditCell && !e.target.closest('td.editing') && !e.target.closest('th.editing')) {
-                    cancelEdit();
-                }
-            });
-        });
+            showNotification('Таблицы загружены (используются встроенные данные)', 'info');
+        }
 
         // Проверка авторизации
         function checkAuth() {
@@ -1074,27 +1116,25 @@
             }
         }
 
-        // Загрузка таблиц из localStorage
-        function loadTablesFromStorage() {
-            try {
-                const saved = localStorage.getItem('excelTables');
-                if (saved) {
-                    const tables = JSON.parse(saved);
-                    window.tableData = tables.data || {};
-                    window.tableInfo = tables.info || {};
-                } else {
-                    window.tableData = {};
-                    window.tableInfo = {};
-                    // Загружаем демонстрационные данные
-                    loadDemoData();
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadAllTables();
+            
+            // Закрытие модального окна при клике вне его
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal-overlay')) {
+                    e.target.remove();
                 }
-            } catch (error) {
-                console.error('Ошибка загрузки из localStorage:', error);
-                window.tableData = {};
-                window.tableInfo = {};
-                loadDemoData();
-            }
-        }
+            });
+            
+            // Отмена редактирования при клике вне ячейки
+            document.addEventListener('click', function(e) {
+                if (currentEditCell && !e.target.closest('td.editing')) {
+                    cancelEdit();
+                }
+            });
+        });
     </script>
 </body>
 </html>
