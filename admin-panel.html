@@ -3,26 +3,54 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Панель администратора - ИНДИГРА</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/site.css" />
-    <link rel="stylesheet" href="css/custom.css" />
-    <link rel="stylesheet" href="css/common.css" />
-    <!-- Подключаем библиотеку для чтения Excel -->
+    <title>Редактор Excel - ИНДИГРА</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
-        /* Стили для панели администратора - точно как на price.html */
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .admin-header {
-            background: white;
+        /* Навигационная панель */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             padding: 1rem 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e3a8a !important;
+        }
+
+        /* Основной контейнер */
+        .admin-container {
+            max-width: 1600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Карточки таблиц */
+        .table-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid #dbeafe;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 1rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -30,270 +58,418 @@
             gap: 1rem;
         }
 
-        .admin-header h1 {
-            color: #1e3a8a;
-            font-weight: 700;
+        .table-header h3 {
             margin: 0;
-            font-size: 1.8rem;
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .admin-header .btn-exit {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        .table-header .file-name {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-family: monospace;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-action.delete:hover {
+            background: #dc3545;
+        }
+
+        .btn-action.save:hover {
+            background: #28a745;
+        }
+
+        /* Таблица */
+        .table-wrapper {
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .editable-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #dbeafe;
+            border-radius: 10px;
+        }
+
+        .editable-table th {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: #1e3a8a;
+            font-weight: 600;
+            padding: 12px;
+            border: 1px solid #90caf9;
+            position: relative;
+            min-width: 120px;
+        }
+
+        .editable-table td {
+            padding: 8px;
+            border: 1px solid #dbeafe;
+            background: white;
+        }
+
+        .editable-table td.editing {
+            padding: 0;
+        }
+
+        .editable-table input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #3b82f6;
+            border-radius: 4px;
+            font-size: 1rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .editable-table td:hover {
+            background: #f0f9ff;
+            cursor: pointer;
+        }
+
+        /* Элементы управления столбцами */
+        .col-controls {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        th:hover .col-controls {
+            opacity: 1;
+        }
+
+        .col-btn {
+            background: white;
+            border: none;
+            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #1e3a8a;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+
+        .col-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .col-btn.add-col:hover {
+            background: #28a745;
+            color: white;
+        }
+
+        .col-btn.delete-col:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* Кнопки добавления строк */
+        .add-row-btn {
+            margin-top: 1rem;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
             border: none;
-            padding: 0.5rem 1.5rem;
+            padding: 0.7rem 1.5rem;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .admin-header .btn-exit:hover {
+        .add-row-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
         }
 
-        .admin-container {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-
-        .section-title {
-            color: white;
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            text-align: center;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        /* Стили точно как в price.html */
-        .price-section {
-            margin-bottom: 40px;
-            padding: 25px;
+        /* Панель добавления таблиц */
+        .add-table-panel {
             background: white;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            border: 1px solid #dbeafe;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 2px dashed #3b82f6;
         }
 
-        .price-section h2 {
+        .add-table-panel h4 {
             color: #1e3a8a;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #3b82f6;
-            font-weight: 700;
-            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .price-section h3 {
-            color: #1e3a8a;
-            margin: 20px 0 15px 0;
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
             font-weight: 600;
-            font-size: 1.4rem;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            display: block;
         }
 
-        .price-table {
+        .form-control {
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .price-table thead {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            color: white;
-        }
-
-        .price-table th {
-            padding: 15px;
-            font-weight: 600;
-            text-align: left;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .price-table td {
-            padding: 12px 15px;
-            border: 1px solid #dbeafe;
-            background: white;
-        }
-
-        .price-table tbody tr:nth-child(even) td {
-            background: #f8fafc;
-        }
-
-        .price-table tbody tr:hover td {
-            background: #dbeafe;
-            transition: background 0.3s ease;
-        }
-
-        .info-box {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            border-left: 4px solid #1e3a8a;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        .warning-box {
-            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
-            border-left: 4px solid #c62828;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        .badge-price {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .note-text {
-            font-size: 0.9rem;
-            color: #4a5568;
-            margin-top: 10px;
-            padding: 10px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 0.8rem;
+            border: 2px solid #dbeafe;
             border-radius: 8px;
-            font-style: italic;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
-        .data-source {
-            background: #e2e8f0;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
+        .form-control:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            border: none;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 58, 138, 0.4);
+        }
+
+        /* Модальное окно подтверждения */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content h4 {
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 1.5rem;
             color: #4a5568;
-            display: inline-block;
-            margin-left: 1rem;
         }
 
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Индикатор загрузки */
         .loading-spinner {
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 3px solid rgba(30, 58, 138, 0.3);
+            border: 3px solid rgba(255,255,255,0.3);
             border-radius: 50%;
-            border-top-color: #1e3a8a;
+            border-top-color: white;
             animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        .error-message {
-            background: #fee;
-            color: #c33;
-            padding: 2rem;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 1.2rem;
-        }
-
-        .debug-info {
-            background: #1a202c;
-            color: #a0aec0;
-            border: 1px solid #4a5568;
-            border-radius: 5px;
-            padding: 15px;
-            margin: 10px 0 20px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            white-space: pre-wrap;
-            max-height: 400px;
-            overflow: auto;
-            display: none;
-        }
-
-        .debug-info.show {
-            display: block;
-        }
-
-        .debug-toggle {
-            background: #4a5568;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .debug-toggle:hover {
-            background: #2d3748;
-        }
-
-        .mt-4 {
-            margin-top: 1.5rem;
-        }
-        .mb-0 {
-            margin-bottom: 0;
-        }
-        .text-center {
-            text-align: center;
-        }
-
-        /* Скрываем индикаторы масштаба */
-        #zoom-indicator,
-        .zoom-controls,
-        .zoom-notification {
-            display: none !important;
-        }
-
-        html {
-            transform: none !important;
-            width: 100% !important;
-            height: 100% !important;
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 0 1rem;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .table-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="admin-header">
-        <h1>🔧 Панель администратора ИНДИГРА</h1>
-        <div>
-            <button class="debug-toggle" onclick="toggleDebug()">🐛 Показать отладку</button>
-            <a href="AutorithAdmin.html" class="btn-exit">🚪 Выйти</a>
+    <!-- Навигация -->
+    <nav class="navbar">
+        <div class="container-fluid">
+            <span class="navbar-brand">
+                <i class="bi bi-table"></i> Редактор Excel - ИНДИГРА
+            </span>
+            <div>
+                <button class="btn btn-outline-primary me-2" onclick="showAddTablePanel()">
+                    <i class="bi bi-plus-lg"></i> Новая таблица
+                </button>
+                <a href="AutorithAdmin.html" class="btn btn-outline-danger">
+                    <i class="bi bi-box-arrow-right"></i> Выйти
+                </a>
+            </div>
         </div>
-    </div>
+    </nav>
 
+    <!-- Основной контейнер -->
     <div class="admin-container">
-        <h2 class="section-title">📊 Тарифы на транспортные услуги</h2>
-
         <!-- Индикатор загрузки -->
-        <div id="loadingIndicator" style="text-align: center; color: white; margin: 2rem;">
-            <div class="loading-spinner"></div>
-            Загрузка данных из Excel файлов...
+        <div id="loadingIndicator" class="text-center text-white my-5" style="display: none;">
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+            <p class="mt-2">Загрузка данных...</p>
         </div>
-
-        <!-- Отладочная информация -->
-        <div id="debugInfo" class="debug-info"></div>
 
         <!-- Контейнер для таблиц -->
         <div id="tablesContainer"></div>
+
+        <!-- Панель добавления таблицы (скрыта по умолчанию) -->
+        <div id="addTablePanel" class="add-table-panel" style="display: none;">
+            <h4><i class="bi bi-file-earmark-plus"></i> Создание новой таблицы</h4>
+            <div class="form-group">
+                <label>Название файла (без .xlsx)</label>
+                <input type="text" id="newFileName" class="form-control" placeholder="например: new_table">
+            </div>
+            <div class="form-group">
+                <label>Название таблицы (заголовок)</label>
+                <input type="text" id="newTableTitle" class="form-control" placeholder="например: Моя новая таблица">
+            </div>
+            <div class="form-group">
+                <label>Количество столбцов</label>
+                <input type="number" id="newTableCols" class="form-control" value="3" min="1" max="20">
+            </div>
+            <div class="form-group">
+                <label>Количество строк</label>
+                <input type="number" id="newTableRows" class="form-control" value="5" min="2" max="50">
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-primary me-2" onclick="createNewTable()">
+                    <i class="bi bi-check-lg"></i> Создать
+                </button>
+                <button class="btn btn-secondary" onclick="hideAddTablePanel()">
+                    <i class="bi bi-x-lg"></i> Отмена
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Функция загрузки Excel файла
+        // Глобальные переменные
+        let currentEditCell = null;
+        let confirmCallback = null;
+
+        // Показать уведомление
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Загрузка Excel файла
         async function loadExcelFile(filename) {
             try {
                 const response = await fetch(`data/${filename}`);
@@ -311,401 +487,393 @@
             }
         }
 
-        // Функция для отладки
-        function debugData(filename, data) {
-            if (!data) return `❌ ${filename}: нет данных`;
-            
-            let info = `📁 ${filename}:\n`;
-            info += `Строк: ${data.length}\n\n`;
-            
-            info += 'Все строки файла:\n';
-            for (let i = 0; i < data.length; i++) {
-                const row = data[i];
-                if (row && row.length > 0) {
-                    const rowPreview = row.map(cell => 
-                        cell !== undefined && cell !== null && cell !== '' 
-                            ? String(cell).substring(0, 30) 
-                            : '🔹пусто'
-                    ).join(' | ');
-                    info += `${i}: ${rowPreview}\n`;
-                } else {
-                    info += `${i}: 🔹пустая строка\n`;
-                }
-            }
-            
-            return info;
-        }
-
-        // Функция для извлечения услуг АБС
-        function extractABSServices(data) {
-            const services = [];
-            
-            for (let i = 0; i < data.length; i++) {
-                const row = data[i];
-                if (!row) continue;
+        // Сохранение в Excel файл
+        async function saveExcelFile(filename, data) {
+            try {
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
                 
-                // Ищем строки с услугами АБС
-                if (row[0] && row[0].includes('Услуги АБС') && row[0].includes('м куб.')) {
-                    services.push({
-                        name: row[0].replace('Услуги АБС', 'Услуги АБС').trim(),
-                        unit: row[1] || 'рейс',
-                        price: row[2] || ''
-                    });
-                }
-            }
-            
-            return services;
-        }
-
-        // Функция для извлечения дополнительных услуг АБС
-        function extractABSAdditionalServices(data) {
-            const services = [];
-            let found = false;
-            
-            for (let i = 0; i < data.length; i++) {
-                const row = data[i];
-                if (!row) continue;
+                // Создаем Blob и скачиваем
+                const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
                 
-                // Ищем дополнительные услуги
-                if (row[0] && row[0].includes('Дополнительное время')) {
-                    services.push({
-                        name: row[0],
-                        unit: row[1] || 'час',
-                        price: row[2] || '100'
-                    });
-                }
-                if (row[0] && row[0].includes('дополнительного оборудования')) {
-                    services.push({
-                        name: row[0],
-                        unit: row[1] || 'ед.',
-                        price: row[2] || '50'
-                    });
-                }
+                showNotification(`Файл ${filename} сохранен`, 'success');
+                return true;
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                showNotification('Ошибка при сохранении файла', 'error');
+                return false;
             }
-            
-            return services;
         }
 
-        // Функция для извлечения услуг АБС с насосом
-        function extractNasosServices(data) {
-            const services = [];
-            
-            for (let i = 0; i < data.length; i++) {
-                const row = data[i];
-                if (!row) continue;
-                
-                // Ищем строки с услугами АБС с насосом
-                if (row[0] && row[0].includes('Услуги АБС с насосом')) {
-                    services.push({
-                        name: row[0],
-                        unit: row[1] || 'рейс',
-                        price: row[2] || ''
-                    });
-                }
-            }
-            
-            return services;
+        // Удаление файла (имитация - в реальном проекте нужен серверный API)
+        async function deleteFile(filename) {
+            showNotification(`В реальном проекте файл ${filename} был бы удален с сервера`, 'info');
+            return true;
         }
 
-        // Функция для извлечения дополнительных услуг АБС с насосом
-        function extractNasosAdditionalServices(data) {
-            const services = [];
-            
-            for (let i = 0; i < data.length; i++) {
-                const row = data[i];
-                if (!row) continue;
-                
-                if (row[0] && row[0].includes('Дополнительное время')) {
-                    services.push({
-                        name: row[0],
-                        unit: row[1] || 'час',
-                        price: row[2] || '200'
-                    });
-                }
-                if (row[0] && row[0].includes('Прокачка бетона')) {
-                    services.push({
-                        name: row[0],
-                        unit: row[1] || 'м³',
-                        price: row[2] || '25'
-                    });
-                }
-                if (row[0] && row[0].includes('дополнительного оборудования')) {
-                    services.push({
-                        name: row[0],
-                        unit: row[1] || 'ед.',
-                        price: row[2] || '50'
-                    });
-                }
-                if (row[0] && row[0].includes('Отсутствие места мойки')) {
-                    services.push({
-                        name: row[0],
-                        unit: row[1] || 'ед.',
-                        price: row[2] || '200'
-                    });
-                }
+        // Начать редактирование ячейки
+        function startEdit(cell, rowIndex, colIndex, tableId, value) {
+            if (currentEditCell) {
+                cancelEdit();
             }
             
-            return services;
+            cell.classList.add('editing');
+            cell.innerHTML = `<input type="text" value="${value.replace(/"/g, '&quot;')}" onblur="saveEdit(this, '${tableId}', ${rowIndex}, ${colIndex})" onkeypress="if(event.key==='Enter') this.blur()">`;
+            const input = cell.querySelector('input');
+            input.focus();
+            input.select();
+            currentEditCell = { cell, input, rowIndex, colIndex, tableId };
         }
 
-        // Функция для извлечения данных МКАД для АБС с насосом
-        function extractNasosMKDServices(data) {
-            const services = [];
-            let found = false;
+        // Сохранить редактирование
+        function saveEdit(input, tableId, rowIndex, colIndex) {
+            const newValue = input.value;
+            const cell = input.parentElement;
+            cell.classList.remove('editing');
+            cell.innerHTML = newValue || '🔹пусто';
+            cell.setAttribute('onclick', `startEdit(this, ${rowIndex}, ${colIndex}, '${tableId}', '${newValue.replace(/'/g, "\\'")}')`);
             
-            for (let i = 0; i < data.length; i++) {
-                const row = data[i];
-                if (!row) continue;
-                
-                if (row[0] && row[0].includes('Доставка продукции за пределы МКАД')) {
-                    found = true;
-                    continue;
-                }
-                
-                if (found && row[0] && (row[0].includes('0-49') || row[0].includes('50-99') || row[0].includes('100-149') || row[0].includes('свыше'))) {
-                    services.push({
-                        distance: row[0],
-                        tariff: row[2] || row[1] || '5'
-                    });
-                }
+            // Обновляем данные в памяти
+            const tableData = window.tableData[tableId];
+            if (tableData && tableData[rowIndex] && tableData[rowIndex][colIndex] !== undefined) {
+                tableData[rowIndex][colIndex] = newValue;
             }
             
-            return services;
+            currentEditCell = null;
         }
 
-        // Проверка наличия предупреждения о мойке
-        function hasWarning(data) {
-            for (let row of data) {
-                if (row && row[0] && row[0].includes('ЗАКАЗЫ НЕ ПРИНИМАЮТСЯ')) {
-                    return true;
-                }
+        // Отменить редактирование
+        function cancelEdit() {
+            if (currentEditCell) {
+                const { cell, input, rowIndex, colIndex, tableId, value } = currentEditCell;
+                cell.classList.remove('editing');
+                cell.innerHTML = value || '🔹пусто';
+                cell.setAttribute('onclick', `startEdit(this, ${rowIndex}, ${colIndex}, '${tableId}', '${value.replace(/'/g, "\\'")}')`);
+                currentEditCell = null;
             }
-            return false;
         }
 
-        // Основная функция загрузки и отображения всех таблиц
-        async function loadAllTables() {
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            const container = document.getElementById('tablesContainer');
-            const debugDiv = document.getElementById('debugInfo');
+        // Добавить строку
+        function addRow(tableId) {
+            const tableData = window.tableData[tableId];
+            if (!tableData) return;
             
-            // Загружаем оба файла
-            const [tarifData, nasosData] = await Promise.all([
-                loadExcelFile('tarif.xlsx'),
-                loadExcelFile('Nasos.xlsx')
-            ]);
-            
-            loadingIndicator.style.display = 'none';
-            
-            // Отладочная информация
-            let debugText = '';
-            if (tarifData) {
-                debugText += debugData('tarif.xlsx', tarifData);
+            const newRow = [];
+            if (tableData.length > 0) {
+                const cols = tableData[0].length;
+                for (let i = 0; i < cols; i++) {
+                    newRow.push('');
+                }
             }
-            if (nasosData) {
-                debugText += '\n\n' + debugData('Nasos.xlsx', nasosData);
-            }
-            debugDiv.textContent = debugText;
-            
-            if (!tarifData && !nasosData) {
-                container.innerHTML = '<div class="error-message">❌ Не удалось загрузить файлы tarif.xlsx и Nasos.xlsx</div>';
+            tableData.push(newRow);
+            renderTable(tableId);
+            showNotification('Строка добавлена', 'success');
+        }
+
+        // Удалить строку
+        function deleteRow(tableId, rowIndex) {
+            const tableData = window.tableData[tableId];
+            if (!tableData || tableData.length <= 1) {
+                showNotification('Нельзя удалить последнюю строку', 'error');
                 return;
             }
             
-            let html = '';
+            tableData.splice(rowIndex, 1);
+            renderTable(tableId);
+            showNotification('Строка удалена', 'success');
+        }
+
+        // Добавить столбец
+        function addColumn(tableId) {
+            const tableData = window.tableData[tableId];
+            if (!tableData) return;
             
-            // ==================== ТАРИФЫ НА АВТОБЕТОНОСМЕСИТЕЛИ (tarif.xlsx) ====================
-            if (tarifData) {
-                html += '<div class="price-section">';
-                html += '<h2>🚚 Тарифы на транспортные услуги автобетоносмесителей (в пределах МКАД) <span class="data-source">tarif.xlsx</span></h2>';
-                
-                // Основные услуги
-                html += '<h3>📋 Основные услуги</h3>';
-                const absServices = extractABSServices(tarifData);
-                
-                html += '<div class="table-responsive">';
-                html += '<table class="price-table">';
-                html += '<thead><tr><th>Наименование услуги</th><th>Ед. изм.</th><th>Тариф без НДС, руб.</th></tr></thead>';
-                html += '<tbody>';
-                
-                if (absServices.length > 0) {
-                    absServices.forEach(service => {
-                        html += `<tr><td>${service.name}</td><td>${service.unit}</td><td><span class="badge-price">${service.price}</span></td></tr>`;
-                    });
-                } else {
-                    // Статические данные на случай если не найдены
-                    html += '<tr><td>Услуги АБС 7 м³</td><td>рейс</td><td><span class="badge-price">200</span></td></tr>';
-                    html += '<tr><td>Услуги АБС 8 м³</td><td>рейс</td><td><span class="badge-price">210</span></td></tr>';
-                    html += '<tr><td>Услуги АБС 9 м³</td><td>рейс</td><td><span class="badge-price">220</span></td></tr>';
-                    html += '<tr><td>Услуги АБС 10 м³</td><td>рейс</td><td><span class="badge-price">240</span></td></tr>';
-                    html += '<tr><td>Услуги АБС 11 м³</td><td>рейс</td><td><span class="badge-price">300</span></td></tr>';
-                    html += '<tr><td>Услуги АБС 12 м³</td><td>рейс</td><td><span class="badge-price">320</span></td></tr>';
-                    html += '<tr><td>Услуги АБС 14 м³</td><td>рейс</td><td><span class="badge-price">350</span></td></tr>';
-                }
-                
-                html += '</tbody></table></div>';
-                
-                // Дополнительные услуги
-                html += '<h3>⏱️ Дополнительные услуги</h3>';
-                const additionalServices = extractABSAdditionalServices(tarifData);
-                
-                html += '<div class="table-responsive">';
-                html += '<table class="price-table">';
-                html += '<thead><tr><th>Наименование услуги</th><th>Ед. изм.</th><th>Тариф без НДС, руб.</th></tr></thead>';
-                html += '<tbody>';
-                
-                if (additionalServices.length > 0) {
-                    additionalServices.forEach(service => {
-                        html += `<tr><td>${service.name}</td><td>${service.unit}</td><td><span class="badge-price">${service.price}</span></td></tr>`;
-                    });
-                } else {
-                    html += '<tr><td>Дополнительное время работы на объекте (свыше 1 машино-часа)</td><td>час</td><td><span class="badge-price">100</span></td></tr>';
-                    html += '<tr><td>Использование дополнительного оборудования (доп. лоток)</td><td>ед.</td><td><span class="badge-price">50</span></td></tr>';
-                }
-                
-                html += '</tbody></table></div>';
-                
-                // Информация о рейсе
-                html += '<div class="info-box">';
-                html += '<h4>ℹ️ В стоимость рейса АБС входит:</h4>';
-                html += '<ul class="mb-0">';
-                html += '<li>Доставка продукции от узла до объекта строительства</li>';
-                html += '<li>Работа на объекте 1 машино-час (включая технологическую мойку)</li>';
-                html += '<li>Возврат транспорта на узел</li>';
-                html += '</ul></div>';
-                
-                // Доставка за МКАД
-                html += '<h3>🛣️ Доставка продукции за пределы МКАД</h3>';
-                html += '<div class="table-responsive">';
-                html += '<table class="price-table">';
-                html += '<thead><tr><th>Расстояние от МКАД</th><th>Примечание</th></tr></thead>';
-                html += '<tbody>';
-                html += '<tr><td>0-49 км</td><td>Договорной тариф</td></tr>';
-                html += '<tr><td>50-99 км</td><td>Договорной тариф</td></tr>';
-                html += '<tr><td>100-149 км</td><td>Договорной тариф</td></tr>';
-                html += '<tr><td>свыше 150 км</td><td>Договорной тариф</td></tr>';
-                html += '</tbody></table></div>';
-                html += '<p class="note-text">* Точная стоимость доставки за МКАД рассчитывается индивидуально. Обращайтесь к менеджерам!</p>';
-                
-                html += '</div>'; // Закрываем price-section
+            // Добавляем новый столбец в каждую строку
+            tableData.forEach(row => {
+                row.push('');
+            });
+            
+            renderTable(tableId);
+            showNotification('Столбец добавлен', 'success');
+        }
+
+        // Удалить столбец
+        function deleteColumn(tableId, colIndex) {
+            const tableData = window.tableData[tableId];
+            if (!tableData || tableData[0].length <= 1) {
+                showNotification('Нельзя удалить последний столбец', 'error');
+                return;
             }
             
-            // ==================== ТАРИФЫ НА АБС С НАСОСОМ (Nasos.xlsx) ====================
-            if (nasosData) {
-                html += '<div class="price-section">';
-                html += '<h2>🚛 Тарифы на транспортные услуги автобетоносмесителей с насосом (в пределах МКАД) <span class="data-source">Nasos.xlsx</span></h2>';
-                
-                // Основные услуги
-                html += '<h3>📋 Основные услуги</h3>';
-                const nasosServices = extractNasosServices(nasosData);
-                
-                html += '<div class="table-responsive">';
-                html += '<table class="price-table">';
-                html += '<thead><tr><th>Наименование услуги</th><th>Ед. изм.</th><th>Тариф без НДС, руб.</th></tr></thead>';
-                html += '<tbody>';
-                
-                if (nasosServices.length > 0) {
-                    nasosServices.forEach(service => {
-                        html += `<tr><td>${service.name}</td><td>${service.unit}</td><td><span class="badge-price">${service.price}</span></td></tr>`;
-                    });
-                } else {
-                    html += '<tr><td>Услуги АБС с насосом 7 м³</td><td>рейс</td><td><span class="badge-price">600</span></td></tr>';
-                    html += '<tr><td>Услуги АБС с насосом 8 м³</td><td>рейс</td><td><span class="badge-price">650</span></td></tr>';
-                    html += '<tr><td>Услуги АБС с насосом 7 м³ (стрела 28 м)</td><td>рейс</td><td><span class="badge-price">650</span></td></tr>';
-                    html += '<tr><td>Услуги АБС с насосом 8 м³ (стрела 28 м)</td><td>рейс</td><td><span class="badge-price">700</span></td></tr>';
+            // Удаляем столбец из каждой строки
+            tableData.forEach(row => {
+                row.splice(colIndex, 1);
+            });
+            
+            renderTable(tableId);
+            showNotification('Столбец удален', 'success');
+        }
+
+        // Сохранить таблицу
+        async function saveTable(tableId, filename) {
+            const tableData = window.tableData[tableId];
+            if (!tableData) return;
+            
+            await saveExcelFile(filename, tableData);
+        }
+
+        // Удалить таблицу
+        function deleteTable(tableId, filename) {
+            showConfirmModal(
+                'Удаление таблицы',
+                `Вы уверены, что хотите удалить таблицу "${filename}"?`,
+                async () => {
+                    delete window.tableData[tableId];
+                    await deleteFile(filename);
+                    renderAllTables();
+                    showNotification('Таблица удалена', 'success');
                 }
+            );
+        }
+
+        // Рендеринг одной таблицы
+        function renderTable(tableId) {
+            const tableData = window.tableData[tableId];
+            if (!tableData) return;
+            
+            const container = document.getElementById(`table-${tableId}`);
+            if (!container) return;
+            
+            const { filename, title } = window.tableInfo[tableId];
+            const headers = tableData[0] || [];
+            
+            let html = `
+                <div class="table-wrapper">
+                    <table class="editable-table">
+                        <thead>
+                            <tr>
+            `;
+            
+            // Заголовки с элементами управления
+            headers.forEach((header, colIndex) => {
+                html += `
+                    <th>
+                        ${header || '🔹Заголовок'}
+                        <div class="col-controls">
+                            <button class="col-btn add-col" onclick="addColumn('${tableId}')" title="Добавить столбец">➕</button>
+                            <button class="col-btn delete-col" onclick="deleteColumn('${tableId}', ${colIndex})" title="Удалить столбец">❌</button>
+                        </div>
+                    </th>
+                `;
+            });
+            
+            html += `
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Строки данных
+            for (let i = 1; i < tableData.length; i++) {
+                const row = tableData[i];
+                html += '<tr>';
                 
-                html += '</tbody></table></div>';
+                row.forEach((cell, colIndex) => {
+                    const value = cell || '';
+                    html += `
+                        <td onclick="startEdit(this, ${i}, ${colIndex}, '${tableId}', '${value.replace(/'/g, "\\'")}')">
+                            ${value || '🔹пусто'}
+                        </td>
+                    `;
+                });
                 
-                // Дополнительные услуги
-                html += '<h3>⏱️ Дополнительные услуги</h3>';
-                const additionalServices = extractNasosAdditionalServices(nasosData);
+                // Кнопка удаления строки
+                html += `
+                    <td style="border: none; background: transparent; width: 40px;">
+                        <button class="col-btn delete-col" onclick="deleteRow('${tableId}', ${i})" title="Удалить строку">❌</button>
+                    </td>
+                `;
                 
-                html += '<div class="table-responsive">';
-                html += '<table class="price-table">';
-                html += '<thead><tr><th>Наименование услуги</th><th>Ед. изм.</th><th>Тариф без НДС, руб.</th></tr></thead>';
-                html += '<tbody>';
-                
-                if (additionalServices.length > 0) {
-                    additionalServices.forEach(service => {
-                        html += `<tr><td>${service.name}</td><td>${service.unit}</td><td><span class="badge-price">${service.price}</span></td></tr>`;
-                    });
-                } else {
-                    html += '<tr><td>Дополнительное время работы на объекте (свыше 2 машино-часов)</td><td>час</td><td><span class="badge-price">200</span></td></tr>';
-                    html += '<tr><td>Прокачка бетона свыше 15 м³</td><td>м³</td><td><span class="badge-price">25</span></td></tr>';
-                    html += '<tr><td>Использование дополнительного оборудования (доп. шланг 4 м)</td><td>ед.</td><td><span class="badge-price">50</span></td></tr>';
-                    html += '<tr><td>Отсутствие места мойки смесительного барабана</td><td>ед.</td><td><span class="badge-price">200</span></td></tr>';
-                }
-                
-                html += '</tbody></table></div>';
-                
-                // Предупреждение о мойке
-                if (hasWarning(nasosData)) {
-                    html += '<div class="warning-box">';
-                    html += '<h4>⚠️ Важное предупреждение!</h4>';
-                    html += '<p class="mb-0"><strong>Отсутствие мойки приемника автобетононасоса - ЗАКАЗЫ НЕ ПРИНИМАЮТСЯ!</strong></p>';
-                    html += '</div>';
-                }
-                
-                // Информация о рейсе
-                html += '<div class="info-box">';
-                html += '<h4>ℹ️ В стоимость рейса АБС с насосом входит:</h4>';
-                html += '<ul class="mb-0">';
-                html += '<li>Доставка продукции от узла до объекта строительства</li>';
-                html += '<li>Работа на объекте 2 машино-часа (включая заезд на объект, раскладывание стрелы и технологическую мойку)</li>';
-                html += '<li>Возврат транспорта на узел</li>';
-                html += '</ul></div>';
-                
-                // Доставка за МКАД
-                html += '<h3>🗺️ Доставка продукции за пределы МКАД (АБС с насосом)</h3>';
-                const mkdServices = extractNasosMKDServices(nasosData);
-                
-                html += '<div class="table-responsive">';
-                html += '<table class="price-table">';
-                html += '<thead><tr><th>Расстояние от МКАД</th><th>Тариф за 1 км, руб.</th></tr></thead>';
-                html += '<tbody>';
-                
-                if (mkdServices.length > 0) {
-                    mkdServices.forEach(service => {
-                        html += `<tr><td>${service.distance}</td><td><span class="badge-price">${service.tariff}</span></td></tr>`;
-                    });
-                } else {
-                    html += '<tr><td>0-49 км</td><td><span class="badge-price">5</span></td></tr>';
-                    html += '<tr><td>50-99 км</td><td><span class="badge-price">6</span></td></tr>';
-                    html += '<tr><td>100-149 км</td><td><span class="badge-price">7</span></td></tr>';
-                    html += '<tr><td>свыше 150 км</td><td><span class="badge-price">8</span></td></tr>';
-                }
-                
-                html += '</tbody></table></div>';
-                html += '<p class="note-text">* Тариф применяется за каждый километр от МКАД до объекта</p>';
-                
-                html += '</div>'; // Закрываем price-section
+                html += '</tr>';
             }
             
-            // Контактная информация
-            html += '<div class="text-center mt-4">';
-            html += '<div class="info-box" style="background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);">';
-            html += '<h3>📞 Для заказа и консультации</h3>';
-            html += '<p style="font-size: 1.2rem; margin-bottom: 10px;">';
-            html += '<strong>+375 29 108-30-83</strong> | <strong>+375 29 169-72-27</strong>';
-            html += '</p>';
-            html += '<p style="font-size: 1rem; margin-bottom: 0;">';
-            html += '<a href="mailto:indigra.beton@gmail.com" style="color: #1e3a8a;">indigra.beton@gmail.com</a>';
-            html += '</p></div></div>';
+            html += `
+                        </tbody>
+                    </table>
+                    <button class="add-row-btn" onclick="addRow('${tableId}')">
+                        <i class="bi bi-plus-lg"></i> Добавить строку
+                    </button>
+                </div>
+            `;
             
             container.innerHTML = html;
         }
 
-        // Переключение отладочной информации
-        function toggleDebug() {
-            const debugDiv = document.getElementById('debugInfo');
-            debugDiv.classList.toggle('show');
-            const btn = document.querySelector('.debug-toggle');
-            if (debugDiv.classList.contains('show')) {
-                btn.textContent = '🐛 Скрыть отладку';
-            } else {
-                btn.textContent = '🐛 Показать отладку';
+        // Рендеринг всех таблиц
+        function renderAllTables() {
+            const container = document.getElementById('tablesContainer');
+            let html = '';
+            
+            for (const tableId in window.tableData) {
+                const { filename, title } = window.tableInfo[tableId];
+                
+                html += `
+                    <div class="table-card" id="table-${tableId}">
+                        <div class="table-header">
+                            <h3>
+                                <i class="bi bi-table"></i> ${title}
+                                <span class="file-name">${filename}</span>
+                            </h3>
+                            <div class="table-actions">
+                                <button class="btn-action save" onclick="saveTable('${tableId}', '${filename}')">
+                                    <i class="bi bi-save"></i> Сохранить
+                                </button>
+                                <button class="btn-action delete" onclick="deleteTable('${tableId}', '${filename}')">
+                                    <i class="bi bi-trash"></i> Удалить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
+            
+            container.innerHTML = html;
+            
+            // Заполняем каждую таблицу данными
+            for (const tableId in window.tableData) {
+                renderTable(tableId);
+            }
+        }
+
+        // Показать панель добавления таблицы
+        function showAddTablePanel() {
+            document.getElementById('addTablePanel').style.display = 'block';
+            document.getElementById('newFileName').value = '';
+            document.getElementById('newTableTitle').value = '';
+            document.getElementById('newTableCols').value = '3';
+            document.getElementById('newTableRows').value = '5';
+        }
+
+        // Скрыть панель добавления таблицы
+        function hideAddTablePanel() {
+            document.getElementById('addTablePanel').style.display = 'none';
+        }
+
+        // Создать новую таблицу
+        function createNewTable() {
+            const fileName = document.getElementById('newFileName').value.trim();
+            const tableTitle = document.getElementById('newTableTitle').value.trim();
+            const cols = parseInt(document.getElementById('newTableCols').value);
+            const rows = parseInt(document.getElementById('newTableRows').value);
+            
+            if (!fileName) {
+                showNotification('Введите название файла', 'error');
+                return;
+            }
+            
+            if (!tableTitle) {
+                showNotification('Введите название таблицы', 'error');
+                return;
+            }
+            
+            const fullFileName = fileName.endsWith('.xlsx') ? fileName : fileName + '.xlsx';
+            const tableId = 'table_' + Date.now();
+            
+            // Создаем структуру данных
+            const tableData = [];
+            
+            // Заголовки
+            const headers = [];
+            for (let i = 0; i < cols; i++) {
+                headers.push(`Столбец ${i + 1}`);
+            }
+            tableData.push(headers);
+            
+            // Строки данных
+            for (let i = 0; i < rows - 1; i++) {
+                const row = [];
+                for (let j = 0; j < cols; j++) {
+                    row.push('');
+                }
+                tableData.push(row);
+            }
+            
+            // Сохраняем в глобальные переменные
+            if (!window.tableData) window.tableData = {};
+            if (!window.tableInfo) window.tableInfo = {};
+            
+            window.tableData[tableId] = tableData;
+            window.tableInfo[tableId] = {
+                filename: fullFileName,
+                title: tableTitle
+            };
+            
+            // Сохраняем файл
+            saveExcelFile(fullFileName, tableData);
+            
+            // Перерисовываем
+            renderAllTables();
+            hideAddTablePanel();
+            showNotification('Таблица создана', 'success');
+        }
+
+        // Показать модальное окно подтверждения
+        function showConfirmModal(title, message, onConfirm) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h4>${title}</h4>
+                    <p>${message}</p>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Отмена</button>
+                        <button class="btn btn-danger" id="confirmBtn">Подтвердить</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('confirmBtn').addEventListener('click', () => {
+                onConfirm();
+                modal.remove();
+            });
+        }
+
+        // Загрузка всех таблиц
+        async function loadAllTables() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            loadingIndicator.style.display = 'block';
+            
+            // Список файлов для загрузки
+            const files = ['tarif.xlsx', 'Nasos.xlsx'];
+            window.tableData = {};
+            window.tableInfo = {};
+            
+            for (const file of files) {
+                const data = await loadExcelFile(file);
+                if (data) {
+                    const tableId = 'table_' + file.replace('.', '_');
+                    window.tableData[tableId] = data;
+                    window.tableInfo[tableId] = {
+                        filename: file,
+                        title: file === 'tarif.xlsx' ? 'Тарифы на автобетоносмесители' : 'Тарифы на АБС с насосом'
+                    };
+                }
+            }
+            
+            loadingIndicator.style.display = 'none';
+            renderAllTables();
         }
 
         // Проверка авторизации
@@ -734,24 +902,24 @@
             }
         }
 
-        // Выход из системы
-        function logout() {
-            sessionStorage.removeItem('admin_authenticated');
-            window.location.href = 'AutorithAdmin.html';
-        }
-
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
             checkAuth();
             loadAllTables();
             
-            const exitBtn = document.querySelector('.btn-exit');
-            if (exitBtn) {
-                exitBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    logout();
-                });
-            }
+            // Закрытие модального окна при клике вне его
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal-overlay')) {
+                    e.target.remove();
+                }
+            });
+            
+            // Отмена редактирования при клике вне ячейки
+            document.addEventListener('click', function(e) {
+                if (currentEditCell && !e.target.closest('td.editing')) {
+                    cancelEdit();
+                }
+            });
         });
     </script>
 </body>
