@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Редактор Excel - ИНДИГРА (Офлайн версия)</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Навигационная панель */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            padding: 1rem 2rem;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e3a8a !important;
+        }
+
+        /* Основной контейнер */
+        .admin-container {
+            max-width: 1600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Карточки таблиц */
+        .table-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid #dbeafe;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .table-header h3 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .table-header .file-name {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-family: monospace;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-action.delete:hover {
+            background: #dc3545;
+        }
+
+        .btn-action.save:hover {
+            background: #28a745;
+        }
+
+        .btn-action.download:hover {
+            background: #17a2b8;
+        }
+
+        /* Таблица */
+        .table-wrapper {
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .editable-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #dbeafe;
+            border-radius: 10px;
+        }
+
+        .editable-table th {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: #1e3a8a;
+            font-weight: 600;
+            padding: 12px;
+            border: 1px solid #90caf9;
+            position: relative;
+            min-width: 120px;
+            cursor: pointer !important;
+            user-select: none;
+        }
+
+        .editable-table th:hover {
+            background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
+            cursor: pointer !important;
+        }
+
+        .editable-table th.editing {
+            background: white !important;
+            cursor: text !important;
+            padding: 0 !important;
+        }
+
+        .editable-table td {
+            padding: 8px;
+            border: 1px solid #dbeafe;
+            background: white;
+        }
+
+        .editable-table td.editing {
+            padding: 0;
+        }
+
+        .editable-table input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #3b82f6;
+            border-radius: 4px;
+            font-size: 1rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .editable-table td:hover {
+            background: #f0f9ff;
+            cursor: pointer;
+        }
+
+        /* Элементы управления столбцами */
+        .col-controls {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        th:hover .col-controls {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .col-btn {
+            background: white;
+            border: none;
+            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #1e3a8a;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+
+        .col-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .col-btn.add-col:hover {
+            background: #28a745;
+            color: white;
+        }
+
+        .col-btn.delete-col:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* Кнопки добавления строк */
+        .add-row-btn {
+            margin-top: 1rem;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-row-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        /* Панель добавления таблиц */
+        .add-table-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 2px dashed #3b82f6;
+        }
+
+        .add-table-panel h4 {
+            color: #1e3a8a;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #dbeafe;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            border: none;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 58, 138, 0.4);
+        }
+
+        /* Панель загрузки файлов */
+        .upload-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 2px dashed #17a2b8;
+        }
+
+        .upload-panel h4 {
+            color: #17a2b8;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+        }
+
+        /* Модальное окно подтверждения */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content h4 {
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 1.5rem;
+            color: #4a5568;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 0 1rem;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .table-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar">
+        <div class="container-fluid">
+            <span class="navbar-brand">
+                <i class="bi bi-table"></i> Редактор Excel - ИНДИГРА (Офлайн)
+            </span>
+            <div>
+                <button class="btn btn-outline-primary me-2" onclick="showAddTablePanel()">
+                    <i class="bi bi-plus-lg"></i> Новая таблица
+                </button>
+                <button class="btn btn-outline-info me-2" onclick="showUploadPanel()">
+                    <i class="bi bi-upload"></i> Загрузить Excel
+                </button>
+                <a href="index.html" class="btn btn-outline-secondary">
+                    <i class="bi bi-house"></i> На сайт
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Основной контейнер -->
+    <div class="admin-container">
+        <!-- Панель загрузки файлов (скрыта по умолчанию) -->
+        <div id="uploadPanel" class="upload-panel" style="display: none;">
+            <h4><i class="bi bi-upload"></i> Загрузка Excel файла</h4>
+            <div class="form-group">
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="handleFileUpload(event)">
+                    <label for="fileInput" class="file-input-label">
+                        <i class="bi bi-file-earmark-arrow-up"></i> Выберите Excel файл
+                    </label>
+                </div>
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-secondary" onclick="hideUploadPanel()">
+                    <i class="bi bi-x-lg"></i> Отмена
+                </button>
+            </div>
+        </div>
+
+        <!-- Контейнер для таблиц -->
+        <div id="tablesContainer"></div>
+
+        <!-- Панель добавления таблицы (скрыта по умолчанию) -->
+        <div id="addTablePanel" class="add-table-panel" style="display: none;">
+            <h4><i class="bi bi-file-earmark-plus"></i> Создание новой таблицы</h4>
+            <div class="form-group">
+                <label>Название файла (без .xlsx)</label>
+                <input type="text" id="newFileName" class="form-control" placeholder="например: new_table">
+            </div>
+            <div class="form-group">
+                <label>Название таблицы (заголовок)</label>
+                <input type="text" id="newTableTitle" class="form-control" placeholder="например: Моя новая таблица">
+            </div>
+            <div class="form-group">
+                <label>Количество столбцов</label>
+                <input type="number" id="newTableCols" class="form-control" value="3" min="1" max="20">
+            </div>
+            <div class="form-group">
+                <label>Количество строк</label>
+                <input type="number" id="newTableRows" class="form-control" value="5" min="2" max="50">
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-primary me-2" onclick="createNewTable()">
+                    <i class="bi bi-check-lg"></i> Создать
+                </button>
+                <button class="btn btn-secondary" onclick="hideAddTablePanel()">
+                    <i class="bi bi-x-lg"></i> Отмена
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Глобальные переменные
+        let currentEditCell = null;
+        let confirmCallback = null;
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTablesFromStorage();
+            renderAllTables();
+            
+            // Закрытие модального окна при клике вне его
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal-overlay')) {
+                    e.target.remove();
+                }
+            });
+            
+            // Отмена редактирования при клике вне ячейки
+            document.addEventListener('click', function(e) {
+                if (currentEditCell && !e.target.closest('td.editing')) {
+                    cancelEdit();
+                }
+            });
+        });
+
+        // Показать уведомление
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Загрузка таблиц из localStorage
+        function loadTablesFromStorage() {
+            try {
+                const saved = localStorage.getItem('excelTables');
+                if (saved) {
+                    const tables = JSON.parse(saved);
+                    window.tableData = tables.data || {};
+                    window.tableInfo = tables.info || {};
+                } else {
+                    window.tableData = {};
+                    window.tableInfo = {};
+                    // Загружаем демонстрационные данные
+                    loadDemoData();
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки из localStorage:', error);
+                window.tableData = {};
+                window.tableInfo = {};
+                loadDemoData();
+            }
+        }
+
+        // Сохранение таблиц в localStorage
+        function saveTablesToStorage() {
+            try {
+                const data = {
+                    data: window.tableData,
+                    info: window.tableInfo
+                };
+                localStorage.setItem('excelTables', JSON.stringify(data));
+            } catch (error) {
+                console.error('Ошибка сохранения в localStorage:', error);
+                showNotification('Ошибка сохранения данных', 'error');
+            }
+        }
+
+        // Загрузка демонстрационных данных
+        function loadDemoData() {
+            // Тарифы
+            const tarifData = [
+                ['Модель', 'Цена за час', 'Минимальный заказ'],
+                ['АБС 5м³', '5000 руб', '2 часа'],
+                ['АБС 7м³', '6000 руб', '2 часа'],
+                ['АБС 9м³', '7000 руб', '2 часа']
+            ];
+            
+            const tableId1 = 'table_tarif_xlsx';
+            window.tableData[tableId1] = tarifData;
+            window.tableInfo[tableId1] = {
+                filename: 'tarif.xlsx',
+                title: 'Тарифы на автобетоносмесители'
+            };
+
+            // Насосы
+            const nasosData = [
+                ['Модель', 'Цена за час', 'Дальность подачи'],
+                ['АБС с насосом 5м³', '7000 руб', '30м'],
+                ['АБС с насосом 7м³', '8000 руб', '35м'],
+                ['АБС с насосом 9м³', '9000 руб', '40м']
+            ];
+            
+            const tableId2 = 'table_Nasos_xlsx';
+            window.tableData[tableId2] = nasosData;
+            window.tableInfo[tableId2] = {
+                filename: 'Nasos.xlsx',
+                title: 'Тарифы на АБС с насосом'
+            };
+        }
+
+        // Обработка загрузки файла
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const tableData = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+                    
+                    const filename = file.name;
+                    const tableId = 'table_' + filename.replace('.', '_');
+                    
+                    window.tableData[tableId] = tableData;
+                    window.tableInfo[tableId] = {
+                        filename: filename,
+                        title: filename.replace('.xlsx', '').replace('.xls', '')
+                    };
+                    
+                    saveTablesToStorage();
+                    renderAllTables();
+                    hideUploadPanel();
+                    showNotification(`Файл ${filename} загружен`, 'success');
+                } catch (error) {
+                    console.error('Ошибка загрузки файла:', error);
+                    showNotification('Ошибка при загрузке файла', 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Скачать Excel файл
+        function downloadExcelFile(filename, data) {
+            try {
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                
+                // Создаем Blob и скачиваем
+                const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                showNotification(`Файл ${filename} скачан`, 'success');
+            } catch (error) {
+                console.error('Ошибка скачивания:', error);
+                showNotification('Ошибка при скачивании файла', 'error');
+            }
+        }
+
+        // Начать редактирование ячейки
+        function startEdit(cell, rowIndex, colIndex, tableId, value) {
+            if (currentEditCell) {
+                cancelEdit();
+            }
+            
+            const safeValue = value || '';
+            
+            cell.classList.add('editing');
+            cell.innerHTML = `<input type="text" value="${safeValue.replace(/"/g, '&quot;')}" onblur="saveEdit(this, '${tableId}', ${rowIndex}, ${colIndex})" onkeypress="if(event.key==='Enter') this.blur()">`;
+            const input = cell.querySelector('input');
+            input.focus();
+            input.select();
+            currentEditCell = { cell, input, rowIndex, colIndex, tableId, value: safeValue };
+        }
+
+        // Начать редактирование заголовка
+        function startEditHeader(cell, colIndex, tableId, value) {
+            console.log('startEditHeader called with:', { colIndex, tableId, value });
+            
+            if (currentEditCell) {
+                cancelEdit();
+            }
+            
+            const safeValue = value || '';
+            
+            cell.classList.add('editing');
+            cell.innerHTML = `
+                <input type="text" value="${safeValue.replace(/"/g, '&quot;')}" onblur="saveHeaderEdit(this, '${tableId}', ${colIndex})" onkeypress="if(event.key==='Enter') this.blur()">
+                <div class="col-controls" style="position: absolute; top: 5px; right: 5px; display: flex; gap: 5px; opacity: 1;">
+                    <button class="col-btn add-col" onclick="event.stopPropagation(); addColumn('${tableId}')" title="Добавить столбец">➕</button>
+                    <button class="col-btn delete-col" onclick="event.stopPropagation(); deleteColumn('${tableId}', ${colIndex})" title="Удалить столбец">❌</button>
+                </div>
+            `;
+            const input = cell.querySelector('input');
+            if (input) {
+                input.focus();
+                input.select();
+            }
+            currentEditCell = { cell, input, rowIndex: 0, colIndex, tableId, value: safeValue, isHeader: true };
+        }
+
+        // Сохранить редактирование
+        function saveEdit(input, tableId, rowIndex, colIndex) {
+            const newValue = input.value;
+            const cell = input.parentElement;
+            cell.classList.remove('editing');
+            cell.innerHTML = newValue || '🔹пусто';
+            cell.setAttribute('onclick', `startEdit(this, ${rowIndex}, ${colIndex}, '${tableId}', '${newValue.replace(/'/g, "\\'")}')`);
+            
+            // Обновляем данные в памяти
+            const tableData = window.tableData[tableId];
+            if (tableData && tableData[rowIndex] && tableData[rowIndex][colIndex] !== undefined) {
+                tableData[rowIndex][colIndex] = newValue;
+                saveTablesToStorage();
+            }
+            
+            currentEditCell = null;
+        }
+
+        // Сохранить редактирование заголовка
+        function saveHeaderEdit(input, tableId, colIndex) {
+            console.log('saveHeaderEdit called with:', { tableId, colIndex, value: input.value });
+            
+            const newValue = input.value;
+            const cell = input.parentElement;
+            cell.classList.remove('editing');
+            cell.innerHTML = `
+                ${newValue || '🔹Заголовок'}
+                <div class="col-controls">
+                    <button class="col-btn add-col" onclick="addColumn('${tableId}')" title="Добавить столбец">➕</button>
+                    <button class="col-btn delete-col" onclick="deleteColumn('${tableId}', ${colIndex})" title="Удалить столбец">❌</button>
+                </div>
+            `;
+            cell.setAttribute('onclick', `startEditHeader(this, ${colIndex}, '${tableId}', '${newValue.replace(/'/g, "\\'")}')`);
+            
+            // Обновляем данные в памяти
+            const tableData = window.tableData[tableId];
+            if (tableData && tableData[0] && tableData[0][colIndex] !== undefined) {
+                tableData[0][colIndex] = newValue;
+                saveTablesToStorage();
+                console.log('Header saved successfully:', newValue);
+            } else {
+                console.error('Failed to save header - tableData not found or invalid');
+            }
+            
+            currentEditCell = null;
+        }
+
+        // Отменить редактирование
+        function cancelEdit() {
+            if (currentEditCell) {
+                const { cell, input, rowIndex, colIndex, tableId, value, isHeader } = currentEditCell;
+                cell.classList.remove('editing');
+                
+                const safeValue = value || '';
+                
+                if (isHeader) {
+                    cell.innerHTML = `
+                        ${safeValue || '🔹Заголовок'}
+                        <div class="col-controls">
+                            <button class="col-btn add-col" onclick="addColumn('${tableId}')" title="Добавить столбец">➕</button>
+                            <button class="col-btn delete-col" onclick="deleteColumn('${tableId}', ${colIndex})" title="Удалить столбец">❌</button>
+                        </div>
+                    `;
+                    cell.setAttribute('onclick', `startEditHeader(this, ${colIndex}, '${tableId}', '${safeValue.replace(/'/g, "\\'")}')`);
+                } else {
+                    cell.innerHTML = safeValue || '🔹пусто';
+                    cell.setAttribute('onclick', `startEdit(this, ${rowIndex}, ${colIndex}, '${tableId}', '${safeValue.replace(/'/g, "\\'")}')`);
+                }
+                
+                currentEditCell = null;
+            }
+        }
+
+        // Добавить строку
+        function addRow(tableId) {
+            const tableData = window.tableData[tableId];
+            if (!tableData) return;
+            
+            const newRow = [];
+            if (tableData.length > 0) {
+                const cols = tableData[0].length;
+                for (let i = 0; i < cols; i++) {
+                    newRow.push('');
+                }
+            }
+            tableData.push(newRow);
+            saveTablesToStorage();
+            renderTable(tableId);
+            showNotification('Строка добавлена', 'success');
+        }
+
+        // Удалить строку
+        function deleteRow(tableId, rowIndex) {
+            const tableData = window.tableData[tableId];
+            if (!tableData || tableData.length <= 1) {
+                showNotification('Нельзя удалить последнюю строку', 'error');
+                return;
+            }
+            
+            tableData.splice(rowIndex, 1);
+            saveTablesToStorage();
+            renderTable(tableId);
+            showNotification('Строка удалена', 'success');
+        }
+
+        // Добавить столбец
+        function addColumn(tableId) {
+            const tableData = window.tableData[tableId];
+            if (!tableData) return;
+            
+            // Добавляем новый столбец в каждую строку
+            tableData.forEach(row => {
+                row.push('');
+            });
+            
+            saveTablesToStorage();
+            renderTable(tableId);
+            showNotification('Столбец добавлен', 'success');
+        }
+
+        // Удалить столбец
+        function deleteColumn(tableId, colIndex) {
+            const tableData = window.tableData[tableId];
+            if (!tableData || tableData[0].length <= 1) {
+                showNotification('Нельзя удалить последний столбец', 'error');
+                return;
+            }
+            
+            // Удаляем столбец из каждой строки
+            tableData.forEach(row => {
+                row.splice(colIndex, 1);
+            });
+            
+            saveTablesToStorage();
+            renderTable(tableId);
+            showNotification('Столбец удален', 'success');
+        }
+
+        // Удалить таблицу
+        function deleteTable(tableId, filename) {
+            showConfirmModal(
+                'Удаление таблицы',
+                `Вы уверены, что хотите удалить таблицу "${filename}"?`,
+                () => {
+                    delete window.tableData[tableId];
+                    delete window.tableInfo[tableId];
+                    saveTablesToStorage();
+                    renderAllTables();
+                    showNotification('Таблица удалена', 'success');
+                }
+            );
+        }
+
+        // Рендеринг одной таблицы
+        function renderTable(tableId) {
+            const tableData = window.tableData[tableId];
+            if (!tableData) return;
+            
+            const container = document.getElementById(`table-${tableId}`);
+            if (!container) return;
+            
+            const { filename, title } = window.tableInfo[tableId];
+            const headers = tableData[0] || [];
+            
+            let html = `
+                <div class="table-wrapper">
+                    <table class="editable-table">
+                        <thead>
+                            <tr>
+            `;
+            
+            // Заголовки с элементами управления
+            headers.forEach((header, colIndex) => {
+                const headerValue = (header || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                html += `
+                    <th onclick="startEditHeader(this, ${colIndex}, '${tableId}', '${headerValue}')">
+                        ${header || '🔹Заголовок'}
+                        <div class="col-controls">
+                            <button class="col-btn add-col" onclick="event.stopPropagation(); addColumn('${tableId}')" title="Добавить столбец">➕</button>
+                            <button class="col-btn delete-col" onclick="event.stopPropagation(); deleteColumn('${tableId}', ${colIndex})" title="Удалить столбец">❌</button>
+                        </div>
+                    </th>
+                `;
+            });
+            
+            html += `
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Строки данных
+            for (let i = 1; i < tableData.length; i++) {
+                const row = tableData[i];
+                html += '<tr>';
+                
+                row.forEach((cell, colIndex) => {
+                    const value = cell || '';
+                    html += `
+                        <td onclick="startEdit(this, ${i}, ${colIndex}, '${tableId}', '${value.replace(/'/g, "\\'")}')">
+                            ${value || '🔹пусто'}
+                        </td>
+                    `;
+                });
+                
+                // Кнопка удаления строки
+                html += `
+                    <td style="border: none; background: transparent; width: 40px;">
+                        <button class="col-btn delete-col" onclick="deleteRow('${tableId}', ${i})" title="Удалить строку">❌</button>
+                    </td>
+                `;
+                
+                html += '</tr>';
+            }
+            
+            html += `
+                        </tbody>
+                    </table>
+                    <button class="add-row-btn" onclick="addRow('${tableId}')">
+                        <i class="bi bi-plus-lg"></i> Добавить строку
+                    </button>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        // Рендеринг всех таблиц
+        function renderAllTables() {
+            const container = document.getElementById('tablesContainer');
+            let html = '';
+            
+            for (const tableId in window.tableData) {
+                const { filename, title } = window.tableInfo[tableId];
+                
+                html += `
+                    <div class="table-card" id="table-${tableId}">
+                        <div class="table-header">
+                            <h3>
+                                <i class="bi bi-table"></i> ${title}
+                                <span class="file-name">${filename}</span>
+                            </h3>
+                            <div class="table-actions">
+                                <button class="btn-action download" onclick="downloadExcelFile('${filename}', window.tableData['${tableId}'])">
+                                    <i class="bi bi-download"></i> Скачать
+                                </button>
+                                <button class="btn-action delete" onclick="deleteTable('${tableId}', '${filename}')">
+                                    <i class="bi bi-trash"></i> Удалить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+            
+            // Заполняем каждую таблицу данными
+            for (const tableId in window.tableData) {
+                renderTable(tableId);
+            }
+        }
+
+        // Показать панель добавления таблицы
+        function showAddTablePanel() {
+            document.getElementById('addTablePanel').style.display = 'block';
+            document.getElementById('newFileName').value = '';
+            document.getElementById('newTableTitle').value = '';
+            document.getElementById('newTableCols').value = '3';
+            document.getElementById('newTableRows').value = '5';
+        }
+
+        // Скрыть панель добавления таблицы
+        function hideAddTablePanel() {
+            document.getElementById('addTablePanel').style.display = 'none';
+        }
+
+        // Показать панель загрузки
+        function showUploadPanel() {
+            document.getElementById('uploadPanel').style.display = 'block';
+            document.getElementById('fileInput').value = '';
+        }
+
+        // Скрыть панель загрузки
+        function hideUploadPanel() {
+            document.getElementById('uploadPanel').style.display = 'none';
+        }
+
+        // Создать новую таблицу
+        function createNewTable() {
+            const fileName = document.getElementById('newFileName').value.trim();
+            const tableTitle = document.getElementById('newTableTitle').value.trim();
+            const cols = parseInt(document.getElementById('newTableCols').value);
+            const rows = parseInt(document.getElementById('newTableRows').value);
+            
+            if (!fileName) {
+                showNotification('Введите название файла', 'error');
+                return;
+            }
+            
+            if (!tableTitle) {
+                showNotification('Введите название таблицы', 'error');
+                return;
+            }
+            
+            const fullFileName = fileName.endsWith('.xlsx') ? fileName : fileName + '.xlsx';
+            const tableId = 'table_' + fullFileName.replace('.', '_');
+            
+            // Создаем структуру данных
+            const tableData = [];
+            
+            // Заголовки
+            const headers = [];
+            for (let i = 0; i < cols; i++) {
+                headers.push(`Столбец ${i + 1}`);
+            }
+            tableData.push(headers);
+            
+            // Строки данных
+            for (let i = 0; i < rows - 1; i++) {
+                const row = [];
+                for (let j = 0; j < cols; j++) {
+                    row.push('');
+                }
+                tableData.push(row);
+            }
+            
+            // Сохраняем в глобальные переменные
+            window.tableData[tableId] = tableData;
+            window.tableInfo[tableId] = {
+                filename: fullFileName,
+                title: tableTitle
+            };
+            
+            saveTablesToStorage();
+            renderAllTables();
+            hideAddTablePanel();
+            showNotification('Таблица создана', 'success');
+        }
+
+        // Показать модальное окно подтверждения
+        function showConfirmModal(title, message, onConfirm) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h4>${title}</h4>
+                    <p>${message}</p>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Отмена</button>
+                        <button class="btn btn-danger" id="confirmBtn">Подтвердить</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('confirmBtn').addEventListener('click', () => {
+                onConfirm();
+                modal.remove();
+            });
+        }
+    </script>
+</body>
+</html>
