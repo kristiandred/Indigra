@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="css/site.css" />
     <link rel="stylesheet" href="css/custom.css" />
     <link rel="stylesheet" href="css/common.css" />
-    <!-- Подключаем библиотеку для чтения Excel -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         /* Стили для страницы авторизации */
         body {
@@ -95,14 +93,9 @@
             font-size: 1.1rem;
         }
 
-        .auth-form .btn-auth:hover:not(:disabled) {
+        .auth-form .btn-auth:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-
-        .auth-form .btn-auth:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
         }
 
         .auth-footer {
@@ -262,17 +255,6 @@
             }
         }
 
-        // Блокирует форму на время обработки
-        function setFormDisabled(disabled) {
-            const loginInput = document.getElementById('login');
-            const passwordInput = document.getElementById('password');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            loginInput.disabled = disabled;
-            passwordInput.disabled = disabled;
-            submitBtn.disabled = disabled;
-        }
-
         // Обработка логина
         function handleLogin() {
             const login = document.getElementById('login').value.trim();
@@ -290,59 +272,23 @@
                 user.login.toLowerCase() === login.toLowerCase() && user.password === password
             );
             
-            setFormDisabled(true);
-            
-            setTimeout(() => {
-                if (foundUser) {
-                    showSuccess(true);
-                    
-                    try {
-                        sessionStorage.setItem('admin_authenticated', 'true');
-                        sessionStorage.setItem('admin_login', foundUser.login);
-                        sessionStorage.setItem('admin_login_time', new Date().toISOString());
-                    } catch (e) {
-                        console.warn('Не удалось сохранить сессию:', e);
-                    }
-                    
-                    setTimeout(() => {
-                        window.location.href = 'admin-panel.html';
-                    }, 2000);
-                } else {
-                    showError(true, 'Неверный логин или пароль.');
-                    setFormDisabled(false);
-                    document.getElementById('password').value = '';
-                    document.getElementById('password').focus();
-                }
-            }, 800);
-        }
-
-        // Проверка существующей сессии
-        function checkExistingSession() {
-            try {
-                const isAuthenticated = sessionStorage.getItem('admin_authenticated') === 'true';
-                const loginTime = sessionStorage.getItem('admin_login_time');
+            if (foundUser) {
+                showSuccess(true);
                 
-                if (isAuthenticated && loginTime) {
-                    const timeSinceLogin = new Date() - new Date(loginTime);
-                    const sessionTimeout = 30 * 60 * 1000;
-                    
-                    if (timeSinceLogin < sessionTimeout) {
-                        window.location.href = 'admin-panel.html';
-                    } else {
-                        sessionStorage.removeItem('admin_authenticated');
-                        sessionStorage.removeItem('admin_login');
-                        sessionStorage.removeItem('admin_login_time');
-                    }
-                }
-            } catch (e) {
-                console.warn('Не удалось проверить сессию:', e);
+                // 👇 НЕТ СОХРАНЕНИЯ СЕССИИ - каждый раз нужно вводить пароль
+                
+                setTimeout(() => {
+                    window.location.href = 'admin-panel.html';
+                }, 2000);
+            } else {
+                showError(true, 'Неверный логин или пароль.');
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
             }
         }
 
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            checkExistingSession();
-            
             const inputs = document.querySelectorAll('#login, #password');
             inputs.forEach(input => {
                 input.addEventListener('keypress', function(e) {
