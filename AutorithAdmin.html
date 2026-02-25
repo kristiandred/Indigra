@@ -18,7 +18,6 @@
             justify-content: center;
             margin: 0;
             padding: 20px;
-            /* Убираем масштабирование */
             transform: none !important;
         }
 
@@ -31,7 +30,6 @@
             width: 100%;
             border: 1px solid rgba(255,255,255,0.2);
             backdrop-filter: blur(10px);
-            /* Убираем наследование масштаба */
             transform: none !important;
         }
 
@@ -91,6 +89,7 @@
             transition: all 0.3s ease;
             cursor: pointer;
             font-size: 1.1rem;
+            margin-top: 1rem;
         }
 
         .auth-form .btn-auth:hover {
@@ -166,6 +165,28 @@
             color: #1e3a8a;
         }
 
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .remember-me input {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #1e3a8a;
+        }
+
+        .remember-me label {
+            color: #4a5568;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
         /* Скрываем индикаторы масштаба */
         #zoom-indicator,
         .zoom-controls,
@@ -209,6 +230,11 @@
                     <span class="toggle-password" onclick="togglePasswordVisibility()">👁️</span>
                 </div>
             </div>
+
+            <div class="remember-me">
+                <input type="checkbox" id="rememberMe" name="rememberMe">
+                <label for="rememberMe">Запомнить меня</label>
+            </div>
             
             <button type="submit" class="btn-auth" id="submitBtn">Войти</button>
         </form>
@@ -223,6 +249,29 @@
         const ADMIN_CREDENTIALS = [
             { login: "Kristina", password: "123456" }
         ];
+
+        // Проверяем сохраненную сессию при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedSession = localStorage.getItem('admin_session');
+            if (savedSession) {
+                try {
+                    const session = JSON.parse(savedSession);
+                    const now = new Date().getTime();
+                    
+                    // Проверяем, не истекла ли сессия (30 дней)
+                    if (now - session.timestamp < 30 * 24 * 60 * 60 * 1000) {
+                        // Автоматический вход
+                        sessionStorage.setItem('admin_authenticated', 'true');
+                        window.location.href = 'admin-panel.html';
+                    } else {
+                        // Сессия истекла - удаляем
+                        localStorage.removeItem('admin_session');
+                    }
+                } catch (e) {
+                    localStorage.removeItem('admin_session');
+                }
+            }
+        });
 
         // Переключает видимость пароля
         function togglePasswordVisibility() {
@@ -259,6 +308,7 @@
         function handleLogin() {
             const login = document.getElementById('login').value.trim();
             const password = document.getElementById('password').value.trim();
+            const rememberMe = document.getElementById('rememberMe').checked;
             
             showError(false);
             
@@ -275,7 +325,20 @@
             if (foundUser) {
                 showSuccess(true);
                 
-                // 👇 НЕТ СОХРАНЕНИЯ СЕССИИ - каждый раз нужно вводить пароль
+                // Сохраняем сессию в sessionStorage (на время сессии браузера)
+                sessionStorage.setItem('admin_authenticated', 'true');
+                
+                // Если нажата "Запомнить меня", сохраняем в localStorage
+                if (rememberMe) {
+                    const sessionData = {
+                        login: login,
+                        timestamp: new Date().getTime()
+                    };
+                    localStorage.setItem('admin_session', JSON.stringify(sessionData));
+                } else {
+                    // Удаляем сохраненную сессию, если она была
+                    localStorage.removeItem('admin_session');
+                }
                 
                 setTimeout(() => {
                     window.location.href = 'admin-panel.html';
