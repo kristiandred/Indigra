@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Панель администратора - ИНДИГРА</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="css/custom.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <!-- Подключаем библиотеку для чтения Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        /* Стили для панели администратора */
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .admin-header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-header h1 {
+            color: #1e3a8a;
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .admin-header .btn-exit {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .admin-header .btn-exit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .table-card h2 {
+            color: #1e3a8a;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #3b82f6;
+        }
+
+        .table-card h3 {
+            color: #2d3748;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            font-weight: 600;
+            padding: 15px;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        td {
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+            color: #2d3748;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        tbody tr:hover {
+            background: #dbeafe;
+            transition: background 0.3s ease;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            color: #2c5282;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+            border-left: 4px solid #c53030;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            color: #c53030;
+            font-weight: 600;
+        }
+
+        .badge-price {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .last-updated {
+            text-align: right;
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        .data-source {
+            background: #e2e8f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #4a5568;
+            display: inline-block;
+            margin-left: 1rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(30, 58, 138, 0.3);
+            border-radius: 50%;
+            border-top-color: #1e3a8a;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        /* Скрываем индикаторы масштаба */
+        #zoom-indicator,
+        .zoom-controls,
+        .zoom-notification {
+            display: none !important;
+        }
+
+        /* Убираем масштабирование */
+        html {
+            transform: none !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <h1>🔧 Панель администратора ИНДИГРА</h1>
+        <a href="AutorithAdmin.html" class="btn-exit">🚪 Выйти</a>
+    </div>
+
+    <div class="admin-container">
+        <h2 class="section-title">📊 Тарифы на транспортные услуги</h2>
+
+        <!-- Индикатор загрузки -->
+        <div id="loadingIndicator" style="text-align: center; color: white; margin: 2rem;">
+            <div class="loading-spinner"></div>
+            Загрузка данных из Excel файлов...
+        </div>
+
+        <!-- Контейнер для таблиц -->
+        <div id="tablesContainer"></div>
+    </div>
+
+    <script>
+        // Функция загрузки Excel файла
+        async function loadExcelFile(filename) {
+            try {
+                const response = await fetch(`data/${filename}`);
+                if (!response.ok) {
+                    throw new Error(`Файл ${filename} не найден`);
+                }
+                const arrayBuffer = await response.arrayBuffer();
+                const data = new Uint8Array(arrayBuffer);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                return XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+            } catch (error) {
+                console.error(`Ошибка загрузки ${filename}:`, error);
+                return null;
+            }
+        }
+
+        // Функция создания таблицы из данных
+        function createTable(data, title) {
+            if (!data || data.length === 0) return '<p>Нет данных</p>';
+            
+            let html = '<div class="table-responsive"><table>';
+            
+            // Заголовки (первая строка)
+            if (data[0] && data[0].length > 0) {
+                html += '<thead><tr>';
+                for (let cell of data[0]) {
+                    if (cell && String(cell).trim() !== '') {
+                        html += `<th>${String(cell).trim()}</th>`;
+                    }
+                }
+                html += '</tr></thead>';
+            }
+            
+            // Данные (со второй строки)
+            html += '<tbody>';
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                if (!row || row.length === 0) continue;
+                
+                // Проверяем, есть ли в строке хоть одно непустое значение
+                const hasData = row.some(cell => cell && String(cell).trim() !== '');
+                if (!hasData) continue;
+                
+                html += '<tr>';
+                for (let cell of row) {
+                    if (cell !== undefined) {
+                        const cellValue = String(cell).trim();
+                        if (cellValue !== '') {
+                            // Если это цена - оборачиваем в badge
+                            if (!isNaN(parseFloat(cellValue)) && cellValue.length < 10) {
+                                html += `<td><span class="badge-price">${cellValue}</span></td>`;
+                            } else {
+                                html += `<td>${cellValue}</td>`;
+                            }
+                        } else {
+                            html += '<td>-</td>';
+                        }
+                    } else {
+                        html += '<td>-</td>';
+                    }
+                }
+                html += '</tr>';
+            }
+            html += '</tbody></table></div>';
+            
+            return html;
+        }
+
+        // Функция создания информационного блока
+        function createInfoBlock(data, startIndex) {
+            let infoText = '';
+            for (let i = startIndex; i < data.length; i++) {
+                const row = data[i];
+                if (row && row[0] && String(row[0]).includes('Рейс АБС')) {
+                    infoText = String(row[0]).trim();
+                    break;
+                }
+            }
+            return infoText ? `<div class="info-box">ℹ️ ${infoText}</div>` : '';
+        }
+
+        // Функция создания предупреждения
+        function createWarningBlock(data) {
+            for (let row of data) {
+                if (row && row[0] && String(row[0]).includes('ЗАКАЗЫ НЕ ПРИНИМАЮТСЯ')) {
+                    return `<div class="warning-box">⚠️ ${String(row[0]).trim()}</div>`;
+                }
+            }
+            return '';
+        }
+
+        // Основная функция загрузки и отображения всех таблиц
+        async function loadAllTables() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const container = document.getElementById('tablesContainer');
+            
+            // Загружаем оба файла
+            const [tarifData, nasosData] = await Promise.all([
+                loadExcelFile('tarif.xlsx'),
+                loadExcelFile('Nasos.xlsx')
+            ]);
+            
+            loadingIndicator.style.display = 'none';
+            
+            if (!tarifData && !nasosData) {
+                container.innerHTML = '<div class="error-message">❌ Не удалось загрузить файлы tarif.xlsx и Nasos.xlsx</div>';
+                return;
+            }
+            
+            let html = '';
+            
+            // ============ ТАРИФЫ АБС (tarif.xlsx) ============
+            if (tarifData) {
+                html += '<div class="table-card">';
+                html += '<h2>🚚 Автобетоносмесители (АБС) <span class="data-source">tarif.xlsx</span></h2>';
+                
+                // Основная таблица
+                html += '<h3>📋 Основные услуги</h3>';
+                const mainTableData = tarifData.slice(0, 12); // Первые 12 строк с услугами
+                html += createTable(mainTableData, 'АБС');
+                
+                // Дополнительные услуги
+                html += '<h3>⏱️ Дополнительные услуги</h3>';
+                const additionalData = tarifData.slice(12, 15); // Строки с доп. услугами
+                html += createTable(additionalData, 'Дополнительно');
+                
+                // Информация о рейсе
+                const infoBlock = createInfoBlock(tarifData, 15);
+                if (infoBlock) html += infoBlock;
+                
+                // Доставка за МКАД
+                html += '<h3>🛣️ Доставка за пределы МКАД</h3>';
+                const mkdData = tarifData.slice(18, 23); // Строки с МКАД
+                html += createTable(mkdData, 'МКАД');
+                
+                html += '<div class="last-updated">📅 Данные из tarif.xlsx</div>';
+                html += '</div>';
+            }
+            
+            // ============ ТАРИФЫ АБС С НАСОСОМ (Nasos.xlsx) ============
+            if (nasosData) {
+                html += '<div class="table-card">';
+                html += '<h2>🚛 Автобетоносмесители с насосом <span class="data-source">Nasos.xlsx</span></h2>';
+                
+                // Основная таблица
+                html += '<h3>📋 Основные услуги</h3>';
+                const mainTableData = nasosData.slice(0, 9); // Первые 9 строк с услугами
+                html += createTable(mainTableData, 'АБС с насосом');
+                
+                // Дополнительные услуги
+                html += '<h3>⏱️ Дополнительные услуги</h3>';
+                const additionalData = nasosData.slice(9, 14); // Строки с доп. услугами
+                html += createTable(additionalData, 'Дополнительно');
+                
+                // Предупреждение о мойке
+                const warningBlock = createWarningBlock(nasosData);
+                if (warningBlock) html += warningBlock;
+                
+                // Информация о рейсе
+                const infoBlock = createInfoBlock(nasosData, 16);
+                if (infoBlock) html += infoBlock;
+                
+                // Доставка за МКАД
+                html += '<h3>🗺️ Доставка за пределы МКАД</h3>';
+                const mkdData = nasosData.slice(22, 27); // Строки с МКАД
+                html += createTable(mkdData, 'МКАД с насосом');
+                
+                html += '<div class="last-updated">📅 Данные из Nasos.xlsx</div>';
+                html += '</div>';
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // Проверка авторизации
+        function checkAuth() {
+            // Проверяем sessionStorage (текущая сессия)
+            const sessionAuth = sessionStorage.getItem('admin_authenticated') === 'true';
+            
+            // Проверяем localStorage (долговременная сессия с "Запомнить меня")
+            let localAuth = false;
+            const savedSession = localStorage.getItem('admin_session');
+            if (savedSession) {
+                try {
+                    const session = JSON.parse(savedSession);
+                    const now = new Date().getTime();
+                    // Проверяем, не истекла ли сессия (30 дней)
+                    if (now - session.timestamp < 30 * 24 * 60 * 60 * 1000) {
+                        localAuth = true;
+                        // Восстанавливаем sessionStorage
+                        sessionStorage.setItem('admin_authenticated', 'true');
+                    } else {
+                        // Сессия истекла - удаляем
+                        localStorage.removeItem('admin_session');
+                    }
+                } catch (e) {
+                    localStorage.removeItem('admin_session');
+                }
+            }
+            
+            if (!sessionAuth && !localAuth) {
+                window.location.href = 'AutorithAdmin.html';
+            }
+        }
+
+        // Выход из системы
+        function logout() {
+            sessionStorage.removeItem('admin_authenticated');
+            // localStorage не очищаем, чтобы "Запомнить меня" продолжал работать
+            window.location.href = 'AutorithAdmin.html';
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadAllTables();
+            
+            // Добавляем обработчик на кнопку выхода
+            const exitBtn = document.querySelector('.btn-exit');
+            if (exitBtn) {
+                exitBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    logout();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
