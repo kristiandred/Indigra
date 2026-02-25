@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Производство и продажа бетона - ИНДИГРА</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="css/custom.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/zoom.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <div class="navbar-brand-wrapper">
+                    <a class="navbar-brand d-flex align-items-center" href="index.html">
+                        <img src="images/Логотип 1.svg" alt="ИНДИГРА" class="navbar-logo me-2">
+                        <span>ИНДИГРА</span>
+                    </a>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Главная</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="about.html">О компании</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="products.html">Услуги</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="price.html">Прайс</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="delivery.html">Доставка и оплата</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contact.html">Контакты</a>
+                        </li>
+                    </ul>
+                    <div class="ms-lg-3 mt-2 mt-lg-0">
+                        <div class="navbar-phones">
+                            <a href="tel:+375291083083" class="phone-link">📞 +375 29 108-30-83</a>
+                            <a href="tel:+375291697227" class="phone-link">📞 +375 29 169-72-27</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main">
+        <!-- Hero Section -->
+        <section class="hero-section" style="background-image: url('images/Узел 1.png');">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Бетон с доставкой в Минске</h1>
+                    <div class="hero-features">
+                        <div class="feature-item">✓ Полное соответствие СТБ</div>
+                        <div class="feature-item">✓ Ежедневные проверки качества</div>
+                        <div class="feature-item">✓ Марки бетона от М-100 до М-600</div>
+                        <div class="feature-item">✓ Доставка собственным транспортом</div>
+                        <div class="feature-item">✓ Возможность подачи автобетоносмесителем с насосом</div>
+                    </div>
+                    <div class="hero-buttons">
+                        <a href="#order" class="btn btn-primary btn-lg me-3">Купить бетон</a>
+                        <a href="#services" class="btn btn-outline-light btn-lg">Раствор и услуги</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Продукция -->
+        <section class="products" id="services">
+            <div class="container">
+                <h2 class="section-title">НАША ПРОДУКЦИЯ</h2>
+                <div class="row">
+                    <!-- Левый столбик - текст о компании -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="company-info">
+                            <div class="company-features">
+                                <div class="company-feature">
+                                    <div class="feature-text">Надежный поставщик бетона</div>
+                                </div>
+                                <div class="company-feature">
+                                    <div class="feature-text">Собственные производственные мощности</div>
+                                </div>
+                                <div class="company-feature">
+                                    <div class="feature-text">Соблюдение марки и качества</div>
+                                </div>
+                                <div class="company-feature">
+                                    <div class="feature-text">Соблюдение сроков доставки бетона</div>
+                                </div>
+                                <div class="company-feature">
+                                    <div class="feature-text">Современный автопарк, включая: автобетононасосы и автобетоносмесители</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Правый столбик - карточки материалов -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="materials-grid">
+                            <div class="material-card" onclick="openConcreteModal()">
+                                <div class="material-image">
+                                    <img src="images/товарный бетон.webp" alt="Товарный бетон">
+                                </div>
+                                <div class="material-name">Товарный бетон</div>
+                            </div>
+                            <div class="material-card" onclick="openMaterialPage('Растворная смесь')">
+                                <div class="material-image">
+                                    <img src="images/Растворная смесь.webp" alt="Растворная смесь">
+                                </div>
+                                <div class="material-name">Растворная смесь</div>
+                            </div>
+                            <div class="material-card" onclick="openMaterialPage('Щебень')">
+                                <div class="material-image">
+                                    <img src="images/Щебень.webp" alt="Щебень">
+                                </div>
+                                <div class="material-name">Щебень</div>
+                            </div>
+                            <div class="material-card" onclick="openMaterialPage('Песок')">
+                                <div class="material-image">
+                                    <img src="images/Песок.png" alt="Песок">
+                                </div>
+                                <div class="material-name">Песок</div>
+                            </div>
+                            <div class="material-card" onclick="openMaterialPage('Гравий')">
+                                <div class="material-image">
+                                    <img src="images/Гравий.webp" alt="Гравий">
+                                </div>
+                                <div class="material-name">Гравий</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Модальное окно выбора типа бетона -->
+        <div class="modal fade" id="concreteModal" tabindex="-1" aria-labelledby="concreteModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="concreteModalLabel">Выберите тип бетона</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-grid gap-3">
+                            <button type="button" class="btn btn-primary btn-lg concrete-option" onclick="selectConcreteType('gravel')">
+                                🏔️ Бетон на гравии
+                            </button>
+                            <button type="button" class="btn btn-primary btn-lg concrete-option" onclick="selectConcreteType('crushed')">
+                                💎 Бетон на щебне
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Второе модальное окно - карточки бетона -->
+        <div class="modal fade" id="concreteCardsModal" tabindex="-1" aria-labelledby="concreteCardsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="concreteCardsModalLabel">Выберите марку бетона</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="concreteCardsContainer" class="row g-4">
+                            <!-- Карточки бетона будут добавлены через JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Калькулятор -->
+        <section class="calculator" id="calculator">
+            <div class="container">
+                <h2 class="section-title">РАССЧИТАТЬ СТОИМОСТЬ</h2>
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="calculator-card p-4">
+                            <form id="calcForm">
+                                <div class="mb-3">
+                                    <label for="productType" class="form-label">Тип бетона</label>
+                                    <select class="form-select" id="productType">
+                                        <option value="3800">Бетон М100-М300 (3 800 ₽/м³)</option>
+                                        <option value="4500">Бетон М350-М500 (4 500 ₽/м³)</option>
+                                        <option value="3200">Раствор кладочный (3 200 ₽/м³)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="volume" class="form-label">Объем, м³</label>
+                                    <input type="number" class="form-control" id="volume" min="1" max="100" value="10">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="delivery" class="form-label">Доставка</label>
+                                    <select class="form-select" id="delivery">
+                                        <option value="0">Самовывоз</option>
+                                        <option value="5000">В пределах города (+5 000 ₽)</option>
+                                        <option value="10000">За городом (+10 000 ₽)</option>
+                                    </select>
+                                </div>
+                                <div class="result mb-3 p-3 bg-light rounded">
+                                    <h5>Итого: <span id="totalPrice">0</span> ₽</h5>
+                                </div>
+                                <button type="button" class="btn btn-primary w-100" onclick="calculateTotal()">Рассчитать</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Контакты -->
+        <section class="contacts">
+            <div class="container">
+                <h2 class="section-title">КОНТАКТЫ</h2>
+                <div class="contact-info">
+                    <h4>📍 Адрес</h4>
+                    <p>г. Минск, ул. Монтажников, д. 39</p>
+
+                    <h4>📞 Телефон</h4>
+                    <p><a href="tel:+375291083083">+375 29 108 30 83</a><br>
+                       <a href="tel:+375291697227">+375 29 169 72 27</a></p>
+
+                    <h4>📧 Email</h4>
+                    <p><a href="mailto:indigra.beton@gmail.com">indigra.beton@gmail.com</a></p>
+
+                    <h4>🕐 Режим работы</h4>
+                    <p>Офис: Пн-Пт 9:00-18:00<br>Производство: Пн-Вс 8:00-20:00</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/zoom-sync.js"></script>
+    <script>
+        function calculateTotal() {
+            const price = parseInt(document.getElementById('productType').value);
+            const volume = parseInt(document.getElementById('volume').value);
+            const delivery = parseInt(document.getElementById('delivery').value);
+            const total = price * volume + delivery;
+            document.getElementById('totalPrice').textContent = total.toLocaleString('ru-RU');
+        }
+
+        // Функция открытия страницы с информацией о материале
+        function openMaterialPage(materialName) {
+            window.location.href = `material.html?material=${encodeURIComponent(materialName)}`;
+        }
+
+        // Функция открытия модального окна выбора бетона
+        function openConcreteModal() {
+            const modal = new bootstrap.Modal(document.getElementById('concreteModal'));
+            modal.show();
+        }
+
+        // Функция выбора типа бетона
+        function selectConcreteType(type) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('concreteModal'));
+            modal.hide();
+            
+            // Данные о бетоне для разных типов
+            const concreteData = {
+                gravel: {
+                    title: 'Бетон на гравии',
+                    grades: ['М150', 'М200', 'М250', 'М300'],
+                    images: {
+                        'М150': 'images/c 8 10 m 150.png',
+                        'М200': 'images/c 12 15 m 200.png',
+                        'М250': 'images/c 16 20 m 250.png',
+                        'М300': 'images/c 18 22,5 m 300.png'
+                    }
+                },
+                crushed: {
+                    title: 'Бетон на гранитном щебне',
+                    grades: ['М150', 'М200', 'М250', 'М300', 'М350', 'М400', 'М450', 'М500'],
+                    images: {
+                        'М150': 'images/c 8 10 m 150.png',
+                        'М200': 'images/c 12 15 m 200.png',
+                        'М250': 'images/c 16 20 m 250.png',
+                        'М300': 'images/c 18 22,5 m 300.png',
+                        'М350': 'images/c 20 25 m 350.png',
+                        'М400': 'images/c 25 30 m 400.png',
+                        'М450': 'images/c 28 35 m 450.png',
+                        'М500': 'images/c 30 37 m 500.png'
+                    }
+                }
+            };
+            
+            // Устанавливаем заголовок модального окна
+            document.getElementById('concreteCardsModalLabel').textContent = concreteData[type].title;
+            
+            // Создаем карточки бетона
+            const container = document.getElementById('concreteCardsContainer');
+            container.innerHTML = '';
+            
+            concreteData[type].grades.forEach(grade => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 col-lg-4';
+                col.innerHTML = `
+                    <div class="concrete-card" onclick="selectConcreteGrade('${type}', '${grade}')">
+                        <div class="concrete-image">
+                            <img src="${concreteData[type].images[grade]}" alt="${grade}" onerror="this.src='images/товарный бетон.webp'">
+                        </div>
+                        <div class="concrete-body">
+                            <h5>${grade}</h5>
+                            <p>${concreteData[type].title}</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+            
+            // Открываем второе модальное окно
+            setTimeout(() => {
+                const cardsModal = new bootstrap.Modal(document.getElementById('concreteCardsModal'));
+                cardsModal.show();
+            }, 300);
+        }
+        
+        // Функция выбора марки бетона
+        function selectConcreteGrade(type, grade) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('concreteCardsModal'));
+            modal.hide();
+            
+            // Формируем название бетона и открываем страницу с информацией
+            const concreteName = `Бетон ${grade}`;
+            window.location.href = `material.html?material=${encodeURIComponent(concreteName)}`;
+        }
+
+        // Функция показа уведомления
+        function showNotification(message) {
+            // Создаем элемент уведомления
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+            notification.style.zIndex = '9999';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Автоматически закрываем через 3 секунды
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+
+        // Initial calculation
+        calculateTotal();
+    </script>
+</body>
+</html>

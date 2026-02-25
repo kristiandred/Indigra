@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Контакты - ИНДИГРА</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="css/custom.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/zoom.css" />
+    <style>
+        /* Стили специфичные для страницы контактов */
+        .contact-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .contact-image {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .contact-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .contact-info {
+            padding: 1rem 1.5rem;
+            width: 200%;
+            box-sizing: border-box;
+        }
+        
+        .contact-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+            color: #007bff;
+            width: 100%;
+        }
+        
+        .contact-item {
+            margin-bottom: 0.5rem;
+            width: 100%;
+        }
+        
+        .contact-item h4 {
+            font-size: 0.85rem;
+            margin-bottom: 0.1rem;
+            color: #6c757d;
+            font-weight: 600;
+        }
+        
+        .contact-item p {
+            font-size: 0.85rem;
+            margin-bottom: 0;
+            line-height: 1.3;
+            width: 100%;
+        }
+        
+        .contact-item a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+        
+        .mt-5 {
+            margin-top: 3rem !important;
+        }
+        
+        .col-12 {
+            position: relative;
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        
+        /* КАРТА НА ВСЮ ШИРИНУ - исправлено */
+        .map-fullwidth {
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            background: #f8f9fa;
+            padding: 2rem 0;
+        }
+        
+        .map-fullwidth .container {
+            max-width: 1140px;
+        }
+        
+        .map-container {
+            width: 100%;
+            margin: 0.75rem 0;
+        }
+        
+        #map {
+            width: 100%;
+            height: 450px;
+            border-radius: 12px;
+        }
+        
+        .map-legend {
+            margin-top: 1rem !important;
+            width: 100%;
+        }
+        
+        .mt-3 {
+            margin-top: 0.75rem !important;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        
+        .legend-color.office {
+            background: #3b82f6;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        
+        .legend-color.production {
+            background: #ef4444;
+            box-shadow: 0 2px 5px rgba(239,68,68,0.3);
+        }
+        
+        .legend-item strong {
+            font-size: 0.9rem;
+            margin-right: 0.25rem;
+            white-space: nowrap;
+        }
+        
+        .legend-item span:not(.legend-color) {
+            font-size: 0.9rem;
+            color: #495057;
+        }
+        
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            text-align: center;
+            vertical-align: middle;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+            border: 1px solid transparent;
+            width: 100%;
+        }
+        
+        .btn-primary {
+            color: #fff;
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+        
+        .btn-danger {
+            color: #fff;
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+        
+        .w-100 {
+            width: 100%;
+        }
+        
+        .custom-div-icon {
+            background: transparent;
+            border: none;
+        }
+        
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .contact-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .contact-image {
+                height: 180px;
+            }
+            
+            #map {
+                height: 350px;
+            }
+            
+            .contact-info {
+                padding: 0.75rem 1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .contact-image {
+                height: 160px;
+            }
+            
+            .contact-info {
+                padding: 0.5rem 0.75rem;
+            }
+            
+            #map {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <div class="navbar-brand-wrapper">
+                    <a class="navbar-brand d-flex align-items-center" href="index.html">
+                        <img src="images/Логотип 1.svg" alt="ИНДИГРА" class="navbar-logo me-2">
+                        <span>ИНДИГРА</span>
+                    </a>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Главная</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="about.html">О компании</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="products.html">Услуги</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="price.html">Прайс</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="delivery.html">Доставка и оплата</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="contact.html">Контакты</a>
+                        </li>
+                    </ul>
+                    <div class="ms-lg-3 mt-2 mt-lg-0">
+                        <div class="navbar-phones">
+                            <a href="tel:+375291083083" class="phone-link">📞 +375 29 108-30-83</a>
+                            <a href="tel:+375291697227" class="phone-link">📞 +375 29 169-72-27</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main">
+        <!-- Первая часть - в контейнере -->
+        <div class="container py-5">
+            <h1 class="text-center mb-5">КОНТАКТЫ</h1>
+
+            <div class="row">
+                <!-- Первый столбик - Офис -->
+                <div class="col-md-6 mb-4">
+                    <div class="contact-card">
+                        <div class="contact-image">
+                            <img src="images/Офис.png" alt="Офис" class="img-fluid">
+                        </div>
+                        <div class="contact-info">
+                            <h3 class="contact-title">🏢 ОФИС</h3>
+                            
+                            <div class="contact-item">
+                                <h4>📍 Адрес</h4>
+                                <p>г. Минск, ул. Монтажников, д. 39</p>
+                            </div>
+
+                            <div class="contact-item">
+                                <h4>🕐 РЕЖИМ РАБОТЫ</h4>
+                                <p>Пн-Пт: 9:00-17:00<br>Сб-Вс: выходной</p>
+                            </div>
+
+                            <div class="contact-item">
+                                <h4>📝 Прием заявок</h4>
+                                <p>Пн-Пт: 9:00-20:00<br>Сб-Вс: 10:00-17:00</p>
+                            </div>
+
+                            <div class="contact-item">
+                                <h4>📞 ТЕЛЕФОН</h4>
+                                <p>
+                                    <a href="tel:+375291083083">+375 29 108 30 83</a><br>
+                                    <a href="tel:+375291697227">+375 29 169 72 27</a>
+                                </p>
+                            </div>
+
+                            <div class="contact-item">
+                                <h4>📧 EMAIL</h4>
+                                <p><a href="mailto:indigra.beton@gmail.com">indigra.beton@gmail.com</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Второй столбик - Производство -->
+                <div class="col-md-6 mb-4">
+                    <div class="contact-card">
+                        <div class="contact-image">
+                            <img src="images/Производство.webp" alt="Производство" class="img-fluid">
+                        </div>
+                        <div class="contact-info">
+                            <h3 class="contact-title">🏭 ПРОИЗВОДСТВО</h3>
+                            
+                            <div class="contact-item">
+                                <h4>📍 Адрес</h4>
+                                <p>г. Минск, ул. Монтажников, д. 39</p>
+                            </div>
+
+                            <div class="contact-item">
+                                <h4>🕐 РЕЖИМ РАБОТЫ</h4>
+                                <p>Пн-Пт: 8:00-17:00<br>Сб-Вс: выходной</p>
+                            </div>
+
+                            <div class="contact-item">
+                                <h4>📞 ТЕЛЕФОН</h4>
+                                <p><a href="tel:+375291697227">+375 29 169 72 27</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Карта на всю ширину страницы -->
+        <div class="map-fullwidth">
+            <div class="container">
+                <div class="contact-card">
+                        <h3 class="contact-title">🗺️ КАРТА РАСПОЛОЖЕНИЯ</h3>
+                        <div class="map-container">
+                            <div id="map"></div>
+                        </div>
+                        
+                        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                        <script>
+                            var map = L.map('map').setView([53.86805188015046, 27.38908660918188], 17);
+                            
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: ''
+                            }).addTo(map);
+                            
+                            // Маркер офиса
+                            var officeIcon = L.divIcon({
+                                html: '<div style="background: #3b82f6; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">🏢</div>',
+                                iconSize: [30, 30],
+                                className: 'custom-div-icon'
+                            });
+                            
+                            var productionIcon = L.divIcon({
+                                html: '<div style="background: #ef4444; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">🏭</div>',
+                                iconSize: [30, 30],
+                                className: 'custom-div-icon'
+                            });
+                            
+                            L.marker([53.86860542472731, 27.391564970135555], {icon: officeIcon})
+                                .addTo(map)
+                                .bindPopup('<b>🏢 Офис</b><br>г. Минск, ул. Монтажников, д. 39<br>📞 +375 29 108 30 83');
+                            
+                            L.marker([53.867498335573615, 27.3866082482287], {icon: productionIcon})
+                                .addTo(map)
+                                .bindPopup('<b>🏭 Производство</b><br>г. Минск, ул. Монтажников, д. 39<br>📞 +375 29 169 72 27');
+                        </script>
+                        
+                        <!-- Легенда и кнопки -->
+                        <div class="map-legend mt-3">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="legend-item">
+                                        <span class="legend-color office"></span>
+                                        <strong>🏢 Офис:</strong>
+                                        <span>г. Минск, ул. Монтажников, д. 39</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="legend-item">
+                                        <span class="legend-color production"></span>
+                                        <strong>🏭 Производство:</strong>
+                                        <span>г. Минск, ул. Монтажников, д. 39</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <a href="https://yandex.ru/maps/?rtext=~53.86860542472731,27.391564970135555" target="_blank" class="btn btn-primary w-100">
+                                        🗺️ Маршрут до офиса
+                                    </a>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="https://yandex.ru/maps/?rtext=~53.867498335573615,27.3866082482287" target="_blank" class="btn btn-danger w-100">
+                                        🗺️ Маршрут до производства
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

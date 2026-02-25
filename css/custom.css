@@ -1,0 +1,1096 @@
+﻿/* Дополнительные стили для бетонного сайта */
+
+
+
+/* Hero секция */
+
+.hero-section {
+
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('../images/Узел 1.png');
+
+    background-size: cover;
+
+    background-position: center;
+
+    color: white;
+
+    padding: 120px 0;
+
+    text-align: center;
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+
+
+.hero-section::before {
+
+    content: '';
+
+    position: absolute;
+
+    top: 0;
+
+    left: 0;
+
+    right: 0;
+
+    bottom: 0;
+
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.85) 0%, rgba(59, 130, 246, 0.75) 50%, rgba(96, 165, 250, 0.65) 100%);
+
+    z-index: 1;
+
+}
+
+
+
+.hero-content {
+
+    position: relative;
+
+    z-index: 2;
+
+}
+
+
+
+/* Специальные стили для delivery-page hero */
+
+.delivery-page .hero-title {
+
+    color: var(--primary-blue);
+
+    text-shadow: none;
+
+    background: var(--gradient-primary);
+
+    -webkit-background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+
+    background-clip: text;
+
+}
+
+
+
+.hero-features {
+
+    margin: 2rem 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 0.8rem;
+
+}
+
+
+
+.feature-item {
+
+    font-size: 1.125rem; /* Используем увеличенный размер как в оригинале */
+
+    font-weight: 500;
+
+    color: var(--white);
+
+    opacity: 0.9;
+
+}
+
+
+
+.hero-buttons {
+
+    display: flex;
+
+    gap: 1rem;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+}
+
+
+
+/* Стили для материалов */
+
+.materials-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+
+    gap: 1rem;
+
+}
+
+
+
+.material-card {
+
+    background: transparent;
+
+    border-radius: 10px;
+
+    padding: 0; /* Убираем все отступы */
+
+    text-align: center;
+
+    cursor: pointer;
+
+    transition: all 0.3s ease;
+
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
+    width: 100%;
+
+    height: 200px; /* Фиксированная высота для всех карточек */
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 0; /* Убираем пространство между элементами */
+
+}
+
+
+
+.material-card:hover {
+
+    transform: translateY(-5px);
+
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+
+}
+
+
+
+.material-image {
+
+    width: 100%;
+
+    height: 150px; /* Фиксированная высота для изображений */
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+    margin: 0;
+
+    padding: 0;
+
+}
+
+
+
+.material-image img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    border-radius: 5px;
+
+    margin: 0;
+
+    padding: 0;
+
+    display: block;
+
+}
+
+
+
+.material-name {
+
+    font-weight: 600;
+
+    font-size: 0.85rem; /* Уменьшаем текст чтобы помещался */
+
+    color: #333;
+
+    line-height: 1;
+
+    height: 40px; /* Фиксированная высота для текста */
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+    margin: 0;
+
+    padding: 0;
+
+}
+
+
+
+/* Стили для карточек бетона */
+
+.concrete-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.concrete-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.concrete-image {
+    height: 135px; /* Высота контейнера 135px */
+    overflow: hidden;
+    position: relative;
+}
+
+.concrete-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.concrete-body {
+    padding: 0.5rem 1rem 0 1rem;
+    text-align: center;
+}
+
+.concrete-body h5 {
+    margin: 0 0 0.5rem 0;
+    color: #1e3a8a;
+    font-size: 1.125rem; /* Увеличенный размер */
+}
+
+.concrete-body p {
+    font-size: 1rem; /* Стандартный размер */
+    margin: 0;
+}
+
+
+/* Стили для страницы material.html */
+
+.material-detail .material-image {
+    width: 100%;
+    aspect-ratio: 1; /* Делаем контейнер квадратным */
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.material-detail .material-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Стили для о компании */
+
+.about-company {
+
+    padding: 80px 0;
+
+    background: #f8f9fa;
+
+}
+
+
+
+.about-text {
+
+    padding: 2rem;
+
+}
+
+
+
+.about-subtitle {
+
+    color: #1e3a8a;
+
+    margin-bottom: 1.5rem;
+
+    font-weight: 700;
+
+    font-size: 1.8rem; /* Увеличенный размер */
+
+}
+
+
+
+.about-description {
+
+    margin-bottom: 1.5rem;
+
+    line-height: 1.8;
+
+    font-size: 1.125rem; /* Увеличенный размер */
+
+}
+
+
+
+.company-stats {
+
+    display: flex;
+
+    gap: 2rem;
+
+    margin-top: 2rem;
+
+}
+
+
+
+.stat-item {
+
+    text-align: center;
+
+}
+
+
+
+.stat-number {
+
+    font-size: 2.5rem;
+
+    font-weight: 800;
+
+    color: #1e3a8a;
+
+    display: block;
+
+}
+
+
+
+.stat-label {
+
+    font-size: 1rem; /* Стандартный размер */
+
+    color: #666;
+
+    margin-top: 0.5rem;
+
+}
+
+
+
+/* Преимущества */
+
+.advantages {
+
+    padding: 80px 0;
+
+}
+
+
+
+.advantage-card {
+
+    padding: 2rem 1rem;
+
+    border-radius: 10px;
+
+    text-align: center;
+
+    height: 100%;
+
+    background: white;
+
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
+    transition: all 0.3s ease;
+
+}
+
+
+
+.advantage-card:hover {
+
+    transform: translateY(-5px);
+
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+
+}
+
+
+
+.advantage-icon {
+
+    font-size: 3rem;
+
+    margin-bottom: 1rem;
+
+    color: #1e3a8a;
+
+}
+
+
+
+.advantage-card h4 {
+
+    color: #1e3a8a;
+
+    margin-bottom: 1rem;
+
+    font-size: 1.25rem; /* Увеличенный размер */
+
+}
+
+
+
+.advantage-card p {
+
+    font-size: 1rem; /* Стандартный размер */
+
+}
+
+
+
+/* Продукция */
+
+.products-overview {
+
+    padding: 80px 0;
+
+    background: #f8f9fa;
+
+}
+
+
+
+.product-category {
+
+    padding: 2rem;
+
+    background: white;
+
+    border-radius: 10px;
+
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
+}
+
+
+
+.category-icon {
+
+    font-size: 2.5rem;
+
+    margin-bottom: 1rem;
+
+    color: #1e3a8a;
+
+}
+
+
+
+.product-category h3 {
+
+    color: #1e3a8a;
+
+    margin-bottom: 1rem;
+
+    font-size: 1.5rem; /* Увеличенный размер */
+
+}
+
+
+
+.product-category p {
+
+    font-size: 1.125rem; /* Увеличенный размер */
+
+    margin-bottom: 1rem;
+
+}
+
+
+
+.product-list {
+
+    list-style: none;
+
+    padding: 0;
+
+}
+
+
+
+.product-list li {
+
+    padding: 0.5rem 0;
+
+    border-bottom: 1px solid #eee;
+
+    font-size: 1rem; /* Стандартный размер */
+
+}
+
+
+
+.product-list li:last-child {
+
+    border-bottom: none;
+
+}
+
+
+
+.product-list li::before {
+
+    content: "✓";
+
+    color: #1e3a8a;
+
+    font-weight: bold;
+
+    margin-right: 0.5rem;
+
+}
+
+
+
+/* География */
+
+.geography {
+
+    padding: 80px 0;
+
+}
+
+
+
+.geography-content {
+
+    text-align: center;
+
+}
+
+
+
+.geography-content p {
+
+    font-size: 1.125rem; /* Увеличенный размер */
+
+}
+
+
+
+.regions-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+    gap: 1rem;
+
+    margin-top: 2rem;
+
+}
+
+
+
+.region-item {
+
+    padding: 1rem;
+
+    background: #1e3a8a;
+
+    color: white;
+
+    border-radius: 8px;
+
+    font-weight: 500;
+
+    transition: all 0.3s ease;
+
+    font-size: 1rem; /* Стандартный размер */
+
+}
+
+
+
+.region-item:hover {
+
+    background: #3b82f6;
+
+    transform: translateY(-2px);
+
+}
+
+
+
+/* Контакты */
+
+.contacts {
+
+    padding: 80px 0;
+
+    background: #f8f9fa;
+
+}
+
+
+
+.contact-info {
+
+    max-width: 600px;
+
+    margin: 0 auto;
+
+    text-align: center;
+
+}
+
+
+
+.contact-info h4 {
+
+    color: #1e3a8a;
+
+    margin: 1.5rem 0 0.5rem 0;
+
+    font-size: 1.25rem; /* Увеличенный размер */
+
+}
+
+
+
+.contact-info p {
+
+    font-size: 1.125rem; /* Увеличенный размер */
+
+}
+
+
+
+/* Калькулятор */
+
+.calculator {
+
+    padding: 80px 0;
+
+}
+
+
+
+.calculator-card {
+
+    background: white;
+
+    border-radius: 10px;
+
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+
+}
+
+
+
+.calculator label {
+
+    font-size: 1rem; /* Стандартный размер */
+
+}
+
+
+
+.result {
+
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+
+    color: white;
+
+    border-radius: 8px;
+
+}
+
+
+
+.result h5 {
+
+    margin: 0;
+
+    font-size: 1.5rem; /* Увеличенный размер */
+
+}
+
+
+
+/* Секционные заголовки */
+
+.section-title {
+
+    text-align: center;
+
+    font-size: 2.5rem;
+
+    font-weight: 700;
+
+    color: #1e3a8a;
+
+    margin-bottom: 3rem;
+
+    position: relative;
+
+}
+
+
+
+.section-title::after {
+
+    content: '';
+
+    position: absolute;
+
+    bottom: -10px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 80px;
+
+    height: 4px;
+
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+
+    border-radius: 2px;
+
+}
+
+
+
+/* Анимации */
+
+@keyframes fadeInUp {
+
+    from {
+
+        opacity: 0;
+
+        transform: translateY(30px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+    }
+
+}
+
+
+
+.fade-in {
+
+    animation: fadeInUp 0.6s ease-out;
+
+}
+
+
+
+/* Адаптивность */
+
+@media (max-width: 768px) {
+
+    .hero-section {
+
+        padding: 60px 0;
+
+    }
+
+
+
+    .hero-title {
+
+        font-size: 2rem;
+
+    }
+
+
+
+    .company-stats {
+
+        flex-direction: column;
+
+        gap: 1rem;
+
+    }
+
+
+
+    .regions-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+
+    .materials-grid {
+
+        grid-template-columns: repeat(2, 1fr);
+
+    }
+
+
+
+    .hero-buttons {
+
+        flex-direction: column;
+
+        align-items: center;
+
+    }
+
+
+
+    .section-title {
+
+        font-size: 2rem;
+
+    }
+
+    
+
+    .delivery-page .hero-title {
+
+        font-size: 2.5rem;
+
+    }
+
+}
+
+
+
+/* Стили для контактных карточек */
+
+.contact-card {
+
+    background: white;
+
+    border-radius: 15px;
+
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+
+    overflow: hidden;
+
+    margin-bottom: 2rem;
+
+}
+
+
+
+.contact-image img {
+
+    width: 100%;
+
+    height: 250px;
+
+    object-fit: cover;
+
+}
+
+
+
+.contact-info {
+
+    padding: 2rem;
+
+}
+
+
+
+.contact-title {
+
+    color: #1e3a8a;
+
+    font-size: 1.5rem;
+
+    font-weight: 700;
+
+    margin-bottom: 1.5rem;
+
+    text-align: center;
+
+}
+
+
+
+.contact-item {
+
+    margin-bottom: 1.5rem;
+
+}
+
+
+
+.contact-item h4 {
+
+    color: #1e3a8a;
+
+    font-size: 1rem;
+
+    margin-bottom: 0.5rem;
+
+    font-weight: 600;
+
+}
+
+
+
+.contact-item p {
+
+    margin: 0;
+
+    line-height: 1.6;
+
+}
+
+
+
+.contact-item a {
+
+    color: #1e3a8a;
+
+    text-decoration: none;
+
+}
+
+
+
+.contact-item a:hover {
+
+    text-decoration: underline;
+
+}
+
+
+
+/* Стили для карты */
+
+.map-container {
+
+    margin-bottom: 1.5rem;
+
+    max-width: 200%; /* Увеличиваем в 2 раза */
+
+    margin-left: -50%; /* Сдвигаем влево для центрирования */
+
+    position: relative;
+
+}
+
+
+
+#map {
+
+    width: 100% !important;
+
+    height: 500px !important; /* Увеличим высоту тоже */
+
+    border-radius: 15px;
+
+}
+
+
+
+/* Для мобильных устройств возвращаем нормальные размеры */
+
+@media (max-width: 768px) {
+
+    .map-container {
+
+        max-width: 100%;
+
+        margin-left: 0;
+
+    }
+
+}
+
+
+
+.map-legend {
+
+    padding: 1rem;
+
+    background: #f8f9fa;
+
+    border-radius: 10px;
+
+}
+
+
+
+.legend-item {
+
+    display: flex;
+
+    align-items: center;
+
+    margin-bottom: 0.5rem;
+
+}
+
+
+
+.legend-color {
+
+    width: 20px;
+
+    height: 20px;
+
+    border-radius: 50%;
+
+    margin-right: 0.5rem;
+
+    border: 2px solid white;
+
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+
+}
+
+
+
+.legend-color.office {
+
+    background: #3b82f6;
+
+}
+
+
+
+.legend-color.production {
+
+    background: #ef4444;
+
+}
+

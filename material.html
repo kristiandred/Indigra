@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Материал - ИНДИГРА</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="css/custom.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/zoom.css" />
+    <style>
+        /* Специфичные стили для страницы material.html */
+        .material-detail .material-image {
+            width: 100%;
+            aspect-ratio: 1/30; /* Пропорция 1:30 - высота в 30 раз больше ширины */
+            overflow: hidden;
+            position: relative;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .material-detail .material-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Растягиваем изображение чтобы заполнить контейнер */
+            transition: transform 0.3s ease;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <div class="navbar-brand-wrapper">
+                    <a class="navbar-brand d-flex align-items-center" href="index.html">
+                        <img src="images/Логотип 1.svg" alt="ИНДИГРА" class="navbar-logo me-2">
+                        <span>ИНДИГРА</span>
+                    </a>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Главная</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="about.html">О компании</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="products.html">Услуги</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="price.html">Прайс</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="delivery.html">Доставка и оплата</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contact.html">Контакты</a>
+                        </li>
+                    </ul>
+                    <div class="ms-lg-3 mt-2 mt-lg-0">
+                        <div class="navbar-phones">
+                            <a href="tel:+375291083083" class="phone-link">📞 +375 29 108-30-83</a>
+                            <a href="tel:+375291697227" class="phone-link">📞 +375 29 169-72-27</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main">
+        <!-- Информация о материале -->
+        <section class="material-detail">
+            <div class="container">
+                <h1 class="material-title" id="materialTitle">Информация о материале</h1>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="material-image">
+                            <img id="materialImage" src="images/товарный бетон.webp" alt="Материал" class="img-fluid">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="material-info">
+                            <div class="material-description" id="materialDescription">
+                                <h3>Описание материала</h3>
+                                <p>Качественный строительный материал от компании ИНДИГРА.</p>
+                            </div>
+                            <div class="material-specifications">
+                                <h3>Характеристики</h3>
+                                <ul id="materialSpecs">
+                                    <li>Высокое качество</li>
+                                    <li>Соответствие стандартам</li>
+                                    <li>Доставка по всей Беларуси</li>
+                                </ul>
+                            </div>
+                            <div class="material-order">
+                                <h3>Заказать материал</h3>
+                                <p>Свяжитесь с нами для заказа:</p>
+                                <p><a href="tel:+375291083083">+375 29 108 30 83</a><br>
+                                   <a href="tel:+375291697227">+375 29 169 72 27</a></p>
+                                <a href="contact.html" class="btn btn-primary">Отправить заявку</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Контакты -->
+        <section class="contacts">
+            <div class="container">
+                <h2 class="section-title">КОНТАКТЫ</h2>
+                <div class="contact-info">
+                    <h4>📍 Адрес</h4>
+                    <p>г. Минск, ул. Монтажников, д. 39</p>
+
+                    <h4>📞 Телефон</h4>
+                    <p><a href="tel:+375291083083">+375 29 108 30 83</a><br>
+                       <a href="tel:+375291697227">+375 29 169 72 27</a></p>
+
+                    <h4>📧 Email</h4>
+                    <p><a href="mailto:indigra.beton@gmail.com">indigra.beton@gmail.com</a></p>
+
+                    <h4>🕐 Режим работы</h4>
+                    <p>Офис: Пн-Пт 9:00-18:00<br>Производство: Пн-Вс 8:00-20:00</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Получаем параметр из URL
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // Данные о материалах
+        const materials = {
+            'Товарный бетон': {
+                title: 'Товарный бетон',
+                image: 'images/товарный бетон.webp',
+                description: 'Товарный бетон - это основа современного строительства. Мы производим бетон различных марок (М100-М600) для любых строительных нужд.',
+                specs: [
+                    'Марки: М100-М600',
+                    'Соответствие СТБ 1037-2013',
+                    'Доставка автобетоносмесителями',
+                    'Возможность подачи с насосом',
+                    'Гарантия качества'
+                ]
+            },
+            'Растворная смесь': {
+                title: 'Растворная смесь',
+                image: 'images/Растворная смесь.webp',
+                description: 'Строительные растворы для кладки, штукатурки и других работ. Готовые смеси с оптимальными характеристиками.',
+                specs: [
+                    'Кладочные растворы М75-М150',
+                    'Штукатурные растворы',
+                    'Готовые к использованию',
+                    'Доставка в миксерах',
+                    'Стабильное качество'
+                ]
+            },
+            'Щебень': {
+                title: 'Щебень',
+                image: 'images/Щебень.webp',
+                description: 'Щебень различных фракций для производства бетона и дорожного строительства. Качественный заполнитель.',
+                specs: [
+                    'Фракции: 5-20, 20-40, 40-70 мм',
+                    'Гранитный и известняковый',
+                    'Соответствие ГОСТ 8267-93',
+                    'Доставка самосвалами',
+                    'Сертифицированная продукция'
+                ]
+            },
+            'Песок': {
+                title: 'Песок',
+                image: 'images/Песок.png',
+                description: 'Строительный песок для бетона, растворов и других строительных нужд. Чистый и качественный материал.',
+                specs: [
+                    'Карьерный и речной песок',
+                    'Различная зернистость',
+                    'Низкое содержание глины',
+                    'Доставка навалом и в мешках',
+                    'Лабораторный контроль'
+                ]
+            },
+            'Гравий': {
+                title: 'Гравий',
+                image: 'images/Гравий.webp',
+                description: 'Природный гравий для строительных работ и ландшафтного дизайна. Экологически чистый материал.',
+                specs: [
+                    'Фракции 5-20, 20-40 мм',
+                    'Овальная форма зерен',
+                    'Высокая прочность',
+                    'Доставка самосвалами',
+                    'Природное происхождение'
+                ]
+            }
+        };
+
+        // Данные о бетоне
+        const concreteGrades = {
+            'Бетон М150': {
+                title: 'Бетон М150',
+                image: 'images/c 8 10 m 150.png',
+                description: 'Бетон марки М150 - используется для подготовки основания под фундаменты, стяжки полов, бетонирования дорожек.',
+                specs: [
+                    'Класс прочности B10',
+                    'Применение: подготовительные работы',
+                    'Морозостойкость F75',
+                    'Подвижность П2-П4',
+                    'Водонепроницаемость W4'
+                ]
+            },
+            'Бетон М200': {
+                title: 'Бетон М200',
+                image: 'images/c 12 15 m 200.png',
+                description: 'Бетон марки М200 - универсальный бетон для фундаментов, отмосток, лестниц, дорожных плит.',
+                specs: [
+                    'Класс прочности B15',
+                    'Применение: фундаменты, отмостки',
+                    'Морозостойкость F100',
+                    'Подвижность П2-П4',
+                    'Водонепроницаемость W4'
+                ]
+            },
+            'Бетон М250': {
+                title: 'Бетон М250',
+                image: 'images/c 16 20 m 250.png',
+                description: 'Бетон марки М250 - для монолитных конструкций, балок, колонн, перекрытий.',
+                specs: [
+                    'Класс прочности B20',
+                    'Применение: монолитные конструкции',
+                    'Морозостойкость F100',
+                    'Подвижность П2-П4',
+                    'Водонепроницаемость W6'
+                ]
+            },
+            'Бетон М300': {
+                title: 'Бетон М300',
+                image: 'images/c 18 22,5 m 300.png',
+                description: 'Бетон марки М300 - для ответственных конструкций, фундаментов под многоэтажные здания.',
+                specs: [
+                    'Класс прочности B22.5',
+                    'Применение: ответственные конструкции',
+                    'Морозостойкость F150',
+                    'Подвижность П2-П4',
+                    'Водонепроницаемость W6'
+                ]
+            },
+            'Бетон М350': {
+                title: 'Бетон М350',
+                image: 'images/c 20 25 m 350.png',
+                description: 'Бетон марки М350 - для высоконагруженных конструкций, колонн, ригелей, балок.',
+                specs: [
+                    'Класс прочности B25',
+                    'Применение: высоконагруженные конструкции',
+                    'Морозостойкость F200',
+                    'Подвижность П2-П4',
+                    'Водонепроницаемость W8'
+                ]
+            },
+            'Бетон М400': {
+                title: 'Бетон М400',
+                image: 'images/c 25 30 m 400.png',
+                description: 'Бетон марки М400 - для особо ответственных конструкций, мостовых опор, гидротехнических сооружений.',
+                specs: [
+                    'Класс прочности B30',
+                    'Применение: особо ответственные конструкции',
+                    'Морозостойкость F200',
+                    'Подвижность П2-П4',
+                    'Водонепроницаемость W10'
+                ]
+            },
+            'Бетон М450': {
+                title: 'Бетон М450',
+                image: 'images/c 28 35 m 450.png',
+                description: 'Бетон марки М450 - для уникальных конструкций, требующих особой прочности и долговечности.',
+                specs: [
+                    'Класс прочности B35',
+                    'Применение: уникальные конструкции',
+                    'Морозостойкость F300',
+                    'Подвижность П2-П4',
+                    'Водонепроницаемость W12'
+                ]
+            },
+            'Бетон М500': {
+                title: 'Бетон М500',
+                image: 'images/c 30 37 m 500.png',
+                description: 'Бетон марки М500 - высший класс прочности для самых ответственных и нагруженных конструкций.',
+                specs: [
+                    'Класс прочности B40',
+                    'Применение: самые ответственные конструкции',
+                    'Морозостойкость F300',
+                    'Подвижность П2-П4',
+                    'Водонепроницаемость W14'
+                ]
+            }
+        };
+
+        // Инициализация страницы
+        $(document).ready(function() {
+            const materialName = getUrlParameter('material');
+            const material = materials[materialName] || concreteGrades[materialName];
+            
+            if (material) {
+                $('#materialTitle').text(material.title);
+                $('#materialImage').attr('src', material.image);
+                $('#materialDescription').html(`
+                    <h3>Описание</h3>
+                    <p>${material.description}</p>
+                `);
+                
+                let specsHtml = '<h3>Характеристики</h3><ul>';
+                material.specs.forEach(spec => {
+                    specsHtml += `<li>${spec}</li>`;
+                });
+                specsHtml += '</ul>';
+                $('#materialSpecs').html(specsHtml);
+            }
+        });
+    </script>
+</body>
+</html>

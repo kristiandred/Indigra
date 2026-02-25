@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Вход для администратора - ИНДИГРА</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="css/custom.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <!-- Фиксированный масштаб 80% через zoom.css -->
+    <link rel="stylesheet" href="css/zoom.css" />
+    <!-- Подключаем библиотеку для чтения Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        /* Стили для страницы авторизации - без навигации */
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 450px;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header h2 {
+            color: #1e3a8a;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+
+        .auth-header p {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        .auth-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-form label {
+            color: #1e3a8a;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .auth-form .form-control {
+            border: 2px solid #dbeafe;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            background: #ffffff;
+            font-size: 1rem;
+        }
+
+        .auth-form .form-control:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+            outline: none;
+        }
+
+        .auth-form .btn-auth {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem;
+            border-radius: 10px;
+            width: 100%;
+            border: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .auth-form .btn-auth:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .auth-form .btn-auth:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .auth-footer a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .auth-footer a:hover {
+            color: #1e3a8a;
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background-color: #fee;
+            color: #c33;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+            border: 1px solid #fcc;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+            border: 1px solid #a5d6a7;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #9ca3af;
+            user-select: none;
+            font-size: 1.2rem;
+        }
+
+        .toggle-password:hover {
+            color: #1e3a8a;
+        }
+
+        .file-status {
+            font-size: 0.9rem;
+            margin: 1rem 0;
+            padding: 0.75rem;
+            background: #f3f4f6;
+            border-radius: 8px;
+            text-align: center;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .file-status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-color: #a5d6a7;
+        }
+
+        .file-status.error {
+            background: #fee;
+            color: #c33;
+            border-color: #fcc;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(0,0,0,.1);
+            border-radius: 50%;
+            border-top-color: #1e3a8a;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Скрываем индикаторы масштаба */
+        #zoom-indicator,
+        .zoom-controls,
+        .zoom-notification {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>🔐 Вход для администратора</h2>
+            <p>Введите логин и пароль из файла Админ.xlsx</p>
+        </div>
+        
+        <div class="error-message" id="errorMessage">
+            Неверный логин или пароль. Попробуйте снова.
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            Успешный вход! Перенаправление...
+        </div>
+
+        <div class="file-status" id="fileStatus">
+            <span class="loading-spinner"></span>
+            Загрузка данных из файла Админ.xlsx...
+        </div>
+        
+        <form class="auth-form" id="loginForm" onsubmit="event.preventDefault(); handleLogin();">
+            <div class="form-group">
+                <label for="login">Логин</label>
+                <input type="text" class="form-control" id="login" name="login" placeholder="Введите логин" required autofocus disabled>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <div class="password-wrapper">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Введите пароль" required disabled>
+                    <span class="toggle-password" onclick="togglePasswordVisibility()">👁️</span>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-auth" id="submitBtn" disabled>Войти</button>
+        </form>
+        
+        <div class="auth-footer">
+            <a href="index.html">← Вернуться на главную</a>
+        </div>
+    </div>
+
+    <script>
+        // Хранилище для учетных данных из Excel
+        let adminCredentials = [];
+        
+        /**
+         * Загружает и парсит Excel файл с учетными данными
+         * Автоматическая загрузка из папки data
+         */
+        async function loadAdminCredentials() {
+            const fileStatus = document.getElementById('fileStatus');
+            
+            try {
+                // Пытаемся загрузить файл из папки data
+                const response = await fetch('data/Админ.xlsx');
+                
+                if (!response.ok) {
+                    throw new Error(`Файл не найден: data/Админ.xlsx (${response.status} ${response.statusText})`);
+                }
+                
+                const arrayBuffer = await response.arrayBuffer();
+                const data = new Uint8Array(arrayBuffer);
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                // Берем первый лист
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                
+                // Преобразуем в JSON
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                
+                // Парсим данные
+                adminCredentials = [];
+                
+                // Ищем строку с логином и паролем
+                for (let i = 0; i < jsonData.length; i++) {
+                    const row = jsonData[i];
+                    if (row && row.length >= 2) {
+                        // Проверяем, что это не заголовок
+                        const login = String(row[0]).trim().toLowerCase();
+                        const password = String(row[1]).trim();
+                        
+                        // Если похоже на реальные данные (не "логин" и не пусто)
+                        if (login && password && 
+                            login !== 'логин' && 
+                            login !== 'login' && 
+                            !login.includes('логин')) {
+                            adminCredentials.push({
+                                login: String(row[0]).trim(),
+                                password: password
+                            });
+                        }
+                    }
+                }
+                
+                if (adminCredentials.length === 0) {
+                    throw new Error('В файле не найдены учетные данные');
+                }
+                
+                fileStatus.className = 'file-status success';
+                fileStatus.innerHTML = `✅ Загружено ${adminCredentials.length} записей из файла data/Админ.xlsx`;
+                
+                // Активируем форму
+                document.getElementById('login').disabled = false;
+                document.getElementById('password').disabled = false;
+                document.getElementById('submitBtn').disabled = false;
+                
+                // Фокусируемся на поле логина
+                document.getElementById('login').focus();
+                
+                console.log('Загруженные учетные данные:', adminCredentials);
+                
+            } catch (error) {
+                console.error('Ошибка загрузки файла:', error);
+                fileStatus.className = 'file-status error';
+                
+                // Понятное сообщение для разных ошибок
+                if (error.message.includes('Failed to fetch')) {
+                    fileStatus.innerHTML = `❌ Ошибка: Не удалось загрузить файл data/Админ.xlsx<br>
+                        <small>Проверьте, что файл существует в папке data/ и доступен для чтения.</small>`;
+                } else {
+                    fileStatus.innerHTML = `❌ Ошибка: ${error.message}`;
+                }
+            }
+        }
+
+        /**
+         * Переключает видимость пароля
+         */
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            const toggleIcon = document.querySelector('.toggle-password');
+            toggleIcon.textContent = type === 'password' ? '👁️' : '🔒';
+        }
+
+        /**
+         * Показывает сообщение об ошибке
+         */
+        function showError(show = true, message = 'Неверный логин или пароль. Попробуйте снова.') {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            if (show) {
+                errorDiv.classList.add('show');
+            } else {
+                errorDiv.classList.remove('show');
+            }
+        }
+
+        /**
+         * Показывает сообщение об успешном входе
+         */
+        function showSuccess(show = true) {
+            const successDiv = document.getElementById('successMessage');
+            if (show) {
+                successDiv.classList.add('show');
+            } else {
+                successDiv.classList.remove('show');
+            }
+        }
+
+        /**
+         * Блокирует форму на время обработки
+         */
+        function setFormDisabled(disabled) {
+            const loginInput = document.getElementById('login');
+            const passwordInput = document.getElementById('password');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            loginInput.disabled = disabled;
+            passwordInput.disabled = disabled;
+            submitBtn.disabled = disabled;
+        }
+
+        /**
+         * Обработка логина
+         */
+        function handleLogin() {
+            const login = document.getElementById('login').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            showError(false);
+            
+            if (!login || !password) {
+                showError(true, 'Пожалуйста, заполните все поля.');
+                return;
+            }
+            
+            if (adminCredentials.length === 0) {
+                showError(true, 'Ошибка: не загружены данные из Excel файла.');
+                return;
+            }
+            
+            // Ищем пользователя в загруженных данных
+            const foundUser = adminCredentials.find(user => 
+                user.login.toLowerCase() === login.toLowerCase() && user.password === password
+            );
+            
+            setFormDisabled(true);
+            
+            // Небольшая задержка для имитации проверки
+            setTimeout(() => {
+                if (foundUser) {
+                    showSuccess(true);
+                    
+                    try {
+                        sessionStorage.setItem('admin_authenticated', 'true');
+                        sessionStorage.setItem('admin_login', foundUser.login);
+                        sessionStorage.setItem('admin_login_time', new Date().toISOString());
+                    } catch (e) {
+                        console.warn('Не удалось сохранить сессию:', e);
+                    }
+                    
+                    // Перенаправляем на админ-панель через 2 секунды
+                    setTimeout(() => {
+                        window.location.href = 'admin-panel.html';
+                    }, 2000);
+                } else {
+                    showError(true, 'Неверный логин или пароль.');
+                    setFormDisabled(false);
+                    document.getElementById('password').value = '';
+                    document.getElementById('password').focus();
+                }
+            }, 800);
+        }
+
+        /**
+         * Проверяет существующую сессию
+         */
+        function checkExistingSession() {
+            try {
+                const isAuthenticated = sessionStorage.getItem('admin_authenticated') === 'true';
+                const loginTime = sessionStorage.getItem('admin_login_time');
+                
+                if (isAuthenticated && loginTime) {
+                    const timeSinceLogin = new Date() - new Date(loginTime);
+                    const sessionTimeout = 30 * 60 * 1000; // 30 минут
+                    
+                    if (timeSinceLogin < sessionTimeout) {
+                        window.location.href = 'admin-panel.html';
+                    } else {
+                        sessionStorage.removeItem('admin_authenticated');
+                        sessionStorage.removeItem('admin_login');
+                        sessionStorage.removeItem('admin_login_time');
+                    }
+                }
+            } catch (e) {
+                console.warn('Не удалось проверить сессию:', e);
+            }
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            checkExistingSession();
+            loadAdminCredentials();
+            
+            const inputs = document.querySelectorAll('#login, #password');
+            inputs.forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleLogin();
+                    }
+                });
+            });
+        });
+
+        // Отключаем все скрипты масштабирования
+        window.ZoomManager = null;
+        window.ZoomSync = null;
+        window.ZoomTracker = null;
+    </script>
+
+    <!-- Подключаем zoom.css для масштаба 80%, но отключаем JS скрипты -->
+    <style>
+        /* Принудительный масштаб 80% через CSS */
+        html {
+            transform: scale(0.8);
+            transform-origin: 0 0;
+            width: 125%;
+            height: 125%;
+        }
+        
+        /* Для мобильных устройств возвращаем нормальный масштаб */
+        @media (max-width: 768px) {
+            html {
+                transform: scale(1);
+                width: 100%;
+                height: 100%;
+            }
+        }
+    </style>
+</body>
+</html>

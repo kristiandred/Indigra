@@ -1,0 +1,203 @@
+/* Общие стили для всех страниц сайта ИНДИГРА */
+
+/* Единые стили навигации */
+.navbar {
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: white !important;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.navbar-brand:hover {
+    color: rgba(255,255,255,0.9) !important;
+    text-decoration: none;
+}
+
+.navbar-logo {
+    height: 30px;
+    width: auto;
+    margin-right: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.navbar-logo:hover {
+    transform: scale(1.05);
+}
+
+.navbar-nav .nav-link {
+    font-size: 1rem;
+    font-weight: 500;
+    color: white !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    margin: 0 0.25rem;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    background: rgba(255,255,255,0.2);
+    color: white !important;
+    transform: translateY(-1px);
+}
+
+.navbar-phones {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-end;
+}
+
+.phone-link {
+    color: white !important;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.15rem 0;
+    transition: all 0.3s ease;
+}
+
+.phone-link:hover {
+    color: rgba(255,255,255,0.9) !important;
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+/* Единые стили контейнера */
+.container {
+    max-width: 1140px;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+/* Единые стили заголовков */
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 2.5rem !important;
+    text-align: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.section-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 3px;
+}
+
+/* Единые стили для контактов */
+.contacts {
+    padding: 3rem 0;
+}
+
+.contact-info {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.contact-info h4 {
+    font-size: 1.1rem;
+    margin-top: 1.25rem;
+    margin-bottom: 0.25rem;
+    color: #007bff;
+}
+
+.contact-info h4:first-child {
+    margin-top: 0;
+}
+
+.contact-info p {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    padding-left: 0.5rem;
+    color: #495057;
+}
+
+.contact-info a {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.contact-info a:hover {
+    text-decoration: underline;
+}
+
+/* Единые размеры шрифтов для базовых элементов */
+body {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+p, span, li, td, th, label {
+    font-size: 1rem;
+}
+
+/* Адаптивность для общих стилей */
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 2rem;
+        margin-bottom: 2rem !important;
+    }
+    
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+    
+    .navbar-nav .nav-link {
+        font-size: 0.95rem;
+        padding: 0.4rem 0.8rem !important;
+    }
+    
+    .phone-link {
+        font-size: 0.85rem;
+    }
+    
+    .contact-info {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .section-title {
+        font-size: 1.8rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1rem;
+    }
+    
+    .navbar-logo {
+        height: 25px;
+    }
+    
+    .contact-info {
+        padding: 1rem;
+    }
+}
