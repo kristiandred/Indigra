@@ -469,44 +469,51 @@
             }, 3000);
         }
 
+        // Загрузка списка Excel файлов
+        async function loadExcelFiles() {
+            try {
+                const response = await fetch('/api/files');
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки списка файлов');
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('Ошибка загрузки списка файлов:', error);
+                return [];
+            }
+        }
+
         // Загрузка Excel файла
         async function loadExcelFile(filename) {
             try {
-                const response = await fetch(`data/${filename}`);
+                const response = await fetch(`/api/file/${filename}`);
                 if (!response.ok) {
                     throw new Error(`Файл ${filename} не найден`);
                 }
-                const arrayBuffer = await response.arrayBuffer();
-                const data = new Uint8Array(arrayBuffer);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                return XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+                return await response.json();
             } catch (error) {
                 console.error(`Ошибка загрузки ${filename}:`, error);
                 return null;
             }
         }
 
-        // Сохранение в Excel файл
+        // Сохранение в Excel файл на сервере
         async function saveExcelFile(filename, data) {
             try {
-                const wb = XLSX.utils.book_new();
-                const ws = XLSX.utils.aoa_to_sheet(data);
-                XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                const response = await fetch(`/api/file/${filename}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ data })
+                });
                 
-                // Создаем Blob и скачиваем
-                const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
+                if (!response.ok) {
+                    throw new Error('Ошибка сохранения файла');
+                }
                 
-                showNotification(`Файл ${filename} сохранен`, 'success');
+                const result = await response.json();
+                showNotification(result.message || `Файл ${filename} сохранен`, 'success');
                 return true;
             } catch (error) {
                 console.error('Ошибка сохранения:', error);
@@ -515,10 +522,25 @@
             }
         }
 
-        // Удаление файла (имитация - в реальном проекте нужен серверный API)
+        // Удаление файла на сервере
         async function deleteFile(filename) {
-            showNotification(`В реальном проекте файл ${filename} был бы удален с сервера`, 'info');
-            return true;
+            try {
+                const response = await fetch(`/api/file/${filename}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Ошибка удаления файла');
+                }
+                
+                const result = await response.json();
+                showNotification(result.message || `Файл ${filename} удален`, 'success');
+                return true;
+            } catch (error) {
+                console.error('Ошибка удаления:', error);
+                showNotification('Ошибка при удалении файла', 'error');
+                return false;
+            }
         }
 
         // Начать редактирование ячейки
@@ -770,7 +792,7 @@
         }
 
         // Создать новую таблицу
-        function createNewTable() {
+        async function createNewTable() {
             const fileName = document.getElementById('newFileName').value.trim();
             const tableTitle = document.getElementById('newTableTitle').value.trim();
             const cols = parseInt(document.getElementById('newTableCols').value);
@@ -787,7 +809,7 @@
             }
             
             const fullFileName = fileName.endsWith('.xlsx') ? fileName : fileName + '.xlsx';
-            const tableId = 'table_' + Date.now();
+            const tableId = 'table_' + fullFileName.replace('.', '_');
             
             // Создаем структуру данных
             const tableData = [];
@@ -808,23 +830,44 @@
                 tableData.push(row);
             }
             
-            // Сохраняем в глобальные переменные
-            if (!window.tableData) window.tableData = {};
-            if (!window.tableInfo) window.tableInfo = {};
-            
-            window.tableData[tableId] = tableData;
-            window.tableInfo[tableId] = {
-                filename: fullFileName,
-                title: tableTitle
-            };
-            
-            // Сохраняем файл
-            saveExcelFile(fullFileName, tableData);
-            
-            // Перерисовываем
-            renderAllTables();
-            hideAddTablePanel();
-            showNotification('Таблица создана', 'success');
+            try {
+                // Сохраняем файл на сервере
+                const response = await fetch('/api/file', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        filename: fullFileName,
+                        data: tableData
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Ошибка создания файла');
+                }
+                
+                const result = await response.json();
+                
+                // Сохраняем в глобальные переменные
+                if (!window.tableData) window.tableData = {};
+                if (!window.tableInfo) window.tableInfo = {};
+                
+                window.tableData[tableId] = tableData;
+                window.tableInfo[tableId] = {
+                    filename: fullFileName,
+                    title: tableTitle
+                };
+                
+                // Перерисовываем
+                renderAllTables();
+                hideAddTablePanel();
+                showNotification(result.message || 'Таблица создана', 'success');
+            } catch (error) {
+                console.error('Ошибка создания таблицы:', error);
+                showNotification(error.message || 'Ошибка создания таблицы', 'error');
+            }
         }
 
         // Показать модальное окно подтверждения
@@ -855,25 +898,30 @@
             const loadingIndicator = document.getElementById('loadingIndicator');
             loadingIndicator.style.display = 'block';
             
-            // Список файлов для загрузки
-            const files = ['tarif.xlsx', 'Nasos.xlsx'];
-            window.tableData = {};
-            window.tableInfo = {};
-            
-            for (const file of files) {
-                const data = await loadExcelFile(file);
-                if (data) {
-                    const tableId = 'table_' + file.replace('.', '_');
-                    window.tableData[tableId] = data;
-                    window.tableInfo[tableId] = {
-                        filename: file,
-                        title: file === 'tarif.xlsx' ? 'Тарифы на автобетоносмесители' : 'Тарифы на АБС с насосом'
-                    };
+            try {
+                // Получаем список всех Excel файлов
+                const files = await loadExcelFiles();
+                window.tableData = {};
+                window.tableInfo = {};
+                
+                for (const file of files) {
+                    const data = await loadExcelFile(file);
+                    if (data) {
+                        const tableId = 'table_' + file.replace('.', '_');
+                        window.tableData[tableId] = data;
+                        window.tableInfo[tableId] = {
+                            filename: file,
+                            title: file.replace('.xlsx', '')
+                        };
+                    }
                 }
+            } catch (error) {
+                console.error('Ошибка загрузки таблиц:', error);
+                showNotification('Ошибка загрузки таблиц', 'error');
+            } finally {
+                loadingIndicator.style.display = 'none';
+                renderAllTables();
             }
-            
-            loadingIndicator.style.display = 'none';
-            renderAllTables();
         }
 
         // Проверка авторизации
