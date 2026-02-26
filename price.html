@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/zoom.css" />
     <style>
-        /* Стили для прайс-листа (без изменений) */
+        /* Стили для прайс-листа */
         .price-section {
             margin-bottom: 40px;
             padding: 25px;
@@ -351,43 +351,76 @@
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
     
-    <!-- ЭТОТ СКРИПТ ДОБАВЛЯЕМ В КОНЕЦ -->
+    <!-- ИСПРАВЛЕННЫЙ СКРИПТ ДЛЯ ЗАГРУЗКИ ЦЕН ИЗ ХРАНИЛИЩА АДМИНА -->
     <script>
         // Функция для загрузки цен из localStorage и обновления таблиц
         function loadPricesFromStorage() {
-            const savedPrices = localStorage.getItem('indigra_prices');
+            console.log('Загружаем цены из хранилища...');
             
-            if (savedPrices) {
-                try {
-                    const prices = JSON.parse(savedPrices);
-                    
-                    // Обновляем все элементы с data-id
-                    for (const [id, value] of Object.entries(prices)) {
-                        const element = document.querySelector(`[data-id="${id}"]`);
-                        if (element) {
-                            element.textContent = value;
-                        }
+            // Собираем все цены из всех ключей, которые использует админ
+            const allPrices = {};
+            
+            // Проверяем оба возможных ключа от админки
+            const keys = [
+                'price_data_tarif.xlsx',
+                'price_data_Nasos.xlsx'
+            ];
+            
+            let loadedCount = 0;
+            
+            keys.forEach(key => {
+                const savedData = localStorage.getItem(key);
+                if (savedData) {
+                    try {
+                        const prices = JSON.parse(savedData);
+                        // Добавляем все цены из этого ключа в общий объект
+                        Object.assign(allPrices, prices);
+                        console.log(`✅ Загружены цены из ${key}:`, Object.keys(prices).length + ' значений');
+                        loadedCount++;
+                    } catch (e) {
+                        console.error(`❌ Ошибка загрузки из ${key}:`, e);
                     }
-                    
-                    console.log('Цены загружены из localStorage');
-                } catch (e) {
-                    console.error('Ошибка загрузки цен:', e);
                 }
-            } else {
-                console.log('Нет сохраненных цен, используем стандартные');
+            });
+            
+            if (loadedCount === 0) {
+                console.log('ℹ️ Нет сохраненных цен, используем стандартные');
+                return;
             }
+            
+            // Обновляем все элементы с data-id
+            let updatedCount = 0;
+            for (const [id, value] of Object.entries(allPrices)) {
+                const element = document.querySelector(`[data-id="${id}"]`);
+                if (element) {
+                    element.textContent = value;
+                    updatedCount++;
+                }
+            }
+            
+            console.log(`✅ Обновлено ${updatedCount} ячеек с ценами`);
         }
         
         // Загружаем цены при загрузке страницы
-        document.addEventListener('DOMContentLoaded', loadPricesFromStorage);
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPricesFromStorage();
+        });
+        
+        // Также загружаем после полной загрузки страницы
+        window.addEventListener('load', function() {
+            loadPricesFromStorage();
+        });
         
         // Слушаем изменения в localStorage (если админ меняет цены в другой вкладке)
         window.addEventListener('storage', function(e) {
-            if (e.key === 'indigra_prices') {
-                console.log('Цены изменились в другой вкладке, обновляем...');
+            if (e.key && e.key.startsWith('price_data_')) {
+                console.log('🔄 Цены изменились в другой вкладке, обновляем...');
                 loadPricesFromStorage();
             }
         });
+
+        // Добавляем кнопку для ручного обновления (невидимую, но полезную для отладки)
+        console.log('🟢 Система загрузки цен готова. Ключи для поиска:', ['price_data_tarif.xlsx', 'price_data_Nasos.xlsx']);
     </script>
 </body>
 </html>
