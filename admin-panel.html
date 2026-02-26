@@ -396,64 +396,7 @@
     </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <div class="container">
-                <div class="navbar-brand-wrapper">
-                    <a class="navbar-brand d-flex align-items-center" href="index.html">
-                        <img src="images/Логотип 1.svg" alt="ИНДИГРА" class="navbar-logo me-2">
-                        <span>ИНДИГРА - Админ-панель</span>
-                    </a>
-                </div>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.html">Главная</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="about.html">О компании</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="products.html">Услуги</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="price.html">Прайс</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="delivery.html">Доставка и оплата</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="contact.html">Контакты</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#">Админ-панель</a>
-                        </li>
-                    </ul>
-                    <div class="ms-lg-3 mt-2 mt-lg-0">
-                        <div class="navbar-phones">
-                            <a href="tel:+375291083083" class="phone-link">📞 +375 29 108-30-83</a>
-                            <a href="tel:+375291697227" class="phone-link">📞 +375 29 169-72-27</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main role="main">
-        <!-- Hero Section -->
-        <section class="hero-section delivery-page">
-            <div class="container">
-                <div class="hero-content">
-                    <h1 class="hero-title">Администрирование таблиц Excel</h1>
-                </div>
-            </div>
-        </section>
-
-        <div class="container py-5">
+    <div class="container py-5">
         <!-- Индикатор загрузки -->
         <div id="loadingIndicator" class="text-center text-white my-5" style="display: none;">
             <div class="spinner-border text-light" role="status">
@@ -493,8 +436,7 @@
                 </button>
             </div>
         </div>
-        </div>
-    </main>
+    </div>
 
     <script>
         // Глобальные переменные
@@ -910,7 +852,7 @@
                 html += '<tr>';
                 
                 row.forEach((cell, colIndex) => {
-                    const value = cell || '';
+                    const value = (cell !== null && cell !== undefined) ? String(cell) : '';
                     html += `
                         <td onclick="startEdit(this, ${i}, ${colIndex}, '${tableId}', '${value.replace(/'/g, "\\'")}')">
                             ${value || '🔹пусто'}
@@ -1081,8 +1023,8 @@
             const loadingIndicator = document.getElementById('loadingIndicator');
             loadingIndicator.style.display = 'block';
             
-            // Список файлов для загрузки
-            const files = ['tarif.xlsx', 'Nasos.xlsx', 'Админ.xlsx'];
+            // Список файлов для загрузки (только реальные Excel файлы)
+            const files = ['tarif.xlsx', 'Nasos.xlsx'];
             window.tableData = {};
             window.tableInfo = {};
             
