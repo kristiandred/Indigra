@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Панель владельца - ИНДИГРА</title>
+    <title>Панель администраторов - ИНДИГРА</title>
     <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/site.css" />
     <link rel="stylesheet" href="css/custom.css" />
@@ -12,240 +12,108 @@
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
     <style>
-        /* Стили для прайс-листа (из admin-panel.html) */
-        .price-section {
-            margin-bottom: 40px;
-            padding: 25px;
-            background: white;
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .owner-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .owner-header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 20px 30px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid #b8e2f2;
-            position: relative;
-        }
-
-        .price-section h2 {
-            color: #0a4b7a;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #7ac9f0;
-            font-weight: 700;
-            font-size: 1.8rem;
-        }
-
-        .price-section h3 {
-            color: #0a4b7a;
-            margin: 20px 0 15px 0;
-            font-weight: 600;
-            font-size: 1.4rem;
-        }
-
-        .price-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        }
-
-        .price-table thead {
-            background: linear-gradient(135deg, #0a4b7a, #1a6aa3);
-            color: white;
-        }
-
-        .price-table th {
-            padding: 15px;
-            font-weight: 600;
-            text-align: left;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .price-table td {
-            padding: 12px 15px;
-            border: 1px solid #b8e2f2;
-            background: white;
-            transition: all 0.2s ease;
-        }
-
-        .price-table tbody tr:nth-child(even) td {
-            background: #f5f9fc;
-        }
-
-        .price-table tbody tr:hover td {
-            background: #d9edf7;
-        }
-
-        /* Редактируемые ячейки */
-        .price-table td[contenteditable="true"] {
-            cursor: pointer;
-            position: relative;
-        }
-
-        .price-table td[contenteditable="true"]:hover {
-            background: #fff9c4;
-            box-shadow: inset 0 0 0 2px #0a4b7a;
-        }
-
-        .price-table td[contenteditable="true"]:focus {
-            background: white;
-            outline: none;
-            box-shadow: inset 0 0 0 3px #0a4b7a;
-        }
-
-        /* Панель администратора */
-        .admin-panel {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
-        .admin-panel h3 {
+        .owner-header h1 {
             margin: 0;
-            font-size: 1.3rem;
+            font-size: 1.8rem;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .admin-panel .btn-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .admin-panel .btn {
-            padding: 8px 20px;
-            border-radius: 6px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .admin-panel .btn-edit {
-            background: #ffc107;
-            color: #1e3c72;
-        }
-
-        .admin-panel .btn-edit:hover {
-            background: #ffca2c;
-            transform: translateY(-2px);
-        }
-
-        .admin-panel .btn-save {
-            background: #28a745;
-            color: white;
-        }
-
-        .admin-panel .btn-save:hover:not(:disabled) {
-            background: #34ce57;
-            transform: translateY(-2px);
-        }
-
-        .admin-panel .btn-save:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .admin-panel .btn-cancel {
-            background: #dc3545;
-            color: white;
-        }
-
-        .admin-panel .btn-cancel:hover:not(:disabled) {
-            background: #ff4757;
-            transform: translateY(-2px);
-        }
-
-        .admin-panel .btn-cancel:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Навигация владельца */
-        .owner-nav {
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            display: flex;
-            gap: 20px;
-        }
-
-        .owner-nav .nav-link {
-            color: white;
-            text-decoration: none;
-            padding: 8px 20px;
-            border-radius: 6px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.1);
-        }
-
-        .owner-nav .nav-link:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-        }
-
-        .owner-nav .nav-link.active {
+        .owner-header h1 span {
             background: #f39c12;
             color: #2c3e50;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 1rem;
         }
 
-        /* Таблица администраторов */
         .admin-table-section {
             background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }
 
         .admin-table-section h2 {
-            color: #0a4b7a;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #7ac9f0;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #f39c12;
+            font-weight: 700;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .admin-controls {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
         .admin-controls .btn {
-            padding: 8px 20px;
-            border-radius: 6px;
+            padding: 10px 25px;
+            border-radius: 8px;
             font-weight: 600;
             border: none;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .admin-controls .btn-primary {
-            background: #0a4b7a;
+            background: #3498db;
             color: white;
         }
 
         .admin-controls .btn-primary:hover {
-            background: #1a6aa3;
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
         }
 
         .admin-controls .btn-success {
-            background: #28a745;
+            background: #2ecc71;
             color: white;
         }
 
         .admin-controls .btn-success:hover:not(:disabled) {
-            background: #34ce57;
+            background: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
         }
 
         .admin-controls .btn-success:disabled {
@@ -254,78 +122,285 @@
         }
 
         .admin-controls .btn-danger {
-            background: #dc3545;
+            background: #e74c3c;
             color: white;
         }
 
         .admin-controls .btn-danger:hover:not(:disabled) {
-            background: #ff4757;
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .admin-controls .btn-info {
+            background: #f39c12;
+            color: #2c3e50;
+        }
+
+        .admin-controls .btn-info:hover {
+            background: #e67e22;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 25px;
         }
 
         .admin-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            background: white;
         }
 
         .admin-table th {
-            background: #0a4b7a;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
             color: white;
-            padding: 12px;
+            padding: 15px;
             text-align: left;
+            font-weight: 600;
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+
+        .admin-table th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        .admin-table th:last-child {
+            border-top-right-radius: 12px;
         }
 
         .admin-table td {
-            padding: 10px 12px;
-            border: 1px solid #dee2e6;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.2s ease;
         }
 
         .admin-table tbody tr:nth-child(even) {
-            background: #f5f9fc;
+            background: #f8f9fa;
         }
 
         .admin-table tbody tr:hover {
-            background: #d9edf7;
+            background: #e8f4fd;
         }
 
         .admin-table td[contenteditable="true"] {
-            background: #fff9c4;
-            cursor: pointer;
+            background: #fff9e6;
+            cursor: text;
+            position: relative;
+        }
+
+        .admin-table td[contenteditable="true"]:hover {
+            background: #fff3cd;
+            box-shadow: inset 0 0 0 2px #f39c12;
         }
 
         .admin-table td[contenteditable="true"]:focus {
             background: white;
-            outline: 2px solid #0a4b7a;
+            outline: none;
+            box-shadow: inset 0 0 0 3px #3498db;
         }
 
-        /* Уведомления */
+        /* Стили для журнала действий */
+        .actions-log-section {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .actions-log-section h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #3498db;
+            font-weight: 700;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .actions-log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .actions-log-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .actions-log-controls .btn {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .actions-log-controls .btn-outline-primary {
+            background: transparent;
+            border: 2px solid #3498db;
+            color: #3498db;
+        }
+
+        .actions-log-controls .btn-outline-primary:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .actions-log-controls .btn-outline-danger {
+            background: transparent;
+            border: 2px solid #e74c3c;
+            color: #e74c3c;
+        }
+
+        .actions-log-controls .btn-outline-danger:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .actions-log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .actions-log-table th {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .actions-log-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: middle;
+        }
+
+        .actions-log-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .actions-log-table tbody tr:hover {
+            background: #e8f4fd;
+        }
+
+        .action-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .action-badge.add {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+
+        .action-badge.edit {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .action-badge.delete {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .action-badge.status {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .action-details {
+            font-size: 0.9rem;
+        }
+
+        .action-details .old-value {
+            color: #e74c3c;
+            text-decoration: line-through;
+            margin-right: 8px;
+        }
+
+        .action-details .new-value {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .action-time {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+        }
+
+        .action-user {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left: 5px solid #28a745;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
+        }
+
+        .info-box h4 {
+            color: #155724;
+            margin-bottom: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-box p {
+            margin: 0;
+            color: #155724;
+            font-size: 1rem;
+        }
+
         .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 8px;
+            top: 30px;
+            right: 30px;
+            padding: 15px 30px;
+            border-radius: 10px;
             color: white;
             font-weight: 600;
             z-index: 9999;
             animation: slideIn 0.3s ease;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            font-size: 1rem;
         }
 
         .notification.success {
-            background: linear-gradient(135deg, #28a745, #20c997);
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
         }
 
         .notification.error {
-            background: linear-gradient(135deg, #dc3545, #c82333);
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
         }
 
         .notification.info {
-            background: linear-gradient(135deg, #17a2b8, #138496);
+            background: linear-gradient(135deg, #3498db, #2980b9);
         }
 
         .notification.warning {
-            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            background: linear-gradient(135deg, #f39c12, #e67e22);
         }
 
         @keyframes slideIn {
@@ -339,7 +414,6 @@
             }
         }
 
-        /* Индикатор загрузки */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -351,13 +425,14 @@
             justify-content: center;
             align-items: center;
             z-index: 9998;
+            backdrop-filter: blur(5px);
         }
 
         .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #0a4b7a;
+            width: 60px;
+            height: 60px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -367,377 +442,172 @@
             100% { transform: rotate(360deg); }
         }
 
-        .hidden {
-            display: none !important;
-        }
-
-        .badge {
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-        }
-
-        .badge-warning {
-            background: #ffc107;
-            color: #1e3c72;
-        }
-
-        .badge-success {
-            background: #28a745;
-            color: white;
-        }
-
-        .info-box {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            border-left: 4px solid #0a4b7a;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        .warning-box {
-            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
-            border-left: 4px solid #c62828;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        .badge-price {
-            background: linear-gradient(135deg, #0a4b7a, #1a6aa3);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .note-text {
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin-top: 10px;
-            padding: 10px;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-radius: 8px;
-            font-style: italic;
-        }
-
-        .edit-hint {
-            background: #fff3cd;
-            border: 1px solid #ffeeba;
-            color: #856404;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        /* Индикатор сохранения */
         .save-indicator {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .save-indicator-dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            margin-right: 5px;
+            display: inline-block;
         }
 
-        .save-indicator.saved {
-            background: #28a745;
-            box-shadow: 0 0 5px #28a745;
+        .save-indicator-dot.saved {
+            background: #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
         }
 
-        .save-indicator.modified {
-            background: #ffc107;
-            box-shadow: 0 0 5px #ffc107;
+        .save-indicator-dot.modified {
+            background: #f39c12;
+            box-shadow: 0 0 10px #f39c12;
         }
 
-        .save-indicator.unsaved {
-            background: #dc3545;
-            box-shadow: 0 0 5px #dc3545;
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .filter-input {
+            padding: 8px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            min-width: 250px;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #3498db;
         }
     </style>
 </head>
 <body>
-    <main role="main">
-        <div class="container py-5">
-            <!-- Навигация владельца -->
-            <div class="owner-nav">
-                <a href="#" class="nav-link active" data-page="admins">👥 Администраторы</a>
-                <a href="#" class="nav-link" data-page="tables">📊 Таблицы</a>
-            </div>
-
-            <!-- Индикатор состояния сохранения -->
-            <div class="d-flex justify-content-end mb-3">
-                <div class="badge bg-light text-dark p-2">
-                    <span class="save-indicator saved" id="globalSaveIndicator"></span>
-                    <span id="globalSaveStatus">Все изменения сохранены</span>
-                </div>
-            </div>
-
-            <!-- Страница администраторов -->
-            <div id="admins-page" class="admin-table-section">
-                <h2>👥 Управление администраторами</h2>
-                
-                <div class="admin-controls">
-                    <button class="btn btn-primary" id="addAdminRow">➕ Добавить запись</button>
-                    <button class="btn btn-success" id="saveAdminChanges" disabled>💾 Сохранить изменения</button>
-                    <button class="btn btn-danger" id="cancelAdminChanges" disabled>❌ Отменить</button>
-                    <button class="btn btn-info" id="exportAdminExcel">📥 Экспорт в Excel</button>
-                    <button class="btn btn-info" id="importAdminExcel">📤 Импорт из Excel</button>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="admin-table" id="admin-table" data-file="Админ.xlsx">
-                        <thead>
-                            <tr id="admin-header">
-                                <th>Имя</th>
-                                <th>Должность</th>
-                                <th>Email</th>
-                                <th>Телефон</th>
-                                <th>Статус</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-body">
-                            <!-- Данные будут загружены из Админ.xlsx -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="info-box">
-                    <h4>ℹ️ Информация</h4>
-                    <p class="mb-0">Для редактирования ячейки нажмите на неё. После внесения изменений нажмите "Сохранить изменения". Все данные хранятся локально в вашем браузере.</p>
-                </div>
-            </div>
-
-            <!-- Страница таблиц (копия функционала из admin-panel.html) -->
-            <div id="tables-page" class="hidden">
-                <!-- Панель администратора -->
-                <div class="admin-panel" id="adminPanel">
-                    <h3>
-                        <span>🔧 Редактор прайс-листа</span>
-                        <span id="editStatus" class="badge badge-warning" style="font-size: 0.8rem;">Режим просмотра</span>
-                    </h3>
-                    <div class="btn-group">
-                        <button class="btn btn-edit" id="toggleEditMode">
-                            ✏️ Войти в режим редактирования
-                        </button>
-                        <button class="btn btn-save" id="saveChanges" disabled>
-                            💾 Сохранить все изменения
-                        </button>
-                        <button class="btn btn-cancel" id="cancelChanges" disabled>
-                            ❌ Отменить изменения
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Подсказка для администратора -->
-                <div class="edit-hint" id="editHint">
-                    <i>✏️</i> Режим редактирования активен. Нажмите на любую ячейку с ценой или текстом, чтобы изменить её. 
-                    После внесения изменений нажмите "Сохранить все изменения".
-                </div>
-
-                <!-- Кнопки экспорта/импорта для таблиц -->
-                <div class="mb-3 d-flex gap-2">
-                    <button class="btn btn-info" id="exportTarifExcel">📥 Экспорт tarif.xlsx</button>
-                    <button class="btn btn-info" id="exportNasosExcel">📥 Экспорт Nasos.xlsx</button>
-                    <button class="btn btn-info" id="importTablesExcel">📤 Импорт из Excel</button>
-                </div>
-
-                <!-- ==================== ТАРИФЫ НА АВТОБЕТОНОСМЕСИТЕЛИ ==================== -->
-                <div class="price-section" id="section-abs">
-                    <h2>🚚 Тарифы на транспортные услуги автобетоносмесителей (в пределах МКАД)</h2>
-                    
-                    <h3>📋 Основные услуги</h3>
-                    <div class="table-responsive">
-                        <table class="price-table" id="table-abs-main" data-file="tarif.xlsx">
-                            <thead>
-                                <tr>
-                                    <th>Наименование услуги</th>
-                                    <th>Ед. изм.</th>
-                                    <th>Тариф без НДС, руб.</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td class="editable-cell">Услуги АБС 7 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">200</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС 8 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">210</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС 9 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">220</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС 10 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">240</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС 11 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">300</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС 12 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">320</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС 14 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">350</span></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <h3>⏱️ Дополнительные услуги</h3>
-                    <div class="table-responsive">
-                        <table class="price-table" id="table-abs-extra" data-file="tarif.xlsx">
-                            <thead>
-                                <tr>
-                                    <th>Наименование услуги</th>
-                                    <th>Ед. изм.</th>
-                                    <th>Тариф без НДС, руб.</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td class="editable-cell">Дополнительное время работы на объекте (свыше 1 машино-часа)</td><td class="editable-cell">час</td><td class="editable-cell price-cell"><span class="badge-price price-value">100</span></td></tr>
-                                <tr><td class="editable-cell">Использование дополнительного оборудования (доп. лоток)</td><td class="editable-cell">ед.</td><td class="editable-cell price-cell"><span class="badge-price price-value">50</span></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="info-box">
-                        <h4>ℹ️ В стоимость рейса АБС входит:</h4>
-                        <ul class="mb-0">
-                            <li>Доставка продукции от узла до объекта строительства</li>
-                            <li>Работа на объекте 1 машино-час (включая технологическую мойку)</li>
-                            <li>Возврат транспорта на узел</li>
-                        </ul>
-                    </div>
-
-                    <h3>🛣️ Доставка продукции за пределы МКАД</h3>
-                    <div class="table-responsive">
-                        <table class="price-table" id="table-abs-delivery" data-file="tarif.xlsx">
-                            <thead>
-                                <tr>
-                                    <th>Расстояние от МКАД</th>
-                                    <th>Примечание</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td class="editable-cell">0-49 км</td><td class="editable-cell">Договорной тариф</td></tr>
-                                <tr><td class="editable-cell">50-99 км</td><td class="editable-cell">Договорной тариф</td></tr>
-                                <tr><td class="editable-cell">100-149 км</td><td class="editable-cell">Договорной тариф</td></tr>
-                                <tr><td class="editable-cell">свыше 150 км</td><td class="editable-cell">Договорной тариф</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <p class="note-text">* Точная стоимость доставки за МКАД рассчитывается индивидуально. Обращайтесь к менеджерам!</p>
-                </div>
-
-                <!-- ==================== ТАРИФЫ НА АБС С НАСОСОМ ==================== -->
-                <div class="price-section" id="section-nasos">
-                    <h2>🚛 Тарифы на транспортные услуги автобетоносмесителей с насосом (в пределах МКАД)</h2>
-                    
-                    <h3>📋 Основные услуги</h3>
-                    <div class="table-responsive">
-                        <table class="price-table" id="table-nasos-main" data-file="Nasos.xlsx">
-                            <thead>
-                                <tr>
-                                    <th>Наименование услуги</th>
-                                    <th>Ед. изм.</th>
-                                    <th>Тариф без НДС, руб.</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td class="editable-cell">Услуги АБС с насосом 7 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">600</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС с насосом 8 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">650</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС с насосом 7 м³ (стрела 28 м)</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">650</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС с насосом 8 м³ (стрела 28 м)</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">700</span></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <h3>⏱️ Дополнительные услуги</h3>
-                    <div class="table-responsive">
-                        <table class="price-table" id="table-nasos-extra" data-file="Nasos.xlsx">
-                            <thead>
-                                <tr>
-                                    <th>Наименование услуги</th>
-                                    <th>Ед. изм.</th>
-                                    <th>Тариф без НДС, руб.</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td class="editable-cell">Дополнительное время работы на объекте (свыше 2 машино-часов)</td><td class="editable-cell">час</td><td class="editable-cell price-cell"><span class="badge-price price-value">200</span></td></tr>
-                                <tr><td class="editable-cell">Прокачка бетона свыше 15 м³</td><td class="editable-cell">м³</td><td class="editable-cell price-cell"><span class="badge-price price-value">25</span></td></tr>
-                                <tr><td class="editable-cell">Использование дополнительного оборудования (доп. шланг 4 м)</td><td class="editable-cell">ед.</td><td class="editable-cell price-cell"><span class="badge-price price-value">50</span></td></tr>
-                                <tr><td class="editable-cell">Отсутствие места мойки смесительного барабана</td><td class="editable-cell">ед.</td><td class="editable-cell price-cell"><span class="badge-price price-value">200</span></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="warning-box">
-                        <h4>⚠️ Важное предупреждение!</h4>
-                        <p class="mb-0"><strong>Отсутствие мойки приемника автобетононасоса - ЗАКАЗЫ НЕ ПРИНИМАЮТСЯ!</strong></p>
-                    </div>
-
-                    <div class="info-box">
-                        <h4>ℹ️ В стоимость рейса АБС с насосом входит:</h4>
-                        <ul class="mb-0">
-                            <li>Доставка продукции от узла до объекта строительства</li>
-                            <li>Работа на объекте 2 машино-часа (включая заезд на объект, раскладывание стрелы и технологическую мойку)</li>
-                            <li>Возврат транспорта на узел</li>
-                        </ul>
-                    </div>
-
-                    <h3>🗺️ Доставка продукции за пределы МКАД (АБС с насосом)</h3>
-                    <div class="table-responsive">
-                        <table class="price-table" id="table-nasos-delivery" data-file="Nasos.xlsx">
-                            <thead>
-                                <tr>
-                                    <th>Расстояние от МКАД</th>
-                                    <th>Тариф за 1 км, руб.</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td class="editable-cell">0-49 км</td><td class="editable-cell price-cell"><span class="badge-price price-value">5</span></td></tr>
-                                <tr><td class="editable-cell">50-99 км</td><td class="editable-cell price-cell"><span class="badge-price price-value">6</span></td></tr>
-                                <tr><td class="editable-cell">100-149 км</td><td class="editable-cell price-cell"><span class="badge-price price-value">7</span></td></tr>
-                                <tr><td class="editable-cell">свыше 150 км</td><td class="editable-cell price-cell"><span class="badge-price price-value">8</span></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <p class="note-text">* Тариф применяется за каждый километр от МКАД до объекта</p>
-                </div>
+    <div class="owner-container">
+        <!-- Шапка -->
+        <div class="owner-header">
+            <h1>
+                👥 Панель управления администраторами
+                <span>владелец</span>
+            </h1>
+            <div class="save-indicator" id="saveIndicator">
+                <span class="save-indicator-dot saved" id="saveIndicatorDot"></span>
+                <span id="saveIndicatorText">Все изменения сохранены</span>
             </div>
         </div>
-    </main>
+
+        <!-- Таблица администраторов -->
+        <div class="admin-table-section">
+            <h2>
+                📋 Список администраторов
+                <span class="badge bg-secondary text-white" id="recordCount">0 записей</span>
+            </h2>
+            
+            <!-- Панель управления -->
+            <div class="admin-controls">
+                <button class="btn btn-primary" id="addAdminRow">
+                    ➕ Добавить запись
+                </button>
+                <button class="btn btn-success" id="saveAdminChanges" disabled>
+                    💾 Сохранить изменения
+                </button>
+                <button class="btn btn-danger" id="cancelAdminChanges" disabled>
+                    ❌ Отменить
+                </button>
+                <button class="btn btn-info" id="exportAdminExcel">
+                    📥 Экспорт в Excel
+                </button>
+                <button class="btn btn-info" id="importAdminExcel">
+                    📤 Импорт из Excel
+                </button>
+            </div>
+
+            <!-- Таблица администраторов -->
+            <div class="table-responsive">
+                <table class="admin-table" id="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Имя</th>
+                            <th>Должность</th>
+                            <th>Email</th>
+                            <th>Телефон</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-body">
+                        <!-- Данные будут загружены -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Журнал действий -->
+        <div class="actions-log-section">
+            <h2>
+                📝 Журнал действий администраторов
+            </h2>
+
+            <div class="actions-log-header">
+                <input type="text" class="filter-input" id="actionFilter" placeholder="🔍 Фильтр по имени, действию или деталям...">
+                <div class="actions-log-controls">
+                    <button class="btn btn-outline-primary" id="refreshActions">
+                        🔄 Обновить
+                    </button>
+                    <button class="btn btn-outline-danger" id="clearActions">
+                        🗑️ Очистить журнал
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="actions-log-table" id="actions-log-table">
+                    <thead>
+                        <tr>
+                            <th>Время</th>
+                            <th>Пользователь</th>
+                            <th>Действие</th>
+                            <th>Детали</th>
+                        </tr>
+                    </thead>
+                    <tbody id="actions-log-body">
+                        <!-- Действия будут загружены -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
     <!-- Невидимый input для загрузки файлов -->
     <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" />
 
     <script>
-        // Глобальные переменные для страницы таблиц
-        let isEditMode = false;
-        let changedCells = new Map();
-
-        // Глобальные переменные для страницы администраторов
+        // Глобальные переменные
         let adminChangedCells = new Map();
         let adminEditMode = false;
+        let currentUser = 'Владелец'; // Имя текущего пользователя
 
-        // Переключение между страницами
-        document.querySelectorAll('.owner-nav .nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Обновляем активный класс
-                document.querySelectorAll('.owner-nav .nav-link').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Показываем нужную страницу
-                const page = this.dataset.page;
-                if (page === 'admins') {
-                    document.getElementById('admins-page').classList.remove('hidden');
-                    document.getElementById('tables-page').classList.add('hidden');
-                    // Загружаем данные администраторов при первом открытии
-                    if (document.getElementById('admin-body').children.length === 0) {
-                        loadAdminData();
-                    }
-                } else {
-                    document.getElementById('admins-page').classList.add('hidden');
-                    document.getElementById('tables-page').classList.remove('hidden');
-                }
-            });
-        });
-
-        // ========== ОБЩИЕ ФУНКЦИИ ==========
+        // Показать уведомление
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
@@ -750,6 +620,7 @@
             }, 3000);
         }
 
+        // Показать/скрыть загрузку
         function showLoading(show = true) {
             let overlay = document.querySelector('.loading-overlay');
             if (show) {
@@ -764,314 +635,198 @@
             }
         }
 
-        function updateGlobalSaveStatus() {
-            const indicator = document.getElementById('globalSaveIndicator');
-            const status = document.getElementById('globalSaveStatus');
+        // Обновить индикатор сохранения
+        function updateSaveIndicator() {
+            const dot = document.getElementById('saveIndicatorDot');
+            const text = document.getElementById('saveIndicatorText');
             
-            const hasTableChanges = changedCells.size > 0;
-            const hasAdminChanges = adminChangedCells.size > 0;
-            
-            if (hasTableChanges || hasAdminChanges) {
-                indicator.className = 'save-indicator modified';
-                status.textContent = 'Есть несохраненные изменения';
+            if (adminChangedCells.size > 0) {
+                dot.className = 'save-indicator-dot modified';
+                text.textContent = 'Есть несохраненные изменения';
             } else {
-                indicator.className = 'save-indicator saved';
-                status.textContent = 'Все изменения сохранены';
+                dot.className = 'save-indicator-dot saved';
+                text.textContent = 'Все изменения сохранены';
             }
         }
 
-        // ========== ФУНКЦИИ ДЛЯ СТРАНИЦЫ ТАБЛИЦ ==========
-        function getCellId(cell) {
-            const table = cell.closest('table');
-            const tableId = table.id;
-            const row = cell.parentElement;
-            const rowIndex = Array.from(row.parentElement.children).indexOf(row);
-            const cellIndex = Array.from(row.children).indexOf(cell);
-            return `${tableId}_${rowIndex}_${cellIndex}`;
+        // Обновить счетчик записей
+        function updateRecordCount() {
+            const count = document.querySelectorAll('#admin-body tr').length;
+            document.getElementById('recordCount').textContent = `${count} записей`;
         }
 
-        function getCellValue(cell) {
-            const priceSpan = cell.querySelector('.price-value');
-            if (priceSpan) {
-                return priceSpan.textContent.trim();
-            }
-            return cell.textContent.trim();
+        // ========== ФУНКЦИИ ДЛЯ ЖУРНАЛА ДЕЙСТВИЙ ==========
+
+        // Загрузить действия из localStorage
+        function loadActions() {
+            const actions = JSON.parse(localStorage.getItem('admin_actions') || '[]');
+            renderActions(actions);
         }
 
-        function setCellValue(cell, value) {
-            const priceSpan = cell.querySelector('.price-value');
-            if (priceSpan) {
-                priceSpan.textContent = value;
-            } else {
-                cell.textContent = value;
-            }
-        }
-
-        function toggleEditMode() {
-            isEditMode = !isEditMode;
-            const editBtn = document.getElementById('toggleEditMode');
-            const saveBtn = document.getElementById('saveChanges');
-            const cancelBtn = document.getElementById('cancelChanges');
-            const editHint = document.getElementById('editHint');
-            const editStatus = document.getElementById('editStatus');
+        // Сохранить действие
+        function addAction(actionType, details) {
+            const actions = JSON.parse(localStorage.getItem('admin_actions') || '[]');
             
-            if (isEditMode) {
-                editBtn.innerHTML = '🔒 Выйти из режима редактирования';
-                editBtn.classList.remove('btn-edit');
-                editBtn.classList.add('btn-cancel');
-                saveBtn.disabled = false;
-                cancelBtn.disabled = false;
-                editHint.style.display = 'block';
-                editStatus.textContent = 'Режим редактирования';
-                editStatus.className = 'badge badge-success';
-                
-                document.querySelectorAll('#tables-page .editable-cell').forEach(cell => {
-                    cell.setAttribute('contenteditable', 'true');
-                    cell.setAttribute('data-original', getCellValue(cell));
-                    
-                    cell.removeEventListener('input', handleCellInput);
-                    cell.addEventListener('input', handleCellInput);
+            const newAction = {
+                id: Date.now() + Math.random(),
+                timestamp: new Date().toISOString(),
+                user: currentUser,
+                type: actionType,
+                details: details
+            };
+            
+            actions.unshift(newAction); // Добавляем в начало
+            localStorage.setItem('admin_actions', JSON.stringify(actions));
+            
+            renderActions(actions);
+            return newAction;
+        }
+
+        // Отрендерить действия
+        function renderActions(actions) {
+            const tbody = document.getElementById('actions-log-body');
+            const filterValue = document.getElementById('actionFilter').value.toLowerCase();
+            
+            let filteredActions = actions;
+            if (filterValue) {
+                filteredActions = actions.filter(action => {
+                    return action.user.toLowerCase().includes(filterValue) ||
+                           action.type.toLowerCase().includes(filterValue) ||
+                           JSON.stringify(action.details).toLowerCase().includes(filterValue);
                 });
-            } else {
-                editBtn.innerHTML = '✏️ Войти в режим редактирования';
-                editBtn.classList.remove('btn-cancel');
-                editBtn.classList.add('btn-edit');
-                saveBtn.disabled = true;
-                cancelBtn.disabled = true;
-                editHint.style.display = 'none';
-                editStatus.textContent = 'Режим просмотра';
-                editStatus.className = 'badge badge-warning';
-                
-                document.querySelectorAll('#tables-page [contenteditable="true"]').forEach(cell => {
-                    cell.removeAttribute('contenteditable');
-                    cell.removeEventListener('input', handleCellInput);
-                });
-                
-                changedCells.clear();
-                updateSaveButtonText();
-                updateGlobalSaveStatus();
             }
-        }
-
-        function handleCellInput(e) {
-            const cell = e.target;
-            const newValue = getCellValue(cell);
-            const cellId = getCellId(cell);
             
-            changedCells.set(cellId, {
-                element: cell,
-                value: newValue
-            });
+            tbody.innerHTML = '';
             
-            updateSaveButtonText();
-            updateGlobalSaveStatus();
-        }
-
-        function updateSaveButtonText() {
-            const saveBtn = document.getElementById('saveChanges');
-            const changesCount = changedCells.size;
-            
-            if (changesCount > 0) {
-                saveBtn.innerHTML = `💾 Сохранить все изменения (${changesCount})`;
-            } else {
-                saveBtn.innerHTML = '💾 Сохранить все изменения';
-            }
-        }
-
-        function cancelChanges() {
-            if (!isEditMode) return;
-            
-            if (changedCells.size > 0) {
-                if (confirm('Отменить все несохраненные изменения?')) {
-                    changedCells.forEach((data, cellId) => {
-                        const cell = data.element;
-                        const originalValue = cell.getAttribute('data-original');
-                        if (originalValue !== null) {
-                            setCellValue(cell, originalValue);
-                        }
-                    });
-                    
-                    changedCells.clear();
-                    updateSaveButtonText();
-                    updateGlobalSaveStatus();
-                    showNotification('Изменения отменены', 'info');
-                }
-            } else {
-                showNotification('Нет изменений для отмены', 'info');
-            }
-        }
-
-        function saveAllChanges() {
-            if (!isEditMode || changedCells.size === 0) {
-                showNotification('Нет изменений для сохранения', 'info');
+            if (filteredActions.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="4" style="text-align: center; padding: 40px; color: #7f8c8d;">
+                    📭 Нет записей о действиях
+                </td>`;
+                tbody.appendChild(tr);
                 return;
             }
-
-            if (!confirm('Сохранить все изменения локально?')) {
-                return;
-            }
-
-            showLoading(true);
-
-            try {
-                const changesByFile = new Map();
+            
+            filteredActions.forEach(action => {
+                const tr = document.createElement('tr');
                 
-                changedCells.forEach((data, cellId) => {
-                    const cell = data.element;
-                    const table = cell.closest('table');
-                    const fileName = table.dataset.file;
-                    const newValue = getCellValue(cell);
-                    
-                    if (!changesByFile.has(fileName)) {
-                        changesByFile.set(fileName, []);
-                    }
-                    
-                    changesByFile.get(fileName).push({
-                        cellId: cellId,
-                        value: newValue
-                    });
-                });
-
-                // Сохраняем только в localStorage, без попыток отправки на сервер
-                for (const [fileName, changes] of changesByFile) {
-                    saveToLocalStorage(fileName, changes);
+                // Время
+                const timeTd = document.createElement('td');
+                const actionTime = new Date(action.timestamp);
+                timeTd.className = 'action-time';
+                timeTd.innerHTML = `
+                    <div>${actionTime.toLocaleDateString()}</div>
+                    <div>${actionTime.toLocaleTimeString()}</div>
+                `;
+                
+                // Пользователь
+                const userTd = document.createElement('td');
+                userTd.className = 'action-user';
+                userTd.textContent = action.user;
+                
+                // Действие
+                const actionTd = document.createElement('td');
+                const actionBadge = document.createElement('span');
+                actionBadge.className = `action-badge ${action.type}`;
+                
+                let actionText = '';
+                switch(action.type) {
+                    case 'add': actionText = '➕ Добавление'; break;
+                    case 'edit': actionText = '✏️ Редактирование'; break;
+                    case 'delete': actionText = '🗑️ Удаление'; break;
+                    case 'status': actionText = '🔄 Изменение статуса'; break;
+                    case 'import': actionText = '📤 Импорт'; break;
+                    case 'export': actionText = '📥 Экспорт'; break;
+                    case 'clear': actionText = '🧹 Очистка журнала'; break;
+                    default: actionText = action.type;
                 }
-
-                // Обновляем data-original для всех измененных ячеек
-                changedCells.forEach((data, cellId) => {
-                    const cell = data.element;
-                    const currentValue = getCellValue(cell);
-                    cell.setAttribute('data-original', currentValue);
-                });
-
-                changedCells.clear();
-                updateSaveButtonText();
-                updateGlobalSaveStatus();
-                showNotification('Изменения успешно сохранены в локальном хранилище!', 'success');
-            } catch (error) {
-                console.error('Ошибка сохранения:', error);
-                showNotification('Ошибка при сохранении изменений: ' + error.message, 'error');
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        function saveToLocalStorage(fileName, changes) {
-            const key = `price_data_${fileName}`;
-            let savedData = JSON.parse(localStorage.getItem(key) || '{}');
-            
-            changes.forEach(change => {
-                savedData[change.cellId] = change.value;
-            });
-            
-            localStorage.setItem(key, JSON.stringify(savedData));
-            console.log(`Данные сохранены в localStorage для ${fileName}`);
-        }
-
-        function loadFromLocalStorage() {
-            const files = ['tarif.xlsx', 'Nasos.xlsx'];
-            
-            files.forEach(fileName => {
-                const key = `price_data_${fileName}`;
-                const savedData = localStorage.getItem(key);
                 
-                if (savedData) {
-                    try {
-                        const changes = JSON.parse(savedData);
-                        
-                        Object.entries(changes).forEach(([cellId, value]) => {
-                            const [tableId, rowIndex, cellIndex] = cellId.split('_');
-                            const table = document.getElementById(tableId);
-                            
-                            if (table) {
-                                const rows = table.querySelectorAll('tbody tr');
-                                if (rows[rowIndex]) {
-                                    const cells = rows[rowIndex].querySelectorAll('td');
-                                    if (cells[cellIndex]) {
-                                        setCellValue(cells[cellIndex], value);
-                                        cells[cellIndex].setAttribute('data-original', value);
-                                    }
-                                }
-                            }
-                        });
-                        
-                        console.log(`Загружены сохраненные данные для ${fileName}`);
-                    } catch (error) {
-                        console.error(`Ошибка загрузки данных для ${fileName}:`, error);
+                actionBadge.textContent = actionText;
+                actionTd.appendChild(actionBadge);
+                
+                // Детали
+                const detailsTd = document.createElement('td');
+                detailsTd.className = 'action-details';
+                
+                if (action.details) {
+                    if (action.details.field) {
+                        // Изменение поля
+                        detailsTd.innerHTML = `
+                            <strong>${action.details.adminName || 'Администратор'}</strong><br>
+                            Поле: ${action.details.field}<br>
+                            <span class="old-value">${action.details.oldValue}</span> → 
+                            <span class="new-value">${action.details.newValue}</span>
+                        `;
+                    } else if (action.details.adminName) {
+                        // Действие с администратором
+                        detailsTd.innerHTML = `
+                            <strong>${action.details.adminName}</strong><br>
+                            ${action.details.description || ''}
+                        `;
+                    } else {
+                        // Простое описание
+                        detailsTd.textContent = action.details;
                     }
                 }
+                
+                tr.appendChild(timeTd);
+                tr.appendChild(userTd);
+                tr.appendChild(actionTd);
+                tr.appendChild(detailsTd);
+                
+                tbody.appendChild(tr);
             });
         }
 
-        // Экспорт таблиц в Excel
-        function exportTableToExcel(fileName) {
-            const tables = document.querySelectorAll(`table[data-file="${fileName}"]`);
-            const wb = XLSX.utils.book_new();
-            
-            tables.forEach((table, index) => {
-                const rows = [];
-                const headers = [];
-                
-                // Заголовки
-                table.querySelectorAll('thead th').forEach(th => {
-                    headers.push(th.textContent);
-                });
-                if (headers.length > 0) rows.push(headers);
-                
-                // Данные
-                table.querySelectorAll('tbody tr').forEach(tr => {
-                    const row = [];
-                    tr.querySelectorAll('td').forEach(td => {
-                        const priceSpan = td.querySelector('.price-value');
-                        if (priceSpan) {
-                            row.push(priceSpan.textContent.trim());
-                        } else {
-                            row.push(td.textContent.trim());
-                        }
-                    });
-                    if (row.length > 0) rows.push(row);
-                });
-                
-                // Добавляем лист
-                const ws = XLSX.utils.aoa_to_sheet(rows);
-                XLSX.utils.book_append_sheet(wb, ws, `Лист${index + 1}`);
-            });
-            
-            // Сохраняем файл
-            XLSX.writeFile(wb, fileName);
-            showNotification(`Файл ${fileName} экспортирован`, 'success');
+        // Очистить журнал
+        function clearActionsLog() {
+            if (confirm('Очистить весь журнал действий?')) {
+                localStorage.setItem('admin_actions', '[]');
+                addAction('clear', 'Журнал действий очищен');
+                loadActions();
+                showNotification('Журнал очищен', 'info');
+            }
         }
 
-        // ========== ФУНКЦИИ ДЛЯ СТРАНИЦЫ АДМИНИСТРАТОРОВ ==========
+        // ========== ФУНКЦИИ ДЛЯ ТАБЛИЦЫ АДМИНИСТРАТОРОВ ==========
+
+        // Загрузить данные администраторов
         function loadAdminData() {
             showLoading(true);
             try {
-                // Пытаемся загрузить из localStorage сначала
+                // Пытаемся загрузить из localStorage
                 const savedAdminData = localStorage.getItem('admin_data');
                 if (savedAdminData) {
                     const data = JSON.parse(savedAdminData);
                     renderAdminTable(data);
-                    showNotification('Данные администраторов загружены из локального хранилища', 'info');
+                    showNotification('Данные загружены из локального хранилища', 'info');
                 } else {
-                    // Если нет в localStorage, создаем тестовые данные
+                    // Создаем тестовые данные
                     const testData = [
                         ['Иван Петров', 'Главный администратор', 'ivan@indigra.ru', '+7 (495) 123-45-67', 'Активен'],
                         ['Мария Сидорова', 'Менеджер по работе с клиентами', 'maria@indigra.ru', '+7 (495) 234-56-78', 'Активен'],
                         ['Алексей Иванов', 'Технический специалист', 'aleksey@indigra.ru', '+7 (495) 345-67-89', 'Неактивен'],
-                        ['Елена Козлова', 'Бухгалтер', 'elena@indigra.ru', '+7 (495) 456-78-90', 'Активен']
+                        ['Елена Козлова', 'Бухгалтер', 'elena@indigra.ru', '+7 (495) 456-78-90', 'Активен'],
+                        ['Дмитрий Смирнов', 'Менеджер по продажам', 'dmitry@indigra.ru', '+7 (495) 567-89-01', 'Активен'],
+                        ['Ольга Новикова', 'HR-менеджер', 'olga@indigra.ru', '+7 (495) 678-90-12', 'Неактивен']
                     ];
                     renderAdminTable(testData);
                     saveAdminToLocalStorage(testData);
-                    showNotification('Созданы тестовые данные администраторов', 'info');
+                    
+                    // Добавляем действия о создании тестовых данных
+                    addAction('add', { description: 'Созданы тестовые данные администраторов' });
+                    showNotification('Созданы тестовые данные', 'info');
                 }
+                updateRecordCount();
             } catch (error) {
-                console.error('Ошибка загрузки данных администраторов:', error);
-                showNotification('Ошибка загрузки данных администраторов', 'error');
+                console.error('Ошибка загрузки:', error);
+                showNotification('Ошибка загрузки данных', 'error');
             } finally {
                 showLoading(false);
             }
         }
 
+        // Отрендерить таблицу
         function renderAdminTable(data) {
             const tbody = document.getElementById('admin-body');
             tbody.innerHTML = '';
@@ -1082,7 +837,18 @@
                 
                 row.forEach((cell, cellIndex) => {
                     const td = document.createElement('td');
-                    td.textContent = cell;
+                    
+                    // Для статуса добавляем специальное оформление
+                    if (cellIndex === 4) {
+                        const statusSpan = document.createElement('span');
+                        statusSpan.className = `status-badge ${cell === 'Активен' ? 'active' : 'inactive'}`;
+                        statusSpan.textContent = cell;
+                        td.appendChild(statusSpan);
+                        td.dataset.value = cell;
+                    } else {
+                        td.textContent = cell;
+                    }
+                    
                     td.dataset.cellIndex = cellIndex;
                     td.dataset.original = cell;
                     td.classList.add('admin-cell');
@@ -1093,37 +859,51 @@
             });
         }
 
-        // Добавление новой строки в таблицу администраторов
-        document.getElementById('addAdminRow').addEventListener('click', function() {
-            const tbody = document.getElementById('admin-body');
-            const newRow = document.createElement('tr');
-            newRow.dataset.rowIndex = tbody.children.length;
-            
-            // Добавляем пустые ячейки
-            for (let i = 0; i < 5; i++) {
-                const td = document.createElement('td');
-                td.textContent = '';
-                td.dataset.cellIndex = i;
-                td.dataset.original = '';
-                td.classList.add('admin-cell');
-                newRow.appendChild(td);
-            }
-            
-            tbody.appendChild(newRow);
-            
-            // Включаем режим редактирования для новой строки
-            if (!adminEditMode) {
-                enableAdminEditMode();
-            }
-            
-            showNotification('Новая запись добавлена', 'success');
-        });
+        // Сохранить данные в localStorage
+        function saveAdminToLocalStorage(data) {
+            localStorage.setItem('admin_data', JSON.stringify(data));
+            console.log('Данные сохранены в localStorage');
+        }
 
-        // Включение режима редактирования администраторов
+        // Включить режим редактирования
         function enableAdminEditMode() {
             adminEditMode = true;
             document.querySelectorAll('#admin-body .admin-cell').forEach(cell => {
                 cell.setAttribute('contenteditable', 'true');
+                
+                // Для статуса делаем особое редактирование
+                if (parseInt(cell.dataset.cellIndex) === 4) {
+                    cell.setAttribute('contenteditable', 'false');
+                    cell.style.cursor = 'pointer';
+                    cell.addEventListener('click', function(e) {
+                        if (!adminEditMode) return;
+                        
+                        const row = this.parentElement;
+                        const adminName = row.children[0]?.textContent || 'Неизвестно';
+                        const currentValue = this.dataset.value || this.textContent;
+                        const newValue = currentValue === 'Активен' ? 'Неактивен' : 'Активен';
+                        
+                        // Обновляем отображение
+                        this.innerHTML = `<span class="status-badge ${newValue === 'Активен' ? 'active' : 'inactive'}">${newValue}</span>`;
+                        this.dataset.value = newValue;
+                        
+                        // Сохраняем изменение
+                        const rowIndex = row.dataset.rowIndex;
+                        const cellIndex = this.dataset.cellIndex;
+                        const cellId = `admin_${rowIndex}_${cellIndex}`;
+                        
+                        adminChangedCells.set(cellId, {
+                            row: row,
+                            cell: this,
+                            rowIndex: parseInt(rowIndex),
+                            cellIndex: parseInt(cellIndex),
+                            value: newValue
+                        });
+                        
+                        updateAdminSaveButton();
+                        updateSaveIndicator();
+                    });
+                }
                 
                 cell.removeEventListener('input', handleAdminInput);
                 cell.addEventListener('input', handleAdminInput);
@@ -1133,7 +913,7 @@
             document.getElementById('cancelAdminChanges').disabled = false;
         }
 
-        // Обработчик ввода в таблице администраторов
+        // Обработчик ввода
         function handleAdminInput(e) {
             const cell = e.target;
             const row = cell.parentElement;
@@ -1151,10 +931,10 @@
             });
             
             updateAdminSaveButton();
-            updateGlobalSaveStatus();
+            updateSaveIndicator();
         }
 
-        // Обновление кнопки сохранения администраторов
+        // Обновить кнопку сохранения
         function updateAdminSaveButton() {
             const saveBtn = document.getElementById('saveAdminChanges');
             const changesCount = adminChangedCells.size;
@@ -1166,14 +946,68 @@
             }
         }
 
-        // Сохранение изменений администраторов
+        // Добавить новую запись
+        document.getElementById('addAdminRow').addEventListener('click', function() {
+            const tbody = document.getElementById('admin-body');
+            const newRow = document.createElement('tr');
+            newRow.dataset.rowIndex = tbody.children.length;
+            
+            // Добавляем пустые ячейки
+            const defaultValues = ['Новый сотрудник', 'Должность', 'email@indigra.ru', '+7 (495) 000-00-00', 'Активен'];
+            
+            defaultValues.forEach((value, i) => {
+                const td = document.createElement('td');
+                
+                if (i === 4) {
+                    const statusSpan = document.createElement('span');
+                    statusSpan.className = 'status-badge active';
+                    statusSpan.textContent = value;
+                    td.appendChild(statusSpan);
+                    td.dataset.value = value;
+                } else {
+                    td.textContent = value;
+                }
+                
+                td.dataset.cellIndex = i;
+                td.dataset.original = value;
+                td.classList.add('admin-cell');
+                newRow.appendChild(td);
+            });
+            
+            tbody.appendChild(newRow);
+            
+            if (!adminEditMode) {
+                enableAdminEditMode();
+            }
+            
+            // Добавляем в изменения
+            for (let i = 0; i < 5; i++) {
+                const cell = newRow.children[i];
+                const cellId = `admin_${newRow.dataset.rowIndex}_${i}`;
+                
+                adminChangedCells.set(cellId, {
+                    row: newRow,
+                    cell: cell,
+                    rowIndex: parseInt(newRow.dataset.rowIndex),
+                    cellIndex: i,
+                    value: defaultValues[i]
+                });
+            }
+            
+            updateAdminSaveButton();
+            updateSaveIndicator();
+            updateRecordCount();
+            showNotification('Новая запись добавлена', 'success');
+        });
+
+        // Сохранить изменения
         document.getElementById('saveAdminChanges').addEventListener('click', function() {
             if (adminChangedCells.size === 0) {
                 showNotification('Нет изменений для сохранения', 'info');
                 return;
             }
 
-            // Собираем все данные таблицы
+            // Собираем все данные
             const allData = [];
             const rows = document.querySelectorAll('#admin-body tr');
             
@@ -1181,32 +1015,62 @@
                 const rowData = [];
                 const cells = row.querySelectorAll('td');
                 cells.forEach(cell => {
-                    rowData.push(cell.textContent.trim());
+                    if (parseInt(cell.dataset.cellIndex) === 4) {
+                        // Для статуса берем из dataset
+                        rowData.push(cell.dataset.value || cell.textContent);
+                    } else {
+                        rowData.push(cell.textContent.trim());
+                    }
                 });
                 allData.push(rowData);
             });
 
-            // Сохраняем в localStorage
+            // Записываем изменения в журнал
+            adminChangedCells.forEach((data, cellId) => {
+                const rowIndex = data.rowIndex;
+                const cellIndex = data.cellIndex;
+                const adminName = rows[rowIndex]?.children[0]?.textContent || 'Неизвестно';
+                const oldValue = data.cell.dataset.original;
+                const newValue = data.value;
+                
+                if (oldValue !== newValue) {
+                    let fieldName = '';
+                    switch(parseInt(cellIndex)) {
+                        case 0: fieldName = 'Имя'; break;
+                        case 1: fieldName = 'Должность'; break;
+                        case 2: fieldName = 'Email'; break;
+                        case 3: fieldName = 'Телефон'; break;
+                        case 4: fieldName = 'Статус'; break;
+                    }
+                    
+                    addAction('edit', {
+                        adminName: adminName,
+                        field: fieldName,
+                        oldValue: oldValue,
+                        newValue: newValue
+                    });
+                }
+            });
+
+            // Сохраняем
             saveAdminToLocalStorage(allData);
 
-            // Обновляем data-original для измененных ячеек
+            // Обновляем original значения
             adminChangedCells.forEach((data, cellId) => {
-                data.cell.dataset.original = data.value;
+                if (parseInt(data.cellIndex) === 4) {
+                    data.cell.dataset.original = data.cell.dataset.value;
+                } else {
+                    data.cell.dataset.original = data.value;
+                }
             });
 
             adminChangedCells.clear();
             updateAdminSaveButton();
-            updateGlobalSaveStatus();
+            updateSaveIndicator();
             showNotification('Изменения успешно сохранены', 'success');
         });
 
-        // Сохранение данных администраторов в localStorage
-        function saveAdminToLocalStorage(data) {
-            localStorage.setItem('admin_data', JSON.stringify(data));
-            console.log('Данные администраторов сохранены в localStorage');
-        }
-
-        // Отмена изменений администраторов
+        // Отменить изменения
         document.getElementById('cancelAdminChanges').addEventListener('click', function() {
             if (adminChangedCells.size === 0) {
                 showNotification('Нет изменений для отмены', 'info');
@@ -1215,41 +1079,41 @@
 
             if (confirm('Отменить все несохраненные изменения?')) {
                 adminChangedCells.forEach((data, cellId) => {
-                    data.cell.textContent = data.cell.dataset.original;
+                    const cell = data.cell;
+                    if (parseInt(data.cellIndex) === 4) {
+                        // Восстанавливаем статус
+                        const originalValue = cell.dataset.original;
+                        cell.innerHTML = `<span class="status-badge ${originalValue === 'Активен' ? 'active' : 'inactive'}">${originalValue}</span>`;
+                        cell.dataset.value = originalValue;
+                    } else {
+                        cell.textContent = cell.dataset.original;
+                    }
                 });
 
                 adminChangedCells.clear();
                 updateAdminSaveButton();
-                updateGlobalSaveStatus();
+                updateSaveIndicator();
                 showNotification('Изменения отменены', 'info');
             }
         });
 
-        // Обработка клика по ячейке администраторов для редактирования
-        document.getElementById('admin-body').addEventListener('click', function(e) {
-            const cell = e.target.closest('.admin-cell');
-            if (cell && !adminEditMode) {
-                enableAdminEditMode();
-                cell.focus();
-            }
-        });
-
-        // Экспорт администраторов в Excel
+        // Экспорт в Excel
         document.getElementById('exportAdminExcel').addEventListener('click', function() {
             const allData = [];
             
             // Заголовки
-            const headers = [];
-            document.querySelectorAll('#admin-header th').forEach(th => {
-                headers.push(th.textContent);
-            });
+            const headers = ['Имя', 'Должность', 'Email', 'Телефон', 'Статус'];
             allData.push(headers);
             
             // Данные
             document.querySelectorAll('#admin-body tr').forEach(tr => {
                 const row = [];
                 tr.querySelectorAll('td').forEach(td => {
-                    row.push(td.textContent.trim());
+                    if (parseInt(td.dataset.cellIndex) === 4) {
+                        row.push(td.dataset.value || td.textContent);
+                    } else {
+                        row.push(td.textContent.trim());
+                    }
                 });
                 allData.push(row);
             });
@@ -1258,10 +1122,12 @@
             const ws = XLSX.utils.aoa_to_sheet(allData);
             XLSX.utils.book_append_sheet(wb, ws, 'Администраторы');
             XLSX.writeFile(wb, 'Админ.xlsx');
+            
+            addAction('export', { description: 'Экспорт данных в Excel' });
             showNotification('Файл Админ.xlsx экспортирован', 'success');
         });
 
-        // Импорт администраторов из Excel
+        // Импорт из Excel
         document.getElementById('importAdminExcel').addEventListener('click', function() {
             document.getElementById('fileInput').onchange = function(e) {
                 const file = e.target.files[0];
@@ -1269,20 +1135,39 @@
                 
                 reader.onload = function(e) {
                     try {
+                        showLoading(true);
                         const data = new Uint8Array(e.target.result);
                         const workbook = XLSX.read(data, { type: 'array' });
                         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                         const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
                         
-                        // Убираем заголовки если они есть
-                        if (jsonData.length > 0) {
-                            renderAdminTable(jsonData.slice(1)); // Пропускаем первую строку (заголовки)
-                            saveAdminToLocalStorage(jsonData.slice(1));
-                            showNotification('Данные импортированы успешно', 'success');
+                        // Проверяем структуру
+                        if (jsonData.length > 1) {
+                            // Пропускаем заголовки
+                            const importedData = jsonData.slice(1).filter(row => row.length >= 5);
+                            
+                            if (importedData.length > 0) {
+                                renderAdminTable(importedData);
+                                saveAdminToLocalStorage(importedData);
+                                
+                                addAction('import', { 
+                                    description: `Импортировано ${importedData.length} записей из Excel` 
+                                });
+                                
+                                adminChangedCells.clear();
+                                updateAdminSaveButton();
+                                updateSaveIndicator();
+                                updateRecordCount();
+                                showNotification(`Импортировано ${importedData.length} записей`, 'success');
+                            } else {
+                                showNotification('Нет данных для импорта', 'warning');
+                            }
                         }
                     } catch (error) {
                         console.error('Ошибка импорта:', error);
                         showNotification('Ошибка при импорте файла', 'error');
+                    } finally {
+                        showLoading(false);
                     }
                 };
                 
@@ -1293,33 +1178,37 @@
             document.getElementById('fileInput').click();
         });
 
-        // Экспорт tarif.xlsx
-        document.getElementById('exportTarifExcel').addEventListener('click', function() {
-            exportTableToExcel('tarif.xlsx');
+        // Клик по ячейке для редактирования
+        document.getElementById('admin-body').addEventListener('click', function(e) {
+            const cell = e.target.closest('.admin-cell');
+            if (cell && !adminEditMode) {
+                enableAdminEditMode();
+                if (parseInt(cell.dataset.cellIndex) !== 4) {
+                    cell.focus();
+                }
+            }
         });
 
-        // Экспорт Nasos.xlsx
-        document.getElementById('exportNasosExcel').addEventListener('click', function() {
-            exportTableToExcel('Nasos.xlsx');
+        // Обработчики для журнала
+        document.getElementById('refreshActions').addEventListener('click', function() {
+            loadActions();
+            showNotification('Журнал обновлен', 'info');
         });
 
-        // Импорт таблиц из Excel
-        document.getElementById('importTablesExcel').addEventListener('click', function() {
-            showNotification('Функция импорта для таблиц будет добавлена позже', 'warning');
+        document.getElementById('clearActions').addEventListener('click', clearActionsLog);
+
+        document.getElementById('actionFilter').addEventListener('input', function() {
+            const actions = JSON.parse(localStorage.getItem('admin_actions') || '[]');
+            renderActions(actions);
         });
 
-        // Назначаем обработчики для кнопок таблиц
-        document.getElementById('toggleEditMode').addEventListener('click', toggleEditMode);
-        document.getElementById('saveChanges').addEventListener('click', saveAllChanges);
-        document.getElementById('cancelChanges').addEventListener('click', cancelChanges);
-
-        // Инициализация при загрузке страницы
+        // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
-            // Загружаем сохраненные данные для таблиц
-            loadFromLocalStorage();
-            
-            // Загружаем данные администраторов
             loadAdminData();
+            loadActions();
+            
+            // Добавляем начальное действие
+            addAction('info', { description: 'Панель управления открыта' });
             
             // Блокируем вставку форматированного текста
             document.addEventListener('paste', function(e) {
@@ -1330,15 +1219,13 @@
                 }
             });
             
-            // Предотвращаем потерю данных при уходе со страницы
+            // Предупреждение при уходе со страницы
             window.addEventListener('beforeunload', function(e) {
-                if ((isEditMode && changedCells.size > 0) || (adminEditMode && adminChangedCells.size > 0)) {
+                if (adminChangedCells.size > 0) {
                     e.preventDefault();
                     e.returnValue = 'У вас есть несохраненные изменения. Точно покинуть страницу?';
                 }
             });
-
-            showNotification('Панель владельца готова к работе. Все данные сохраняются локально.', 'info');
         });
     </script>
 </body>
