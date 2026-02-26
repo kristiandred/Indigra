@@ -351,108 +351,106 @@
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
     
-    <!-- ИСПРАВЛЕННЫЙ СКРИПТ - теперь ищет по ID таблиц -->
+    <!-- ИСПРАВЛЕННЫЙ СКРИПТ ДЛЯ ЗАГРУЗКИ ЦЕН -->
     <script>
-    function loadPricesFromStorage() {
-        console.log('Загружаем цены из хранилища...');
-        
-        // Проверяем оба возможных ключа от админки
-        const keys = ['price_data_tarif.xlsx', 'price_data_Nasos.xlsx'];
-        let allChanges = {};
-        
-        keys.forEach(key => {
-            const savedData = localStorage.getItem(key);
-            if (savedData) {
-                try {
-                    const changes = JSON.parse(savedData);
-                    allChanges = {...allChanges, ...changes};
-                    console.log(`Загружены данные из ${key}:`, Object.keys(changes).length, 'изменений');
-                } catch (e) {
-                    console.error(`Ошибка загрузки из ${key}:`, e);
-                }
-            }
-        });
-        
-        if (Object.keys(allChanges).length === 0) {
-            console.log('Нет сохраненных изменений');
-            return;
-        }
-        
-        console.log('Все изменения:', allChanges);
-        
-        // Применяем изменения к таблицам
-        let updatedCount = 0;
-        
-        for (const [cellId, value] of Object.entries(allChanges)) {
-            // ID ячейки выглядит как "table-abs-main_1_2"
-            // Разбиваем по последнему подчеркиванию
-            const lastUnderscore = cellId.lastIndexOf('_');
-            if (lastUnderscore === -1) continue;
+        function loadPricesFromStorage() {
+            console.log('Загружаем цены из хранилища...');
             
-            const tableId = cellId.substring(0, lastUnderscore); // "table-abs-main_1"
-            const colIndex = parseInt(cellId.substring(lastUnderscore + 1)); // номер столбца
+            // Проверяем оба возможных ключа от админки
+            const keys = ['price_data_tarif.xlsx', 'price_data_Nasos.xlsx'];
+            let allChanges = {};
             
-            // Теперь разбиваем tableId для получения номера строки
-            const secondLastUnderscore = tableId.lastIndexOf('_');
-            if (secondLastUnderscore === -1) continue;
-            
-            const realTableId = tableId.substring(0, secondLastUnderscore); // "table-abs-main"
-            const rowIndex = parseInt(tableId.substring(secondLastUnderscore + 1)); // номер строки
-            
-            console.log(`Ищем: таблица=${realTableId}, строка=${rowIndex}, колонка=${colIndex}, значение=${value}`);
-            
-            const table = document.getElementById(realTableId);
-            if (table) {
-                const tbody = table.querySelector('tbody');
-                if (tbody) {
-                    const rows = tbody.querySelectorAll('tr');
-                    if (rows[rowIndex]) {
-                        const cells = rows[rowIndex].querySelectorAll('td');
-                        if (cells[colIndex]) {
-                            // Ячейка найдена, обновляем значение
-                            const cell = cells[colIndex];
-                            const priceSpan = cell.querySelector('.badge-price');
-                            if (priceSpan) {
-                                priceSpan.textContent = value;
-                                console.log(`✅ Обновлена цена: ${value}`);
-                            } else {
-                                cell.textContent = value;
-                                console.log(`✅ Обновлен текст: ${value}`);
-                            }
-                            updatedCount++;
-                        } else {
-                            console.log(`❌ Нет колонки ${colIndex} в строке ${rowIndex}`);
-                        }
-                    } else {
-                        console.log(`❌ Нет строки ${rowIndex} в таблице ${realTableId}`);
+            keys.forEach(key => {
+                const savedData = localStorage.getItem(key);
+                if (savedData) {
+                    try {
+                        const changes = JSON.parse(savedData);
+                        allChanges = {...allChanges, ...changes};
+                        console.log(`✅ Загружены данные из ${key}:`, Object.keys(changes).length, 'изменений');
+                    } catch (e) {
+                        console.error(`❌ Ошибка загрузки из ${key}:`, e);
                     }
                 }
-            } else {
-                console.log(`❌ Таблица ${realTableId} не найдена`);
+            });
+            
+            if (Object.keys(allChanges).length === 0) {
+                console.log('ℹ️ Нет сохраненных изменений');
+                return;
             }
+            
+            console.log('📊 Все изменения:', allChanges);
+            
+            // Применяем изменения к таблицам
+            let updatedCount = 0;
+            
+            for (const [cellId, value] of Object.entries(allChanges)) {
+                // ID ячейки выглядит как "table-abs-main_0_1"
+                const parts = cellId.split('_');
+                if (parts.length >= 3) {
+                    // Первые две части - ID таблицы (table-abs-main)
+                    const tableId = parts[0] + '_' + parts[1];
+                    // Третья часть - номер строки
+                    const rowIndex = parseInt(parts[2]);
+                    // Четвертая часть - номер колонки (если есть)
+                    const colIndex = parts.length > 3 ? parseInt(parts[3]) : 0;
+                    
+                    console.log(`🔍 Ищем: таблица=${tableId}, строка=${rowIndex}, колонка=${colIndex}, значение=${value}`);
+                    
+                    const table = document.getElementById(tableId);
+                    if (table) {
+                        const tbody = table.querySelector('tbody');
+                        if (tbody) {
+                            const rows = tbody.querySelectorAll('tr');
+                            if (rows[rowIndex]) {
+                                const cells = rows[rowIndex].querySelectorAll('td');
+                                if (cells[colIndex]) {
+                                    // Ячейка найдена, обновляем значение
+                                    const cell = cells[colIndex];
+                                    const priceSpan = cell.querySelector('.badge-price');
+                                    if (priceSpan) {
+                                        priceSpan.textContent = value;
+                                        console.log(`✅ Обновлена цена в ${tableId}: ${value}`);
+                                    } else {
+                                        cell.textContent = value;
+                                        console.log(`✅ Обновлен текст в ${tableId}: ${value}`);
+                                    }
+                                    updatedCount++;
+                                } else {
+                                    console.log(`❌ Нет колонки ${colIndex} в строке ${rowIndex}`);
+                                }
+                            } else {
+                                console.log(`❌ Нет строки ${rowIndex} в таблице ${tableId}`);
+                            }
+                        } else {
+                            console.log(`❌ В таблице ${tableId} нет tbody`);
+                        }
+                    } else {
+                        console.log(`❌ Таблица ${tableId} не найдена`);
+                    }
+                }
+            }
+            
+            console.log(`🎉 Всего обновлено ${updatedCount} ячеек`);
         }
         
-        console.log(`✅ Всего обновлено ${updatedCount} ячеек`);
-    }
-    
-    // Загружаем при старте
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM загружен, начинаем обновление цен...');
-        setTimeout(loadPricesFromStorage, 500); // Небольшая задержка для гарантии
-    });
-    
-    window.addEventListener('load', function() {
-        console.log('Страница загружена, обновляем цены...');
-        loadPricesFromStorage();
-    });
-    
-    // Следим за изменениями в других вкладках
-    window.addEventListener('storage', function(e) {
-        if (e.key && e.key.startsWith('price_data_')) {
-            console.log('Обнаружены изменения в хранилище, обновляем...');
+        // Загружаем при старте с задержкой для гарантии
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🟢 DOM загружен, начинаем обновление цен...');
+            setTimeout(loadPricesFromStorage, 300);
+        });
+        
+        window.addEventListener('load', function() {
+            console.log('🟢 Страница полностью загружена, обновляем цены...');
             loadPricesFromStorage();
-        }
-    });
-</script>
+        });
+        
+        // Следим за изменениями в других вкладках
+        window.addEventListener('storage', function(e) {
+            if (e.key && e.key.startsWith('price_data_')) {
+                console.log('🔄 Обнаружены изменения в хранилище, обновляем...');
+                loadPricesFromStorage();
+            }
+        });
+    </script>
 </body>
 </html>
