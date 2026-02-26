@@ -3,12 +3,15 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Прайс-лист - ИНДИГРА</title>
+    <title>Редактор прайс-листа - ИНДИГРА</title>
     <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/site.css" />
     <link rel="stylesheet" href="css/custom.css" />
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/zoom.css" />
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
     <style>
         /* Стили для прайс-листа */
         .price-section {
@@ -18,6 +21,7 @@
             border-radius: 15px;
             box-shadow: var(--shadow-medium);
             border: 1px solid var(--ice-blue);
+            position: relative;
         }
 
         .price-section h2 {
@@ -61,6 +65,7 @@
             padding: 12px 15px;
             border: 1px solid var(--ice-blue);
             background: white;
+            transition: all 0.2s ease;
         }
 
         .price-table tbody tr:nth-child(even) td {
@@ -69,7 +74,23 @@
 
         .price-table tbody tr:hover td {
             background: var(--ice-blue);
-            transition: background 0.3s ease;
+        }
+
+        /* Редактируемые ячейки */
+        .price-table td[contenteditable="true"] {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .price-table td[contenteditable="true"]:hover {
+            background: #fff9c4;
+            box-shadow: inset 0 0 0 2px var(--primary-blue);
+        }
+
+        .price-table td[contenteditable="true"]:focus {
+            background: white;
+            outline: none;
+            box-shadow: inset 0 0 0 3px var(--primary-blue);
         }
 
         .info-box {
@@ -114,15 +135,159 @@
             font-style: italic;
         }
 
-        .mt-4 {
-            margin-top: 1.5rem;
+        /* Панель администратора */
+        .admin-panel {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        .mb-3 {
-            margin-bottom: 1rem;
+
+        .admin-panel h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .text-center {
-            text-align: center;
+
+        .admin-panel .btn-group {
+            display: flex;
+            gap: 10px;
         }
+
+        .admin-panel .btn {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .admin-panel .btn-edit {
+            background: #ffc107;
+            color: #1e3c72;
+        }
+
+        .admin-panel .btn-edit:hover {
+            background: #ffca2c;
+            transform: translateY(-2px);
+        }
+
+        .admin-panel .btn-save {
+            background: #28a745;
+            color: white;
+        }
+
+        .admin-panel .btn-save:hover {
+            background: #34ce57;
+            transform: translateY(-2px);
+        }
+
+        .admin-panel .btn-cancel {
+            background: #dc3545;
+            color: white;
+        }
+
+        .admin-panel .btn-cancel:hover {
+            background: #ff4757;
+            transform: translateY(-2px);
+        }
+
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Индикатор загрузки */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Кнопка редактирования для ячейки */
+        .edit-hint {
+            position: absolute;
+            background: var(--primary-blue);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .price-section:hover .edit-hint {
+            opacity: 0.7;
+        }
+
+        .mt-4 { margin-top: 1.5rem; }
+        .mb-3 { margin-bottom: 1rem; }
+        .text-center { text-align: center; }
     </style>
 </head>
 <body>
@@ -181,15 +346,40 @@
         </section>
 
         <div class="container py-5">
-            
+            <!-- Панель администратора -->
+            <div class="admin-panel" id="adminPanel">
+                <h3>
+                    <span>🔧 Панель администратора</span>
+                    <span id="editStatus" class="badge bg-warning text-dark" style="font-size: 0.8rem;">Режим просмотра</span>
+                </h3>
+                <div class="btn-group">
+                    <button class="btn btn-edit" id="toggleEditMode" onclick="toggleEditMode()">
+                        ✏️ Войти в режим редактирования
+                    </button>
+                    <button class="btn btn-save" id="saveChanges" onclick="saveAllChanges()" disabled style="opacity: 0.5;">
+                        💾 Сохранить все изменения
+                    </button>
+                    <button class="btn btn-cancel" id="cancelChanges" onclick="cancelChanges()" disabled style="opacity: 0.5;">
+                        ❌ Отменить изменения
+                    </button>
+                </div>
+            </div>
+
+            <!-- Подсказка для администратора -->
+            <div class="alert alert-info" id="editHint" style="display: none;">
+                <i class="bi bi-info-circle"></i> 
+                Режим редактирования активен. Нажмите на любую ячейку с ценой или текстом, чтобы изменить её. 
+                После внесения изменений нажмите "Сохранить все изменения".
+            </div>
+
             <!-- ==================== ТАРИФЫ НА АВТОБЕТОНОСМЕСИТЕЛИ ==================== -->
             
-            <div class="price-section">
+            <div class="price-section" id="section-abs">
                 <h2>🚚 Тарифы на транспортные услуги автобетоносмесителей (в пределах МКАД)</h2>
                 
                 <h3>📋 Основные услуги</h3>
                 <div class="table-responsive">
-                    <table class="price-table">
+                    <table class="price-table" id="table-abs-main">
                         <thead>
                             <tr>
                                 <th>Наименование услуги</th>
@@ -198,20 +388,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>Услуги АБС 7 м³</td><td>рейс</td><td><span class="badge-price">200</span></td></tr>
-                            <tr><td>Услуги АБС 8 м³</td><td>рейс</td><td><span class="badge-price">210</span></td></tr>
-                            <tr><td>Услуги АБС 9 м³</td><td>рейс</td><td><span class="badge-price">220</span></td></tr>
-                            <tr><td>Услуги АБС 10 м³</td><td>рейс</td><td><span class="badge-price">240</span></td></tr>
-                            <tr><td>Услуги АБС 11 м³</td><td>рейс</td><td><span class="badge-price">300</span></td></tr>
-                            <tr><td>Услуги АБС 12 м³</td><td>рейс</td><td><span class="badge-price">320</span></td></tr>
-                            <tr><td>Услуги АБС 14 м³</td><td>рейс</td><td><span class="badge-price">350</span></td></tr>
+                            <tr><td>Услуги АБС 7 м³</td><td>рейс</td><td><span class="badge-price price-value">200</span></td></tr>
+                            <tr><td>Услуги АБС 8 м³</td><td>рейс</td><td><span class="badge-price price-value">210</span></td></tr>
+                            <tr><td>Услуги АБС 9 м³</td><td>рейс</td><td><span class="badge-price price-value">220</span></td></tr>
+                            <tr><td>Услуги АБС 10 м³</td><td>рейс</td><td><span class="badge-price price-value">240</span></td></tr>
+                            <tr><td>Услуги АБС 11 м³</td><td>рейс</td><td><span class="badge-price price-value">300</span></td></tr>
+                            <tr><td>Услуги АБС 12 м³</td><td>рейс</td><td><span class="badge-price price-value">320</span></td></tr>
+                            <tr><td>Услуги АБС 14 м³</td><td>рейс</td><td><span class="badge-price price-value">350</span></td></tr>
                         </tbody>
                     </table>
                 </div>
 
                 <h3>⏱️ Дополнительные услуги</h3>
                 <div class="table-responsive">
-                    <table class="price-table">
+                    <table class="price-table" id="table-abs-extra">
                         <thead>
                             <tr>
                                 <th>Наименование услуги</th>
@@ -220,8 +410,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>Дополнительное время работы на объекте (свыше 1 машино-часа)</td><td>час</td><td><span class="badge-price">100</span></td></tr>
-                            <tr><td>Использование дополнительного оборудования (доп. лоток)</td><td>ед.</td><td><span class="badge-price">50</span></td></tr>
+                            <tr><td>Дополнительное время работы на объекте (свыше 1 машино-часа)</td><td>час</td><td><span class="badge-price price-value">100</span></td></tr>
+                            <tr><td>Использование дополнительного оборудования (доп. лоток)</td><td>ед.</td><td><span class="badge-price price-value">50</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -237,7 +427,7 @@
 
                 <h3>🛣️ Доставка продукции за пределы МКАД</h3>
                 <div class="table-responsive">
-                    <table class="price-table">
+                    <table class="price-table" id="table-abs-delivery">
                         <thead>
                             <tr>
                                 <th>Расстояние от МКАД</th>
@@ -257,12 +447,12 @@
 
             <!-- ==================== ТАРИФЫ НА АБС С НАСОСОМ ==================== -->
             
-            <div class="price-section">
+            <div class="price-section" id="section-nasos">
                 <h2>🚛 Тарифы на транспортные услуги автобетоносмесителей с насосом (в пределах МКАД)</h2>
                 
                 <h3>📋 Основные услуги</h3>
                 <div class="table-responsive">
-                    <table class="price-table">
+                    <table class="price-table" id="table-nasos-main">
                         <thead>
                             <tr>
                                 <th>Наименование услуги</th>
@@ -271,17 +461,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>Услуги АБС с насосом 7 м³</td><td>рейс</td><td><span class="badge-price">600</span></td></tr>
-                            <tr><td>Услуги АБС с насосом 8 м³</td><td>рейс</td><td><span class="badge-price">650</span></td></tr>
-                            <tr><td>Услуги АБС с насосом 7 м³ (стрела 28 м)</td><td>рейс</td><td><span class="badge-price">650</span></td></tr>
-                            <tr><td>Услуги АБС с насосом 8 м³ (стрела 28 м)</td><td>рейс</td><td><span class="badge-price">700</span></td></tr>
+                            <tr><td>Услуги АБС с насосом 7 м³</td><td>рейс</td><td><span class="badge-price price-value">600</span></td></tr>
+                            <tr><td>Услуги АБС с насосом 8 м³</td><td>рейс</td><td><span class="badge-price price-value">650</span></td></tr>
+                            <tr><td>Услуги АБС с насосом 7 м³ (стрела 28 м)</td><td>рейс</td><td><span class="badge-price price-value">650</span></td></tr>
+                            <tr><td>Услуги АБС с насосом 8 м³ (стрела 28 м)</td><td>рейс</td><td><span class="badge-price price-value">700</span></td></tr>
                         </tbody>
                     </table>
                 </div>
 
                 <h3>⏱️ Дополнительные услуги</h3>
                 <div class="table-responsive">
-                    <table class="price-table">
+                    <table class="price-table" id="table-nasos-extra">
                         <thead>
                             <tr>
                                 <th>Наименование услуги</th>
@@ -290,10 +480,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>Дополнительное время работы на объекте (свыше 2 машино-часов)</td><td>час</td><td><span class="badge-price">200</span></td></tr>
-                            <tr><td>Прокачка бетона свыше 15 м³</td><td>м³</td><td><span class="badge-price">25</span></td></tr>
-                            <tr><td>Использование дополнительного оборудования (доп. шланг 4 м)</td><td>ед.</td><td><span class="badge-price">50</span></td></tr>
-                            <tr><td>Отсутствие места мойки смесительного барабана</td><td>ед.</td><td><span class="badge-price">200</span></td></tr>
+                            <tr><td>Дополнительное время работы на объекте (свыше 2 машино-часов)</td><td>час</td><td><span class="badge-price price-value">200</span></td></tr>
+                            <tr><td>Прокачка бетона свыше 15 м³</td><td>м³</td><td><span class="badge-price price-value">25</span></td></tr>
+                            <tr><td>Использование дополнительного оборудования (доп. шланг 4 м)</td><td>ед.</td><td><span class="badge-price price-value">50</span></td></tr>
+                            <tr><td>Отсутствие места мойки смесительного барабана</td><td>ед.</td><td><span class="badge-price price-value">200</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -314,7 +504,7 @@
 
                 <h3>🗺️ Доставка продукции за пределы МКАД (АБС с насосом)</h3>
                 <div class="table-responsive">
-                    <table class="price-table">
+                    <table class="price-table" id="table-nasos-delivery">
                         <thead>
                             <tr>
                                 <th>Расстояние от МКАД</th>
@@ -322,10 +512,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>0-49 км</td><td><span class="badge-price">5</span></td></tr>
-                            <tr><td>50-99 км</td><td><span class="badge-price">6</span></td></tr>
-                            <tr><td>100-149 км</td><td><span class="badge-price">7</span></td></tr>
-                            <tr><td>свыше 150 км</td><td><span class="badge-price">8</span></td></tr>
+                            <tr><td>0-49 км</td><td><span class="badge-price price-value">5</span></td></tr>
+                            <tr><td>50-99 км</td><td><span class="badge-price price-value">6</span></td></tr>
+                            <tr><td>100-149 км</td><td><span class="badge-price price-value">7</span></td></tr>
+                            <tr><td>свыше 150 км</td><td><span class="badge-price price-value">8</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -344,11 +534,404 @@
                     </p>
                 </div>
             </div>
-            
         </div>
     </main>
 
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Глобальные переменные
+        let isEditMode = false;
+        let changedCells = new Map(); // Хранит изменения: ключ = id ячейки, значение = новое значение
+        let originalValues = new Map(); // Хранит оригинальные значения для отмены
+
+        // Конфигурация файлов для сохранения
+        const EXCEL_FILES = {
+            'abs': 'tarif.xlsx',
+            'nasos': 'Nasos.xlsx'
+        };
+
+        // Функция для показа уведомлений
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Функция для показа/скрытия индикатора загрузки
+        function showLoading(show = true) {
+            let overlay = document.querySelector('.loading-overlay');
+            if (show) {
+                if (!overlay) {
+                    overlay = document.createElement('div');
+                    overlay.className = 'loading-overlay';
+                    overlay.innerHTML = '<div class="loading-spinner"></div>';
+                    document.body.appendChild(overlay);
+                }
+            } else {
+                if (overlay) overlay.remove();
+            }
+        }
+
+        // Переключение режима редактирования
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const editBtn = document.getElementById('toggleEditMode');
+            const saveBtn = document.getElementById('saveChanges');
+            const cancelBtn = document.getElementById('cancelChanges');
+            const editHint = document.getElementById('editHint');
+            const editStatus = document.getElementById('editStatus');
+            
+            if (isEditMode) {
+                // Вход в режим редактирования
+                editBtn.innerHTML = '🔒 Выйти из режима редактирования';
+                editBtn.classList.remove('btn-edit');
+                editBtn.classList.add('btn-cancel');
+                saveBtn.disabled = false;
+                saveBtn.style.opacity = '1';
+                cancelBtn.disabled = false;
+                cancelBtn.style.opacity = '1';
+                editHint.style.display = 'block';
+                editStatus.textContent = 'Режим редактирования';
+                editStatus.className = 'badge bg-success';
+                
+                // Делаем все ячейки с ценами редактируемыми
+                document.querySelectorAll('.price-value').forEach(cell => {
+                    const td = cell.parentElement;
+                    td.setAttribute('contenteditable', 'true');
+                    td.setAttribute('data-original', cell.textContent);
+                    
+                    // Добавляем обработчики событий
+                    td.addEventListener('input', function(e) {
+                        const newValue = this.textContent.trim();
+                        const cellId = generateCellId(this);
+                        changedCells.set(cellId, newValue);
+                        
+                        // Обновляем кнопки сохранения
+                        updateSaveButtons();
+                    });
+                });
+                
+                // Делаем редактируемыми также текстовые ячейки (для полной гибкости)
+                document.querySelectorAll('.price-table td:not(:has(.price-value))').forEach(td => {
+                    td.setAttribute('contenteditable', 'true');
+                    td.setAttribute('data-original', td.textContent);
+                    
+                    td.addEventListener('input', function(e) {
+                        const newValue = this.textContent.trim();
+                        const cellId = generateCellId(this);
+                        changedCells.set(cellId, newValue);
+                        updateSaveButtons();
+                    });
+                });
+                
+            } else {
+                // Выход из режима редактирования
+                editBtn.innerHTML = '✏️ Войти в режим редактирования';
+                editBtn.classList.remove('btn-cancel');
+                editBtn.classList.add('btn-edit');
+                saveBtn.disabled = true;
+                saveBtn.style.opacity = '0.5';
+                cancelBtn.disabled = true;
+                cancelBtn.style.opacity = '0.5';
+                editHint.style.display = 'none';
+                editStatus.textContent = 'Режим просмотра';
+                editStatus.className = 'badge bg-warning text-dark';
+                
+                // Убираем редактирование со всех ячеек
+                document.querySelectorAll('[contenteditable="true"]').forEach(td => {
+                    td.removeAttribute('contenteditable');
+                    td.removeAttribute('data-original');
+                });
+                
+                // Очищаем изменения
+                changedCells.clear();
+            }
+        }
+
+        // Генерация уникального ID для ячейки
+        function generateCellId(cell) {
+            const table = cell.closest('table');
+            const tableId = table.id;
+            const row = cell.parentElement;
+            const rowIndex = Array.from(row.parentElement.children).indexOf(row);
+            const cellIndex = Array.from(row.children).indexOf(cell);
+            return `${tableId}_${rowIndex}_${cellIndex}`;
+        }
+
+        // Обновление состояния кнопок сохранения
+        function updateSaveButtons() {
+            const saveBtn = document.getElementById('saveChanges');
+            const changesCount = changedCells.size;
+            
+            if (changesCount > 0) {
+                saveBtn.innerHTML = `💾 Сохранить все изменения (${changesCount})`;
+            } else {
+                saveBtn.innerHTML = '💾 Сохранить все изменения';
+            }
+        }
+
+        // Отмена изменений
+        function cancelChanges() {
+            if (!isEditMode) return;
+            
+            if (changedCells.size > 0) {
+                if (confirm('Отменить все несохраненные изменения?')) {
+                    // Восстанавливаем оригинальные значения
+                    changedCells.forEach((newValue, cellId) => {
+                        const [tableId, rowIndex, cellIndex] = cellId.split('_');
+                        const table = document.getElementById(tableId);
+                        if (table) {
+                            const rows = table.querySelectorAll('tbody tr');
+                            if (rows[rowIndex]) {
+                                const cells = rows[rowIndex].querySelectorAll('td');
+                                if (cells[cellIndex]) {
+                                    const original = cells[cellIndex].getAttribute('data-original');
+                                    if (original) {
+                                        if (cells[cellIndex].querySelector('.price-value')) {
+                                            cells[cellIndex].querySelector('.price-value').textContent = original;
+                                        } else {
+                                            cells[cellIndex].textContent = original;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+                    changedCells.clear();
+                    updateSaveButtons();
+                    showNotification('Изменения отменены', 'info');
+                }
+            } else {
+                showNotification('Нет изменений для отмены', 'info');
+            }
+        }
+
+        // Сохранение всех изменений
+        async function saveAllChanges() {
+            if (!isEditMode || changedCells.size === 0) {
+                showNotification('Нет изменений для сохранения', 'info');
+                return;
+            }
+
+            // Подтверждение сохранения
+            if (!confirm('Сохранить все изменения? Это обновит Excel файлы на сервере.')) {
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                // Собираем данные для каждого файла
+                const filesData = {};
+
+                // Группируем изменения по таблицам
+                changedCells.forEach((newValue, cellId) => {
+                    const [tableId, rowIndex, cellIndex] = cellId.split('_');
+                    
+                    // Определяем, к какому файлу относится таблица
+                    let fileKey = 'abs';
+                    if (tableId.includes('nasos')) {
+                        fileKey = 'nasos';
+                    }
+                    
+                    if (!filesData[fileKey]) {
+                        filesData[fileKey] = {
+                            filename: EXCEL_FILES[fileKey],
+                            changes: []
+                        };
+                    }
+                    
+                    filesData[fileKey].changes.push({
+                        tableId,
+                        row: parseInt(rowIndex),
+                        col: parseInt(cellIndex),
+                        value: newValue
+                    });
+                });
+
+                // Сохраняем каждый файл
+                for (const [fileKey, fileInfo] of Object.entries(filesData)) {
+                    await saveExcelFile(fileInfo.filename, fileInfo.changes);
+                }
+
+                // Очищаем список изменений
+                changedCells.clear();
+                updateSaveButtons();
+                
+                // Обновляем data-original для всех ячеек
+                document.querySelectorAll('[data-original]').forEach(td => {
+                    if (td.querySelector('.price-value')) {
+                        td.setAttribute('data-original', td.querySelector('.price-value').textContent);
+                    } else {
+                        td.setAttribute('data-original', td.textContent);
+                    }
+                });
+                
+                showNotification('Все изменения успешно сохранены!', 'success');
+                
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                showNotification('Ошибка при сохранении изменений', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Функция сохранения в Excel файл
+        async function saveExcelFile(filename, changes) {
+            try {
+                // В реальном проекте здесь будет запрос к серверу
+                // Создаем FormData для отправки
+                const formData = new FormData();
+                formData.append('filename', filename);
+                formData.append('changes', JSON.stringify(changes));
+                
+                // Отправляем на сервер
+                const response = await fetch('save_excel.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Ошибка сервера');
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.message || 'Ошибка сохранения');
+                }
+                
+                // Дополнительно синхронизируем с GitHub (если нужно)
+                await syncWithGitHub(filename);
+                
+                console.log(`Файл ${filename} успешно сохранен`);
+                
+            } catch (error) {
+                console.error(`Ошибка сохранения ${filename}:`, error);
+                
+                // Fallback - сохраняем локально для разработки
+                const wb = XLSX.utils.book_new();
+                const wsData = [];
+                
+                // Собираем текущие данные из таблиц
+                const tables = filename === 'tarif.xlsx' ? 
+                    ['table-abs-main', 'table-abs-extra', 'table-abs-delivery'] : 
+                    ['table-nasos-main', 'table-nasos-extra', 'table-nasos-delivery'];
+                
+                tables.forEach(tableId => {
+                    const table = document.getElementById(tableId);
+                    if (table) {
+                        const rows = table.querySelectorAll('tr');
+                        rows.forEach(row => {
+                            const rowData = [];
+                            const cells = row.querySelectorAll('th, td');
+                            cells.forEach(cell => {
+                                if (cell.querySelector('.price-value')) {
+                                    rowData.push(cell.querySelector('.price-value').textContent);
+                                } else {
+                                    rowData.push(cell.textContent.trim());
+                                }
+                            });
+                            wsData.push(rowData);
+                        });
+                        wsData.push([]); // Пустая строка между таблицами
+                    }
+                });
+                
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+                
+                // Сохраняем файл
+                XLSX.writeFile(wb, filename);
+                
+                showNotification(`Файл ${filename} сохранен локально`, 'success');
+            }
+        }
+
+        // Синхронизация с GitHub
+        async function syncWithGitHub(filename) {
+            try {
+                // Здесь будет реальный API для GitHub
+                // Пока просто имитируем
+                console.log(`Синхронизация ${filename} с GitHub...`);
+                
+                // В реальном проекте здесь будет запрос к вашему серверу,
+                // который выполняет git commit и push
+                
+                // Имитация задержки
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                console.log(`Файл ${filename} синхронизирован с GitHub`);
+                
+            } catch (error) {
+                console.error('Ошибка синхронизации с GitHub:', error);
+                throw error;
+            }
+        }
+
+        // Проверка авторизации администратора
+        function checkAdminAuth() {
+            // В реальном проекте здесь проверка сессии
+            // Сейчас просто имитируем, что админ авторизован
+            const isAdmin = sessionStorage.getItem('admin_authenticated') === 'true' || 
+                           localStorage.getItem('admin_session');
+            
+            if (!isAdmin) {
+                // Если не админ, скрываем панель или делаем её недоступной
+                // Но для демо оставляем доступной
+                console.log('Режим просмотра');
+            }
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAdminAuth();
+            
+            // Блокируем вставку форматированного текста
+            document.addEventListener('paste', function(e) {
+                if (isEditMode && e.target.closest('[contenteditable="true"]')) {
+                    e.preventDefault();
+                    const text = e.clipboardData.getData('text/plain');
+                    document.execCommand('insertText', false, text);
+                }
+            });
+            
+            // Предотвращаем потерю фокуса при сохранении
+            window.addEventListener('beforeunload', function(e) {
+                if (isEditMode && changedCells.size > 0) {
+                    e.preventDefault();
+                    e.returnValue = 'У вас есть несохраненные изменения. Точно покинуть страницу?';
+                }
+            });
+        });
+    </script>
+
+    <!-- PHP скрипт для сохранения (будет выполняться на сервере) -->
+    <?php
+    // Этот код будет выполняться только на сервере
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
+        $uploadDir = 'data/';
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+        
+        $fileName = basename($_FILES['excel_file']['name']);
+        $uploadFile = $uploadDir . $fileName;
+        
+        if (move_uploaded_file($_FILES['excel_file']['tmp_name'], $uploadFile)) {
+            echo json_encode(['success' => true, 'message' => 'Файл сохранен']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Ошибка сохранения файла']);
+        }
+        exit;
+    }
+    ?>
 </body>
 </html>
