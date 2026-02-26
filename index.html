@@ -9,6 +9,91 @@
     <link rel="stylesheet" href="css/custom.css" />
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/zoom.css" />
+    <style>
+        /* Дополнительные стили для прямоугольных карточек */
+        .concrete-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .concrete-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .concrete-image {
+            height: 200px;
+            overflow: hidden;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .concrete-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        
+        .concrete-card:hover .concrete-image img {
+            transform: scale(1.05);
+        }
+        
+        .concrete-body {
+            padding: 1.25rem;
+            background: #fff;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-top: 1px solid #eee;
+        }
+        
+        .concrete-body h5 {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .concrete-body p {
+            margin-bottom: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .modal-dialog-scrollable .modal-body {
+            padding: 1.5rem;
+        }
+        
+        #concreteCardsContainer .col-md-6,
+        #mortarCardsContainer .col-md-6 {
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .concrete-image {
+                height: 160px;
+            }
+            
+            .concrete-body {
+                padding: 1rem;
+            }
+            
+            .concrete-body h5 {
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -56,7 +141,6 @@
     </header>
 
     <main role="main">
-        <!-- Hero Section -->
         <section class="hero-section" style="background-image: url('images/Узел 1.png');">
             <div class="container">
                 <div class="hero-content">
@@ -76,12 +160,10 @@
             </div>
         </section>
 
-        <!-- Продукция -->
         <section class="products" id="services">
             <div class="container">
                 <h2 class="section-title">НАША ПРОДУКЦИЯ</h2>
                 <div class="row">
-                    <!-- Левый столбик - текст о компании -->
                     <div class="col-lg-6 mb-4">
                         <div class="company-info">
                             <div class="company-features">
@@ -104,7 +186,6 @@
                         </div>
                     </div>
                     
-                    <!-- Правый столбик - карточки материалов -->
                     <div class="col-lg-6 mb-4">
                         <div class="materials-grid">
                             <div class="material-card" onclick="openConcreteModal()">
@@ -113,7 +194,7 @@
                                 </div>
                                 <div class="material-name">Товарный бетон</div>
                             </div>
-                            <div class="material-card" onclick="openMaterialPage('Растворная смесь')">
+                            <div class="material-card" onclick="openMortarModal()">
                                 <div class="material-image">
                                     <img src="images/Растворная смесь.webp" alt="Растворная смесь">
                                 </div>
@@ -143,7 +224,6 @@
             </div>
         </section>
 
-        <!-- Модальное окно выбора типа бетона -->
         <div class="modal fade" id="concreteModal" tabindex="-1" aria-labelledby="concreteModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -165,7 +245,6 @@
             </div>
         </div>
 
-        <!-- Второе модальное окно - карточки бетона -->
         <div class="modal fade" id="concreteCardsModal" tabindex="-1" aria-labelledby="concreteCardsModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
@@ -175,14 +254,27 @@
                     </div>
                     <div class="modal-body">
                         <div id="concreteCardsContainer" class="row g-4">
-                            <!-- Карточки бетона будут добавлены через JavaScript -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Калькулятор -->
+        <div class="modal fade" id="mortarCardsModal" tabindex="-1" aria-labelledby="mortarCardsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="mortarCardsModalLabel">Выберите марку растворной смеси</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="mortarCardsContainer" class="row g-4">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <section class="calculator" id="calculator">
             <div class="container">
                 <h2 class="section-title">РАССЧИТАТЬ СТОИМОСТЬ</h2>
@@ -221,7 +313,6 @@
             </div>
         </section>
 
-        <!-- Контакты -->
         <section class="contacts">
             <div class="container">
                 <h2 class="section-title">КОНТАКТЫ</h2>
@@ -245,7 +336,6 @@
 
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
-   <!-- <script src="js/zoom-sync.js"></script>-->
     <script>
         function calculateTotal() {
             const price = parseInt(document.getElementById('productType').value);
@@ -255,23 +345,19 @@
             document.getElementById('totalPrice').textContent = total.toLocaleString('ru-RU');
         }
 
-        // Функция открытия страницы с информацией о материале
         function openMaterialPage(materialName) {
             window.location.href = `material.html?material=${encodeURIComponent(materialName)}`;
         }
 
-        // Функция открытия модального окна выбора бетона
         function openConcreteModal() {
             const modal = new bootstrap.Modal(document.getElementById('concreteModal'));
             modal.show();
         }
 
-        // Функция выбора типа бетона
         function selectConcreteType(type) {
             const modal = bootstrap.Modal.getInstance(document.getElementById('concreteModal'));
             modal.hide();
             
-            // Данные о бетоне для разных типов
             const concreteData = {
                 gravel: {
                     title: 'Бетон на гравии',
@@ -299,10 +385,8 @@
                 }
             };
             
-            // Устанавливаем заголовок модального окна
             document.getElementById('concreteCardsModalLabel').textContent = concreteData[type].title;
             
-            // Создаем карточки бетона
             const container = document.getElementById('concreteCardsContainer');
             container.innerHTML = '';
             
@@ -323,26 +407,66 @@
                 container.appendChild(col);
             });
             
-            // Открываем второе модальное окно
             setTimeout(() => {
                 const cardsModal = new bootstrap.Modal(document.getElementById('concreteCardsModal'));
                 cardsModal.show();
             }, 300);
         }
         
-        // Функция выбора марки бетона
         function selectConcreteGrade(type, grade) {
             const modal = bootstrap.Modal.getInstance(document.getElementById('concreteCardsModal'));
             modal.hide();
             
-            // Формируем название бетона и открываем страницу с информацией
             const concreteName = `Бетон ${grade}`;
             window.location.href = `material.html?material=${encodeURIComponent(concreteName)}`;
         }
 
-        // Функция показа уведомления
+        function openMortarModal() {
+            const mortarData = {
+                title: 'Растворная смесь',
+                grades: ['РСГП М50', 'РСГП М100', 'РСГП М150', 'РСГП М200'],
+                images: {
+                    'РСГП М50': 'images/РСГП М50.png',
+                    'РСГП М100': 'images/РСГП М100.png',
+                    'РСГП М150': 'images/РСГП М150.png',
+                    'РСГП М200': 'images/РСГП М200.png'
+                }
+            };
+            
+            document.getElementById('mortarCardsModalLabel').textContent = mortarData.title;
+            
+            const container = document.getElementById('mortarCardsContainer');
+            container.innerHTML = '';
+            
+            mortarData.grades.forEach(grade => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 col-lg-4';
+                col.innerHTML = `
+                    <div class="concrete-card" onclick="selectMortarGrade('${grade}')">
+                        <div class="concrete-image">
+                            <img src="${mortarData.images[grade]}" alt="${grade}" onerror="this.src='images/Растворная смесь.webp'">
+                        </div>
+                        <div class="concrete-body">
+                            <h5>${grade}</h5>
+                            <p>Растворная смесь</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+            
+            const cardsModal = new bootstrap.Modal(document.getElementById('mortarCardsModal'));
+            cardsModal.show();
+        }
+
+        function selectMortarGrade(grade) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('mortarCardsModal'));
+            modal.hide();
+            
+            window.location.href = `material.html?material=${encodeURIComponent(grade)}`;
+        }
+
         function showNotification(message) {
-            // Создаем элемент уведомления
             const notification = document.createElement('div');
             notification.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
             notification.style.zIndex = '9999';
@@ -353,7 +477,6 @@
             
             document.body.appendChild(notification);
             
-            // Автоматически закрываем через 3 секунды
             setTimeout(() => {
                 if (notification.parentNode) {
                     notification.remove();
@@ -361,7 +484,6 @@
             }, 3000);
         }
 
-        // Initial calculation
         calculateTotal();
     </script>
 </body>
