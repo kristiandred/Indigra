@@ -3,149 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Услуги - ИНДИГРА</title>
+    <title>О компании - ИНДИГРА</title>
     <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/site.css" />
     <link rel="stylesheet" href="css/custom.css" />
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/zoom.css" />
-    <style>
-        /* Основные стили для нового блока */
-        .transport-section {
-            padding: 60px 0;
-            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-        }
-
-        .transport-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-            padding-bottom: 1rem;
-            text-align: center;
-        }
-
-        .transport-title:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 300px; /* Увеличили ширину полоски */
-            height: 4px; /* Сделали немного толще */
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
-            border-radius: 4px;
-        }
-
-        .transport-subtitle {
-            font-size: 1.2rem;
-            color: #1e3a8a;
-            font-weight: 500;
-            margin-bottom: 1.5rem;
-        }
-
-        .transport-list {
-            list-style: none;
-            padding: 0;
-            margin: 1.5rem 0;
-        }
-
-        .transport-list li {
-            padding: 0.8rem 0;
-            font-size: 1.1rem;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            align-items: flex-start;
-        }
-
-        .transport-list li:before {
-            content: "✓";
-            color: #3b82f6;
-            font-weight: bold;
-            margin-right: 1rem;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        .transport-list strong {
-            color: #1e3a8a;
-            margin-right: 0.3rem;
-        }
-
-        .transport-image {
-            width: 100%;
-            height: auto;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            transition: transform 0.3s ease;
-        }
-
-        .transport-image:hover {
-            transform: scale(1.02);
-        }
-
-        /* Стили для нижнего блока с описанием (на всю ширину) */
-        .transport-description-full {
-            margin-top: 3rem;
-            padding: 2rem;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            border-left: 5px solid #3b82f6;
-            width: 100%;
-        }
-
-        .transport-description-full p {
-            font-size: 1.05rem;
-            line-height: 1.8;
-            color: #2d3748;
-            margin-bottom: 1.2rem;
-        }
-
-        .transport-description-full p:last-child {
-            margin-bottom: 0;
-        }
-
-        .highlight {
-            font-weight: 600;
-            color: #1e3a8a;
-            background: linear-gradient(135deg, #e6f0ff 0%, #d4e5ff 100%);
-            padding: 0.2rem 0.5rem;
-            border-radius: 5px;
-        }
-
-        .phone-highlight {
-            font-weight: 700;
-            color: #3b82f6;
-            font-size: 1.1rem;
-        }
-
-        @media (max-width: 768px) {
-            .transport-title {
-                font-size: 2rem;
-            }
-            
-            .transport-title:after {
-                width: 200px; /* На мобильных тоже увеличили */
-            }
-            
-            .transport-list li {
-                font-size: 1rem;
-            }
-            
-            .transport-image {
-                margin-top: 2rem;
-            }
-            
-            .transport-description-full {
-                padding: 1.5rem;
-            }
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -166,10 +29,10 @@
                             <a class="nav-link" href="index.html">Главная</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="about.html">О компании</a>
+                            <a class="nav-link active" href="about.html">О компании</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="products.html">Услуги</a>
+                            <a class="nav-link" href="products.html">Услуги</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="price.html">Прайс</a>
@@ -193,66 +56,134 @@
     </header>
 
     <main role="main">
-        <!-- Секция с автопарком -->
-        <section class="transport-section">
+        <!-- О компании -->
+        <section class="about-company">
             <div class="container">
-                <!-- Заголовок секции -->
-                <h2 class="transport-title">Наш автопарк</h2>
-                
-                <!-- Верхний ряд: текст слева + картинка справа (параллельно) -->
-                <div class="row align-items-start">
-                    <!-- Левая колонка с текстом -->
-                    <div class="col-lg-6">
-                        <p class="transport-subtitle">
-                            Компания располагает собственным автопарком, состоящим из следующих транспортных средств:
-                        </p>
-                        
-                        <ul class="transport-list">
-                            <li>
-                                <strong>автобетоносмесители (миксеры)</strong> 
-                                объемом от 7 до 10 кубометров;
-                            </li>
-                            <li>
-                                <strong>самосвалы</strong> 
-                                грузоподъемностью от 15 до 30 тонн;
-                            </li>
-                            <li>
-                                <strong>цементовозы</strong> 
-                                грузоподъемность до 20 тонн.
-                            </li>
-                        </ul>
+                <h2 class="section-title">О НАС</h2>
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="about-text">
+                            <h3 class="about-subtitle">ИНДИГРА - ваш надежный партнер в строительстве</h3>
+                            <p class="about-description">
+                                Компания ИНДИГРА является одним из ведущих производителей и поставщиков строительных материалов в Республике Беларусь. Мы работаем на строительном рынке с 2010 года и за это время заслужили репутацию надежного партнера, который всегда выполняет свои обязательства в срок и с высоким качеством.
+                            </p>
+                            <p class="about-description">
+                                Наша миссия - обеспечить строительную отрасль Беларуси качественными материалами, которые соответствуют самым высоким стандартам и требованиям. Мы гордимся тем, что наша продукция используется при строительстве важнейших объектов инфраструктуры страны.
+                            </p>
+                            <div class="company-stats">
+                                <div class="stat-item">
+                                    <div class="stat-number">14+</div>
+                                    <div class="stat-label">Лет на рынке</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">5000+</div>
+                                    <div class="stat-label">Довольных клиентов</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">100+</div>
+                                    <div class="stat-label">Объектов в год</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <!-- Правая колонка с картинкой -->
-                    <div class="col-lg-6">
-                        <img src="images/imgdelivery.png" alt="Автопарк компании" class="transport-image img-fluid">
+                    <div class="col-lg-6 mb-4">
+                        <div class="about-image">
+                            <img src="images/Производство.webp" alt="Производство" class="img-fluid">
+                        </div>
                     </div>
                 </div>
-                
-                <!-- Нижний блок с описанием (на всю ширину) -->
+            </div>
+        </section>
+
+        <!-- Наши преимущества -->
+        <section class="advantages">
+            <div class="container">
+                <h2 class="section-title">НАШИ ПРЕИМУЩЕСТВА</h2>
                 <div class="row">
-                    <div class="col-12">
-                        <div class="transport-description-full">
-                            <p>
-                                <span class="highlight">Среди наших клиентов особенно популярна доставка бетона миксером.</span> 
-                                Такой вид транспортировки гарантирует качество продукции, поскольку внутри автобетоносмесителя 
-                                готовая бетонная смесь непрерывно перемешивается – и в процессе движения, и на остановках. 
-                                Это обеспечивает поддержание кондиции бетона до момента его выгрузки. Благодаря собственному 
-                                транспорту наши цены на доставку бетона по Брянску и Брянской области ниже, чем в целом по рынку.
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="advantage-card">
+                            <div class="advantage-icon">🏭</div>
+                            <h4>Собственное производство</h4>
+                            <p>Полный контроль качества на всех этапах. Современное оборудование и технологии.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="advantage-card">
+                            <div class="advantage-icon">🚚</div>
+                            <h4>Собственный автопарк</h4>
+                            <p>Большой парк техники, включая автобетоносмесители с насосом и спецтехнику.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="advantage-card">
+                            <div class="advantage-icon">📋</div>
+                            <h4>Сертификация</h4>
+                            <p>Вся продукция сертифицирована и соответствует требованиям СТБ.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="advantage-card">
+                            <div class="advantage-icon">⏰</div>
+                            <h4>Соблюдение сроков</h4>
+                            <p>Гарантируем доставку продукции точно в срок. Понимаем важность графиков.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Наша продукция -->
+        <section class="products-overview">
+            <div class="container">
+                <h2 class="section-title">НАША ПРОДУКЦИЯ</h2>
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="product-category">
+                            <div class="category-icon">🏗️</div>
+                            <h3>Бетон и растворы</h3>
+                            <p>Производим товарный бетон марок М100-М600, а также различные виды строительных растворов.</p>
+                            <ul class="product-list">
+                                <li>Товарный бетон различных марок</li>
+                                <li>Кладочные и штукатурные растворы</li>
+                                <li>Строительные смеси</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="product-category">
+                            <div class="category-icon">🪨</div>
+                            <h3>Заполнители</h3>
+                            <p>Поставляем щебень, гравий, песок и другие нерудные материалы для строительства.</p>
+                            <ul class="product-list">
+                                <li>Щебень различных фракций</li>
+                                <li>Гравий и песок</li>
+                                <li>Отсев и смеси</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- География деятельности -->
+        <section class="geography">
+            <div class="container">
+                <h2 class="section-title">ГЕОГРАФИЯ ДЕЯТЕЛЬНОСТИ</h2>
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <div class="geography-content">
+                            <p class="text-center">
+                                Поставляем продукцию во все регионы Республики Беларусь, обеспечивая своевременную доставку 
+                                и качественное обслуживание клиентов по всей стране.
                             </p>
-                            
-                            <p>
-                                Доставка продукции производится на следующий день после оплаты без сбоев и каких-либо проблем. 
-                                Если вы хотите, чтобы бетон был доставлен на площадку в определенное удобное для вас время, 
-                                необходимо подать заявку за сутки. Должен быть обеспечен свободный доступ к месту выгрузки. 
-                                Если имеются какие-то особенности или ограничения по подъездным путям, о них обязательно нужно 
-                                проинформировать заранее, при оформлении заказа.
-                            </p>
-                            
-                            <p style="font-weight: 600; color: #1e3a8a; font-size: 1.1rem; text-align: center; margin-top: 1.5rem;">
-                                Если Вам нужна дополнительная информация, звоните! 
-                                <span class="phone-highlight">Наши менеджеры проконсультируют Вас.</span>
-                            </p>
+                            <div class="regions-grid">
+                                <div class="region-item">📍 Минская обл.</div>
+                                <div class="region-item">📍 Брестская обл.</div>
+                                <div class="region-item">📍 Гомельская обл.</div>
+                                <div class="region-item">📍 Гродненская обл.</div>
+                                <div class="region-item">📍 Могилевская обл.</div>
+                                <div class="region-item">📍 Витебская обл.</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -265,7 +196,7 @@
                 <h2 class="section-title">КОНТАКТЫ</h2>
                 <div class="contact-info">
                     <h4>📍 Адрес</h4>
-                    <p>г. Минск, ул. Монтажников, д. 39</p>
+                    <p>г. Минск, ул. Монтажников, 39</p>
 
                     <h4>📞 Телефон</h4>
                     <p><a href="tel:+375291083083">+375 29 108 30 83</a><br>
@@ -275,7 +206,7 @@
                     <p><a href="mailto:indigra.beton@gmail.com">indigra.beton@gmail.com</a></p>
 
                     <h4>🕐 Режим работы</h4>
-                    <p>Офис: Пн-Пт 9:00-18:00<br>Производство: Пн-Вс 8:00-20:00</p>
+                    <p>Офис: Пн-Пт 9:00-18:00<br>Пр-во: Пн-Вс 8:00-20:00</p>
                 </div>
             </div>
         </section>
@@ -283,5 +214,6 @@
 
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
+  <!-- <script src="js/zoom-sync.js"></script>--> 
 </body>
 </html>
