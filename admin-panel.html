@@ -3,15 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Редактор Excel - ИНДИГРА</title>
+    <title>Прайс-лист - ИНДИГРА</title>
     <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/site.css" />
     <link rel="stylesheet" href="css/custom.css" />
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/zoom.css" />
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js"></script>
     <style>
         /* Стили для прайс-листа */
         .price-section {
@@ -58,7 +55,6 @@
             font-weight: 600;
             text-align: left;
             border: 1px solid rgba(255,255,255,0.1);
-            position: relative;
         }
 
         .price-table td {
@@ -76,11 +72,20 @@
             transition: background 0.3s ease;
         }
 
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+        .info-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 4px solid var(--primary-blue);
+            padding: 20px;
             border-radius: 10px;
-            margin-bottom: 20px;
+            margin: 20px 0;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border-left: 4px solid #c62828;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
         }
 
         .badge-price {
@@ -92,1005 +97,258 @@
             display: inline-block;
         }
 
-        /* Элементы управления столбцами */
-        .col-controls {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            display: flex;
-            gap: 5px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
 
-        th:hover .col-controls {
-            opacity: 1;
-        }
-
-        .col-btn {
-            background: white;
-            border: none;
-            border-radius: 4px;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--primary-blue);
-            font-size: 14px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-        }
-
-        .col-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .col-btn.add-col:hover {
-            background: var(--success-green);
-            color: white;
-        }
-
-        .col-btn.delete-col:hover {
-            background: var(--danger-red);
-            color: white;
-        }
-
-        /* Кнопки добавления строк */
-        .add-row-btn {
-            margin-top: 1rem;
-            background: var(--gradient-success);
-            color: white;
-            border: none;
-            padding: 0.7rem 1.5rem;
+        .note-text {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--gradient-secondary);
             border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+            font-style: italic;
         }
 
-        .add-row-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        .mt-4 {
+            margin-top: 1.5rem;
         }
-
-        /* Редактируемые ячейки */
-        .price-table td.editing {
-            padding: 0;
-        }
-
-        .price-table input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid var(--primary-blue);
-            border-radius: 4px;
-            font-size: 1rem;
-            outline: none;
-            box-sizing: border-box;
-            background: white;
-        }
-
-        .price-table td:hover {
-            background: var(--ice-blue);
-            cursor: pointer;
-        }
-
-        /* Адаптивность */
-        @media (max-width: 768px) {
-            .admin-container {
-                padding: 0 1rem;
-            }
-            
-            .price-section {
-                padding: 15px;
-            }
-            
-            .price-table th,
-            .price-table td {
-                padding: 8px;
-                font-size: 0.9rem;
-            }
-        }
-
-        /* Панель добавления таблиц */
-        .add-table-panel {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            border: 2px dashed var(--primary-blue);
-        }
-
-        .add-table-panel h4 {
-            color: var(--primary-blue);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .form-group {
+        .mb-3 {
             margin-bottom: 1rem;
         }
-
-        .form-group label {
-            font-weight: 600;
-            color: var(--primary-blue);
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px solid var(--ice-blue);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary-blue);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-
-        .btn-primary {
-            background: var(--gradient-primary);
-            border: none;
-            padding: 0.8rem 2rem;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(30, 58, 138, 0.4);
-        }
-
-        /* Модальное окно подтверждения */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-content h4 {
-            color: var(--primary-blue);
-            margin-bottom: 1rem;
-        }
-
-        .modal-content p {
-            margin-bottom: 1.5rem;
-            color: var(--text-gray);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-        }
-
-        /* Уведомления */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            z-index: 2000;
-            animation: slideIn 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .notification.success {
-            background: var(--gradient-success);
-        }
-
-        .notification.error {
-            background: var(--gradient-danger);
-        }
-
-        .notification.info {
-            background: var(--gradient-primary);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* Индикатор загрузки */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .btn-action.sync:hover {
-            background: var(--text-gray);
-        }
-
-        /* Статус синхронизации */
-        .sync-status {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            margin-left: 0.5rem;
-        }
-
-        .sync-status.syncing {
-            background: rgba(255, 193, 7, 0.3);
-            color: #856404;
-        }
-
-        .sync-status.synced {
-            background: rgba(40, 167, 69, 0.3);
-            color: #155724;
-        }
-
-        .sync-status.error {
-            background: rgba(220, 53, 69, 0.3);
-            color: #721c24;
-        }
-
-        /* Адаптивность */
-        @media (max-width: 768px) {
-            .admin-container {
-                padding: 0 1rem;
-            }
-            
-            .price-section {
-                padding: 15px;
-            }
-            
-            .price-table th,
-            .price-table td {
-                padding: 8px;
-                font-size: 0.9rem;
-            }
+        .text-center {
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <div class="container py-5">
-        <!-- Индикатор загрузки -->
-        <div id="loadingIndicator" class="text-center text-white my-5" style="display: none;">
-            <div class="spinner-border text-light" role="status">
-                <span class="visually-hidden">Загрузка...</span>
-            </div>
-            <p class="mt-2">Загрузка данных...</p>
-        </div>
-
-        <!-- Контейнер для таблиц -->
-        <div id="tablesContainer"></div>
-
-        <!-- Панель добавления таблицы (скрыта по умолчанию) -->
-        <div id="addTablePanel" class="add-table-panel" style="display: none;">
-            <h4><i class="bi bi-file-earmark-plus"></i> Создание новой таблицы</h4>
-            <div class="form-group">
-                <label>Название файла (без .xlsx)</label>
-                <input type="text" id="newFileName" class="form-control" placeholder="например: new_table">
-            </div>
-            <div class="form-group">
-                <label>Название таблицы (заголовок)</label>
-                <input type="text" id="newTableTitle" class="form-control" placeholder="например: Моя новая таблица">
-            </div>
-            <div class="form-group">
-                <label>Количество столбцов</label>
-                <input type="number" id="newTableCols" class="form-control" value="3" min="1" max="20">
-            </div>
-            <div class="form-group">
-                <label>Количество строк</label>
-                <input type="number" id="newTableRows" class="form-control" value="5" min="2" max="50">
-            </div>
-            <div class="mt-3">
-                <button class="btn btn-primary me-2" onclick="createNewTable()">
-                    <i class="bi bi-check-lg"></i> Создать
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <div class="navbar-brand-wrapper">
+                    <a class="navbar-brand d-flex align-items-center" href="index.html">
+                        <img src="images/Логотип 1.svg" alt="ИНДИГРА" class="navbar-logo me-2">
+                        <span>ИНДИГРА</span>
+                    </a>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
                 </button>
-                <button class="btn btn-secondary" onclick="hideAddTablePanel()">
-                    <i class="bi bi-x-lg"></i> Отмена
-                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Главная</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="about.html">О компании</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="products.html">Услуги</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="price.html">Прайс</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="delivery.html">Доставка и оплата</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contact.html">Контакты</a>
+                        </li>
+                    </ul>
+                    <div class="ms-lg-3 mt-2 mt-lg-0">
+                        <div class="navbar-phones">
+                            <a href="tel:+375291083083" class="phone-link">📞 +375 29 108-30-83</a>
+                            <a href="tel:+375291697227" class="phone-link">📞 +375 29 169-72-27</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+        </nav>
+    </header>
 
-    <script>
-        // Глобальные переменные
-        let currentEditCell = null;
-        let confirmCallback = null;
+    <main role="main">
+        <!-- Hero Section -->
+        <section class="hero-section delivery-page">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Прайс-лист на транспортные услуги</h1>
+                </div>
+            </div>
+        </section>
 
-        // Показать уведомление
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.innerHTML = message;
-            document.body.appendChild(notification);
+        <div class="container py-5">
             
-            setTimeout(() => {
-                notification.style.animation = 'slideIn 0.3s reverse';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        // Встроенные данные для таблиц (избегаем CORS проблемы)
-        const embeddedData = {
-            'tarif.xlsx': [
-                ['Модель', 'Цена за час', 'Минимальный заказ', 'Описание'],
-                ['АБС 5м³', '5000', '2 часа', 'Автобетоносмеситель 5 кубометров'],
-                ['АБС 7м³', '6000', '2 часа', 'Автобетоносмеситель 7 кубометров'],
-                ['АБС 9м³', '7000', '2 часа', 'Автобетоносмеситель 9 кубометров'],
-                ['', '', '', '']
-            ],
-            'Nasos.xlsx': [
-                ['Модель с насосом', 'Цена за час', 'Дальность подачи', 'Описание'],
-                ['АБС 5м³ + насос', '7000', '2 часа', 'С насосом для подачи бетона'],
-                ['АБС 7м³ + насос', '8000', '2 часа', 'С насосом для подачи бетона'],
-                ['АБС 9м³ + насос', '9000', '2 часа', 'С насосом для подачи бетона'],
-                ['', '', '', '']
-            ],
-            'Админ.xlsx': [
-                ['Категория', 'Значение', 'Примечание'],
-                ['Администратор', 'Иванов И.И.', 'Главный администратор'],
-                ['Телефон', '+7 (999) 123-45-67', 'Рабочий телефон'],
-                ['Email', 'admin@indigra.ru', 'Рабочая почта'],
-                ['', '', '']
-            ]
-        };
-
-        // Загрузка Excel файла (сначала пробуем реальные файлы, потом встроенные данные)
-        async function loadExcelFile(filename) {
-            try {
-                // Сначала пробуем загрузить реальные файлы
-                const response = await fetch(`data/${filename}`);
-                if (response.ok) {
-                    const arrayBuffer = await response.arrayBuffer();
-                    const data = new Uint8Array(arrayBuffer);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const result = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
-                    console.log(`Загружены реальные данные из ${filename}:`, result);
-                    return result;
-                }
-            } catch (error) {
-                console.log(`Не удалось загрузить ${filename}, используем встроенные данные:`, error);
-            }
+            <!-- ==================== ТАРИФЫ НА АВТОБЕТОНОСМЕСИТЕЛИ ==================== -->
             
-            // Если реальные файлы не загрузились, используем встроенные данные
-            if (embeddedData[filename]) {
-                console.log(`Используем встроенные данные для ${filename}`);
-                return embeddedData[filename];
-            }
-            
-            // Возвращаем пустую таблицу если файл не найден
-            return [
-                ['Заголовок 1', 'Заголовок 2', 'Заголовок 3'],
-                ['', '', ''],
-                ['', '', '']
-            ];
-        }
-
-        // Сохранение в Excel файл на сервере
-        async function saveExcelFile(filename, data) {
-            try {
-                showNotification(`Сохранение файла ${filename}...`, 'info');
+            <div class="price-section">
+                <h2>🚚 Тарифы на транспортные услуги автобетоносмесителей (в пределах МКАД)</h2>
                 
-                // Отправляем данные на сервер для сохранения
-                const response = await fetch('save_excel.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        filename: filename,
-                        data: data
-                    })
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Ошибка сервера при сохранении');
-                }
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showNotification(`Файл ${filename} сохранен на сервере`, 'success');
-                    
-                    // Автоматически синхронизируем с GitHub
-                    await syncToGitHub(filename);
-                    
-                    return true;
-                } else {
-                    throw new Error(result.message || 'Ошибка сохранения');
-                }
-            } catch (error) {
-                console.error('Ошибка сохранения:', error);
-                showNotification(`Ошибка при сохранении файла: ${error.message}`, 'error');
-                
-                // Fallback: скачиваем файл локально
-                const wb = XLSX.utils.book_new();
-                const ws = XLSX.utils.aoa_to_sheet(data);
-                XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                
-                const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-                
-                showNotification(`Файл ${filename} скачан локально (сохранение на сервере не удалось)`, 'info');
-                return false;
-            }
-        }
-
-        // Синхронизация с GitHub
-        async function syncToGitHub(filename) {
-            try {
-                showNotification(`Синхронизация ${filename} с GitHub...`, 'info');
-                
-                const response = await fetch('sync_github.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        filename: filename
-                    })
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Ошибка синхронизации с GitHub');
-                }
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showNotification(`${filename} успешно синхронизирован с GitHub`, 'success');
-                    updateSyncStatus(filename, 'synced');
-                } else {
-                    throw new Error(result.message || 'Ошибка синхронизации');
-                }
-            } catch (error) {
-                console.error('Ошибка синхронизации с GitHub:', error);
-                showNotification(`Ошибка синхронизации: ${error.message}`, 'error');
-                updateSyncStatus(filename, 'error');
-            }
-        }
-
-        // Обновление статуса синхронизации
-        function updateSyncStatus(filename, status) {
-            const statusElement = document.getElementById(`sync-status-${filename}`);
-            if (statusElement) {
-                statusElement.className = 'sync-status ' + status;
-                switch(status) {
-                    case 'syncing':
-                        statusElement.innerHTML = '<i class="bi bi-arrow-repeat"></i> Синхронизация...';
-                        break;
-                    case 'synced':
-                        statusElement.innerHTML = '<i class="bi bi-check-circle"></i> Синхронизировано';
-                        break;
-                    case 'error':
-                        statusElement.innerHTML = '<i class="bi bi-exclamation-circle"></i> Ошибка';
-                        break;
-                }
-            }
-        }
-
-        // Автосохранение при изменении ячейки
-        let autoSaveTimeout;
-        function scheduleAutoSave(tableId, filename) {
-            clearTimeout(autoSaveTimeout);
-            autoSaveTimeout = setTimeout(async () => {
-                await saveTable(tableId, filename);
-            }, 2000); // Автосохранение через 2 секунды после изменения
-        }
-
-        // Удаление файла (имитация - в реальном проекте нужен серверный API)
-        async function deleteFile(filename) {
-            try {
-                const response = await fetch('delete_file.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        filename: filename
-                    })
-                });
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    if (result.success) {
-                        showNotification(`Файл ${filename} удален с сервера`, 'success');
-                        await syncToGitHub(filename);
-                        return true;
-                    }
-                }
-                
-                showNotification(`В реальном проекте файл ${filename} был бы удален с сервера`, 'info');
-                return true;
-            } catch (error) {
-                console.error('Ошибка удаления файла:', error);
-                showNotification(`Ошибка удаления файла: ${error.message}`, 'error');
-                return false;
-            }
-        }
-
-        // Начать редактирование ячейки
-        function startEdit(cell, rowIndex, colIndex, tableId, value) {
-            if (currentEditCell) {
-                cancelEdit();
-            }
-            
-            cell.classList.add('editing');
-            cell.innerHTML = `<input type="text" value="${value.replace(/"/g, '&quot;')}" onblur="saveEdit(this, '${tableId}', ${rowIndex}, ${colIndex})" onkeypress="if(event.key==='Enter') this.blur()">`;
-            const input = cell.querySelector('input');
-            input.focus();
-            input.select();
-            currentEditCell = { cell, input, rowIndex, colIndex, tableId };
-        }
-
-        // Сохранить редактирование
-        function saveEdit(input, tableId, rowIndex, colIndex) {
-            const newValue = input.value;
-            const cell = input.parentElement;
-            cell.classList.remove('editing');
-            cell.innerHTML = newValue || '🔹пусто';
-            cell.setAttribute('onclick', `startEdit(this, ${rowIndex}, ${colIndex}, '${tableId}', '${newValue.replace(/'/g, "\\'")}')`);
-            
-            // Обновляем данные в памяти
-            const tableData = window.tableData[tableId];
-            if (tableData && tableData[rowIndex] && tableData[rowIndex][colIndex] !== undefined) {
-                tableData[rowIndex][colIndex] = newValue;
-            }
-            
-            currentEditCell = null;
-            
-            // Планируем автосохранение
-            const filename = window.tableInfo[tableId].filename;
-            scheduleAutoSave(tableId, filename);
-        }
-
-        // Отменить редактирование
-        function cancelEdit() {
-            if (currentEditCell) {
-                const { cell, input, rowIndex, colIndex, tableId, value } = currentEditCell;
-                cell.classList.remove('editing');
-                cell.innerHTML = value || '🔹пусто';
-                cell.setAttribute('onclick', `startEdit(this, ${rowIndex}, ${colIndex}, '${tableId}', '${value.replace(/'/g, "\\'")}')`);
-                currentEditCell = null;
-            }
-        }
-
-        // Добавить строку
-        function addRow(tableId) {
-            const tableData = window.tableData[tableId];
-            if (!tableData) return;
-            
-            const newRow = [];
-            if (tableData.length > 0) {
-                const cols = tableData[0].length;
-                for (let i = 0; i < cols; i++) {
-                    newRow.push('');
-                }
-            }
-            tableData.push(newRow);
-            renderTable(tableId);
-            showNotification('Строка добавлена', 'success');
-            
-            // Планируем автосохранение
-            const filename = window.tableInfo[tableId].filename;
-            scheduleAutoSave(tableId, filename);
-        }
-
-        // Удалить строку
-        function deleteRow(tableId, rowIndex) {
-            const tableData = window.tableData[tableId];
-            if (!tableData || tableData.length <= 1) {
-                showNotification('Нельзя удалить последнюю строку', 'error');
-                return;
-            }
-            
-            tableData.splice(rowIndex, 1);
-            renderTable(tableId);
-            showNotification('Строка удалена', 'success');
-            
-            // Планируем автосохранение
-            const filename = window.tableInfo[tableId].filename;
-            scheduleAutoSave(tableId, filename);
-        }
-
-        // Добавить столбец
-        function addColumn(tableId) {
-            const tableData = window.tableData[tableId];
-            if (!tableData) return;
-            
-            // Добавляем новый столбец в каждую строку
-            tableData.forEach(row => {
-                row.push('');
-            });
-            
-            renderTable(tableId);
-            showNotification('Столбец добавлен', 'success');
-            
-            // Планируем автосохранение
-            const filename = window.tableInfo[tableId].filename;
-            scheduleAutoSave(tableId, filename);
-        }
-
-        // Удалить столбец
-        function deleteColumn(tableId, colIndex) {
-            const tableData = window.tableData[tableId];
-            if (!tableData || tableData[0].length <= 1) {
-                showNotification('Нельзя удалить последний столбец', 'error');
-                return;
-            }
-            
-            // Удаляем столбец из каждой строки
-            tableData.forEach(row => {
-                row.splice(colIndex, 1);
-            });
-            
-            renderTable(tableId);
-            showNotification('Столбец удален', 'success');
-            
-            // Планируем автосохранение
-            const filename = window.tableInfo[tableId].filename;
-            scheduleAutoSave(tableId, filename);
-        }
-
-        // Сохранить таблицу
-        async function saveTable(tableId, filename) {
-            const tableData = window.tableData[tableId];
-            if (!tableData) return;
-            
-            await saveExcelFile(filename, tableData);
-        }
-
-        // Удалить таблицу
-        function deleteTable(tableId, filename) {
-            showConfirmModal(
-                'Удаление таблицы',
-                `Вы уверены, что хотите удалить таблицу "${filename}"?`,
-                async () => {
-                    delete window.tableData[tableId];
-                    await deleteFile(filename);
-                    renderAllTables();
-                    showNotification('Таблица удалена', 'success');
-                }
-            );
-        }
-
-        // Рендеринг одной таблицы
-        function renderTable(tableId) {
-            const tableData = window.tableData[tableId];
-            if (!tableData) return;
-            
-            const container = document.getElementById(`table-${tableId}`);
-            if (!container) return;
-            
-            const { filename, title } = window.tableInfo[tableId];
-            const headers = tableData[0] || [];
-            
-            let html = `
+                <h3>📋 Основные услуги</h3>
                 <div class="table-responsive">
                     <table class="price-table">
                         <thead>
                             <tr>
-            `;
-            
-            // Заголовки с элементами управления
-            headers.forEach((header, colIndex) => {
-                html += `
-                    <th>
-                        ${header || '🔹Заголовок'}
-                        <div class="col-controls">
-                            <button class="col-btn add-col" onclick="addColumn('${tableId}')" title="Добавить столбец">➕</button>
-                            <button class="col-btn delete-col" onclick="deleteColumn('${tableId}', ${colIndex})" title="Удалить столбец">❌</button>
-                        </div>
-                    </th>
-                `;
-            });
-            
-            html += `
+                                <th>Наименование услуги</th>
+                                <th>Ед. изм.</th>
+                                <th>Тариф без НДС, руб.</th>
                             </tr>
                         </thead>
                         <tbody>
-            `;
-            
-            // Строки данных
-            for (let i = 1; i < tableData.length; i++) {
-                const row = tableData[i];
-                html += '<tr>';
-                
-                row.forEach((cell, colIndex) => {
-                    const value = (cell !== null && cell !== undefined) ? String(cell) : '';
-                    html += `
-                        <td onclick="startEdit(this, ${i}, ${colIndex}, '${tableId}', '${value.replace(/'/g, "\\'")}')">
-                            ${value || '🔹пусто'}
-                        </td>
-                    `;
-                });
-                
-                // Кнопка удаления строки
-                html += `
-                    <td style="border: none; background: transparent; width: 40px;">
-                        <button class="col-btn delete-col" onclick="deleteRow('${tableId}', ${i})" title="Удалить строку">❌</button>
-                    </td>
-                `;
-                
-                html += '</tr>';
-            }
-            
-            html += `
+                            <tr><td>Услуги АБС 7 м³</td><td>рейс</td><td><span class="badge-price">200</span></td></tr>
+                            <tr><td>Услуги АБС 8 м³</td><td>рейс</td><td><span class="badge-price">210</span></td></tr>
+                            <tr><td>Услуги АБС 9 м³</td><td>рейс</td><td><span class="badge-price">220</span></td></tr>
+                            <tr><td>Услуги АБС 10 м³</td><td>рейс</td><td><span class="badge-price">240</span></td></tr>
+                            <tr><td>Услуги АБС 11 м³</td><td>рейс</td><td><span class="badge-price">300</span></td></tr>
+                            <tr><td>Услуги АБС 12 м³</td><td>рейс</td><td><span class="badge-price">320</span></td></tr>
+                            <tr><td>Услуги АБС 14 м³</td><td>рейс</td><td><span class="badge-price">350</span></td></tr>
                         </tbody>
                     </table>
                 </div>
-                <button class="add-row-btn" onclick="addRow('${tableId}')">
-                    <i class="bi bi-plus-lg"></i> Добавить строку
-                </button>
-            `;
-            
-            container.innerHTML = html;
-        }
 
-        // Рендеринг всех таблиц
-        function renderAllTables() {
-            const container = document.getElementById('tablesContainer');
-            let html = '';
-            
-            for (const tableId in window.tableData) {
-                const { filename, title } = window.tableInfo[tableId];
-                
-                html += `
-                    <div class="price-section" id="table-${tableId}">
-                        <h2>📊 ${title}</h2>
-                        <h3>📋 Редактирование данных</h3>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <span class="file-name" style="background: var(--gradient-primary); color: white; padding: 5px 10px; border-radius: 20px; font-size: 0.9rem; font-family: monospace;">${filename}</span>
-                            <div style="display: flex; gap: 10px;">
-                                <span id="sync-status-${filename}" class="sync-status synced" style="background: rgba(40, 167, 69, 0.3); color: #155724; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem;">
-                                    <i class="bi bi-check-circle"></i> Синхронизировано
-                                </span>
-                                <button class="btn btn-primary btn-sm" onclick="saveTable('${tableId}', '${filename}')" style="padding: 5px 15px;">
-                                    <i class="bi bi-save"></i> Сохранить
-                                </button>
-                                <button class="btn btn-secondary btn-sm" onclick="syncToGitHub('${filename}')" style="padding: 5px 15px;">
-                                    <i class="bi bi-github"></i> GitHub
-                                </button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteTable('${tableId}', '${filename}')" style="padding: 5px 15px;">
-                                    <i class="bi bi-trash"></i> Удалить
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            container.innerHTML = html;
-            
-            // Заполняем каждую таблицу данными
-            for (const tableId in window.tableData) {
-                renderTable(tableId);
-            }
-        }
-
-        // Показать панель добавления таблицы
-        function showAddTablePanel() {
-            document.getElementById('addTablePanel').style.display = 'block';
-            document.getElementById('newFileName').value = '';
-            document.getElementById('newTableTitle').value = '';
-            document.getElementById('newTableCols').value = '3';
-            document.getElementById('newTableRows').value = '5';
-        }
-
-        // Скрыть панель добавления таблицы
-        function hideAddTablePanel() {
-            document.getElementById('addTablePanel').style.display = 'none';
-        }
-
-        // Создать новую таблицу
-        function createNewTable() {
-            const fileName = document.getElementById('newFileName').value.trim();
-            const tableTitle = document.getElementById('newTableTitle').value.trim();
-            const cols = parseInt(document.getElementById('newTableCols').value);
-            const rows = parseInt(document.getElementById('newTableRows').value);
-            
-            if (!fileName) {
-                showNotification('Введите название файла', 'error');
-                return;
-            }
-            
-            if (!tableTitle) {
-                showNotification('Введите название таблицы', 'error');
-                return;
-            }
-            
-            const fullFileName = fileName.endsWith('.xlsx') ? fileName : fileName + '.xlsx';
-            const tableId = 'table_' + Date.now();
-            
-            // Создаем структуру данных
-            const tableData = [];
-            
-            // Заголовки
-            const headers = [];
-            for (let i = 0; i < cols; i++) {
-                headers.push(`Столбец ${i + 1}`);
-            }
-            tableData.push(headers);
-            
-            // Строки данных
-            for (let i = 0; i < rows - 1; i++) {
-                const row = [];
-                for (let j = 0; j < cols; j++) {
-                    row.push('');
-                }
-                tableData.push(row);
-            }
-            
-            // Сохраняем в глобальные переменные
-            if (!window.tableData) window.tableData = {};
-            if (!window.tableInfo) window.tableInfo = {};
-            
-            window.tableData[tableId] = tableData;
-            window.tableInfo[tableId] = {
-                filename: fullFileName,
-                title: tableTitle
-            };
-            
-            // Сохраняем файл
-            saveExcelFile(fullFileName, tableData);
-            
-            // Перерисовываем
-            renderAllTables();
-            hideAddTablePanel();
-            showNotification('Таблица создана', 'success');
-        }
-
-        // Показать модальное окно подтверждения
-        function showConfirmModal(title, message, onConfirm) {
-            const modal = document.createElement('div');
-            modal.className = 'modal-overlay';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <h4>${title}</h4>
-                    <p>${message}</p>
-                    <div class="modal-actions">
-                        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Отмена</button>
-                        <button class="btn btn-danger" id="confirmBtn">Подтвердить</button>
-                    </div>
+                <h3>⏱️ Дополнительные услуги</h3>
+                <div class="table-responsive">
+                    <table class="price-table">
+                        <thead>
+                            <tr>
+                                <th>Наименование услуги</th>
+                                <th>Ед. изм.</th>
+                                <th>Тариф без НДС, руб.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Дополнительное время работы на объекте (свыше 1 машино-часа)</td><td>час</td><td><span class="badge-price">100</span></td></tr>
+                            <tr><td>Использование дополнительного оборудования (доп. лоток)</td><td>ед.</td><td><span class="badge-price">50</span></td></tr>
+                        </tbody>
+                    </table>
                 </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            document.getElementById('confirmBtn').addEventListener('click', () => {
-                onConfirm();
-                modal.remove();
-            });
-        }
 
-        // Загрузка всех таблиц
-        async function loadAllTables() {
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            loadingIndicator.style.display = 'block';
-            
-            // Список файлов для загрузки (только реальные Excel файлы)
-            const files = ['tarif.xlsx', 'Nasos.xlsx'];
-            window.tableData = {};
-            window.tableInfo = {};
-            
-            for (const file of files) {
-                const data = await loadExcelFile(file);
-                if (data) {
-                    const tableId = 'table_' + file.replace('.', '_');
-                    window.tableData[tableId] = data;
-                    window.tableInfo[tableId] = {
-                        filename: file,
-                        title: file === 'tarif.xlsx' ? 'Тарифы на автобетоносмесители' : 
-                               file === 'Nasos.xlsx' ? 'Тарифы на АБС с насосом' : 'Административная таблица'
-                    };
-                }
-            }
-            
-            loadingIndicator.style.display = 'none';
-            renderAllTables();
-            showNotification('Таблицы загружены (используются встроенные данные)', 'info');
-        }
+                <div class="info-box">
+                    <h4>ℹ️ В стоимость рейса АБС входит:</h4>
+                    <ul class="mb-0">
+                        <li>Доставка продукции от узла до объекта строительства</li>
+                        <li>Работа на объекте 1 машино-час (включая технологическую мойку)</li>
+                        <li>Возврат транспорта на узел</li>
+                    </ul>
+                </div>
 
-        // Проверка авторизации
-        function checkAuth() {
-            const sessionAuth = sessionStorage.getItem('admin_authenticated') === 'true';
-            
-            let localAuth = false;
-            const savedSession = localStorage.getItem('admin_session');
-            if (savedSession) {
-                try {
-                    const session = JSON.parse(savedSession);
-                    const now = new Date().getTime();
-                    if (now - session.timestamp < 30 * 24 * 60 * 60 * 1000) {
-                        localAuth = true;
-                        sessionStorage.setItem('admin_authenticated', 'true');
-                    } else {
-                        localStorage.removeItem('admin_session');
-                    }
-                } catch (e) {
-                    localStorage.removeItem('admin_session');
-                }
-            }
-            
-            if (!sessionAuth && !localAuth) {
-                window.location.href = 'AutorithAdmin.html';
-            }
-        }
+                <h3>🛣️ Доставка продукции за пределы МКАД</h3>
+                <div class="table-responsive">
+                    <table class="price-table">
+                        <thead>
+                            <tr>
+                                <th>Расстояние от МКАД</th>
+                                <th>Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>0-49 км</td><td>Договорной тариф</td></tr>
+                            <tr><td>50-99 км</td><td>Договорной тариф</td></tr>
+                            <tr><td>100-149 км</td><td>Договорной тариф</td></tr>
+                            <tr><td>свыше 150 км</td><td>Договорной тариф</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="note-text">* Точная стоимость доставки за МКАД рассчитывается индивидуально. Обращайтесь к менеджерам!</p>
+            </div>
 
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuth();
-            loadAllTables();
+            <!-- ==================== ТАРИФЫ НА АБС С НАСОСОМ ==================== -->
             
-            // Закрытие модального окна при клике вне его
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('modal-overlay')) {
-                    e.target.remove();
-                }
-            });
+            <div class="price-section">
+                <h2>🚛 Тарифы на транспортные услуги автобетоносмесителей с насосом (в пределах МКАД)</h2>
+                
+                <h3>📋 Основные услуги</h3>
+                <div class="table-responsive">
+                    <table class="price-table">
+                        <thead>
+                            <tr>
+                                <th>Наименование услуги</th>
+                                <th>Ед. изм.</th>
+                                <th>Тариф без НДС, руб.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Услуги АБС с насосом 7 м³</td><td>рейс</td><td><span class="badge-price">600</span></td></tr>
+                            <tr><td>Услуги АБС с насосом 8 м³</td><td>рейс</td><td><span class="badge-price">650</span></td></tr>
+                            <tr><td>Услуги АБС с насосом 7 м³ (стрела 28 м)</td><td>рейс</td><td><span class="badge-price">650</span></td></tr>
+                            <tr><td>Услуги АБС с насосом 8 м³ (стрела 28 м)</td><td>рейс</td><td><span class="badge-price">700</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>⏱️ Дополнительные услуги</h3>
+                <div class="table-responsive">
+                    <table class="price-table">
+                        <thead>
+                            <tr>
+                                <th>Наименование услуги</th>
+                                <th>Ед. изм.</th>
+                                <th>Тариф без НДС, руб.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Дополнительное время работы на объекте (свыше 2 машино-часов)</td><td>час</td><td><span class="badge-price">200</span></td></tr>
+                            <tr><td>Прокачка бетона свыше 15 м³</td><td>м³</td><td><span class="badge-price">25</span></td></tr>
+                            <tr><td>Использование дополнительного оборудования (доп. шланг 4 м)</td><td>ед.</td><td><span class="badge-price">50</span></td></tr>
+                            <tr><td>Отсутствие места мойки смесительного барабана</td><td>ед.</td><td><span class="badge-price">200</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="warning-box">
+                    <h4>⚠️ Важное предупреждение!</h4>
+                    <p class="mb-0"><strong>Отсутствие мойки приемника автобетононасоса - ЗАКАЗЫ НЕ ПРИНИМАЮТСЯ!</strong></p>
+                </div>
+
+                <div class="info-box">
+                    <h4>ℹ️ В стоимость рейса АБС с насосом входит:</h4>
+                    <ul class="mb-0">
+                        <li>Доставка продукции от узла до объекта строительства</li>
+                        <li>Работа на объекте 2 машино-часа (включая заезд на объект, раскладывание стрелы и технологическую мойку)</li>
+                        <li>Возврат транспорта на узел</li>
+                    </ul>
+                </div>
+
+                <h3>🗺️ Доставка продукции за пределы МКАД (АБС с насосом)</h3>
+                <div class="table-responsive">
+                    <table class="price-table">
+                        <thead>
+                            <tr>
+                                <th>Расстояние от МКАД</th>
+                                <th>Тариф за 1 км, руб.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>0-49 км</td><td><span class="badge-price">5</span></td></tr>
+                            <tr><td>50-99 км</td><td><span class="badge-price">6</span></td></tr>
+                            <tr><td>100-149 км</td><td><span class="badge-price">7</span></td></tr>
+                            <tr><td>свыше 150 км</td><td><span class="badge-price">8</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="note-text">* Тариф применяется за каждый километр от МКАД до объекта</p>
+            </div>
+
+            <!-- Контактная информация -->
+            <div class="text-center mt-4">
+                <div class="info-box" style="background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);">
+                    <h3>📞 Для заказа и консультации</h3>
+                    <p style="font-size: 1.2rem; margin-bottom: 10px;">
+                        <strong>+375 29 108-30-83</strong> | <strong>+375 29 169-72-27</strong>
+                    </p>
+                    <p style="font-size: 1rem; margin-bottom: 0;">
+                        <a href="mailto:indigra.beton@gmail.com" style="color: var(--primary-blue);">indigra.beton@gmail.com</a>
+                    </p>
+                </div>
+            </div>
             
-            // Отмена редактирования при клике вне ячейки
-            document.addEventListener('click', function(e) {
-                if (currentEditCell && !e.target.closest('td.editing')) {
-                    cancelEdit();
-                }
-            });
-        });
-    </script>
+        </div>
+    </main>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
