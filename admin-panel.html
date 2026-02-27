@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="css/site.css" />
     <link rel="stylesheet" href="css/custom.css" />
     <link rel="stylesheet" href="css/common.css" />
-    <link rel="stylesheet" href="css/zoom.css" />
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
@@ -210,26 +209,6 @@
         .admin-panel .btn-cancel:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-        }
-
-        .admin-panel .btn-success {
-            background: #17a2b8;
-            color: white;
-        }
-
-        .admin-panel .btn-success:hover {
-            background: #138496;
-            transform: translateY(-2px);
-        }
-
-        .admin-panel .btn-warning {
-            background: #ffc107;
-            color: #1e3c72;
-        }
-
-        .admin-panel .btn-warning:hover {
-            background: #ffca2c;
-            transform: translateY(-2px);
         }
 
         /* Уведомления */
@@ -495,6 +474,8 @@
                 </div>
                 <p class="note-text">* Тариф применяется за каждый километр от МКАД до объекта</p>
             </div>
+
+           
         </div>
     </main>
 
@@ -663,14 +644,14 @@
             }
         }
 
-        // Сохранение всех изменений в localStorage
-        function saveAllChanges() {
+        // Сохранение всех изменений
+        async function saveAllChanges() {
             if (!isEditMode || changedCells.size === 0) {
                 showNotification('Нет изменений для сохранения', 'info');
                 return;
             }
 
-            if (!confirm('Сохранить все изменения локально?')) {
+            if (!confirm('Сохранить все изменения на сервере?')) {
                 return;
             }
 
@@ -696,9 +677,17 @@
                     });
                 });
 
-                // Сохраняем в localStorage
+                // Сохраняем каждый файл
                 for (const [fileName, changes] of changesByFile) {
+                    // Сохраняем в localStorage как временное решение
                     saveToLocalStorage(fileName, changes);
+                    
+                    // Пытаемся сохранить на сервер, но не прерываем процесс если не получается
+                    try {
+                        await saveToServer(fileName, changes);
+                    } catch (error) {
+                        console.warn(`Не удалось сохранить ${fileName} на сервер, данные сохранены локально`, error);
+                    }
                 }
 
                 // Обновляем data-original для всех измененных ячеек
@@ -710,16 +699,11 @@
 
                 changedCells.clear();
                 updateSaveButtonText();
-                
-                // Показываем уведомление
-                showNotification('✅ Изменения успешно сохранены локально!', 'success');
-                
-                // Добавляем кнопки если их нет
-                addActionButtons();
+                showNotification('Изменения успешно сохранены локально!', 'success');
                 
             } catch (error) {
                 console.error('Ошибка сохранения:', error);
-                showNotification('❌ Ошибка при сохранении: ' + error.message, 'error');
+                showNotification('Ошибка при сохранении изменений: ' + error.message, 'error');
             } finally {
                 showLoading(false);
             }
@@ -735,10 +719,77 @@
             });
             
             localStorage.setItem(key, JSON.stringify(savedData));
-            console.log(`✅ Данные сохранены в localStorage для ${fileName}`);
+            console.log(`Данные сохранены в localStorage для ${fileName}`);
         }
 
-        // Загрузка данных из localStorage
+        // Сохранение на сервер
+        async function saveToServer(fileName, changes) {
+            // Собираем все данные из таблиц этого файла
+            const tables = document.querySelectorAll(`table[data-file="${fileName}"]`);
+            const allData = [];
+            
+            tables.forEach(table => {
+                const rows = table.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const rowData = [];
+                    const cells = row.querySelectorAll('th, td');
+                    cells.forEach(cell => {
+                        rowData.push(getCellValue(cell));
+                    });
+                    if (rowData.length > 0) {
+                        allData.push(rowData);
+                    }
+                });
+                // Добавляем пустую строку между таблицами для разделения
+                allData.push([]);
+            });
+
+            // Создаем JSON-строку с данными
+            const dataToSave = {
+                filename: fileName,
+                data: allData,
+                changes: Object.fromEntries(changes.map(c => [c.cellId, c.value])),
+                timestamp: new Date().toISOString()
+            };
+
+            // Пытаемся отправить на сервер через разные методы
+            const saveMethods = [
+                { url: 'save_excel.php', method: 'POST' },
+                { url: 'api/save_excel.php', method: 'POST' },
+                { url: 'admin/save_excel.php', method: 'POST' }
+            ];
+
+            let lastError = null;
+            
+            for (const method of saveMethods) {
+                try {
+                    const response = await fetch(method.url, {
+                        method: method.method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(dataToSave)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            console.log(`Файл ${fileName} сохранен на сервере через ${method.url}`);
+                            return true;
+                        }
+                    }
+                } catch (error) {
+                    lastError = error;
+                    console.log(`Не удалось сохранить через ${method.url}:`, error.message);
+                }
+            }
+
+            // Если не удалось сохранить ни одним методом, сохраняем в localStorage
+            console.warn(`Не удалось сохранить ${fileName} на сервер, данные сохранены в localStorage`);
+            return false;
+        }
+
+        // Загрузка данных из localStorage при загрузке страницы
         function loadFromLocalStorage() {
             const files = ['tarif.xlsx', 'Nasos.xlsx'];
             
@@ -752,12 +803,7 @@
                         
                         // Применяем сохраненные изменения к ячейкам
                         Object.entries(changes).forEach(([cellId, value]) => {
-                            // Парсим cellId (формат: tableId_rowIndex_cellIndex)
-                            const parts = cellId.split('_');
-                            const tableId = parts[0];
-                            const rowIndex = parseInt(parts[1]);
-                            const cellIndex = parseInt(parts[2]);
-                            
+                            const [tableId, rowIndex, cellIndex] = cellId.split('_');
                             const table = document.getElementById(tableId);
                             
                             if (table) {
@@ -772,108 +818,18 @@
                             }
                         });
                         
-                        console.log(`✅ Загружены сохраненные данные для ${fileName}`);
+                        console.log(`Загружены сохраненные данные для ${fileName}`);
                     } catch (error) {
-                        console.error(`❌ Ошибка загрузки данных для ${fileName}:`, error);
+                        console.error(`Ошибка загрузки данных для ${fileName}:`, error);
                     }
                 }
             });
-        }
-
-        // Скачивание Excel файлов
-        function downloadAllExcelFiles() {
-            const files = ['tarif.xlsx', 'Nasos.xlsx'];
-            
-            files.forEach(fileName => {
-                // Собираем данные для файла
-                const tables = document.querySelectorAll(`table[data-file="${fileName}"]`);
-                const wb = XLSX.utils.book_new();
-                
-                tables.forEach((table, index) => {
-                    // Собираем данные из таблицы
-                    const rows = [];
-                    
-                    // Заголовки
-                    const headers = [];
-                    const headerRow = table.querySelectorAll('thead th');
-                    headerRow.forEach(th => headers.push(th.textContent.trim()));
-                    if (headers.length > 0) {
-                        rows.push(headers);
-                    }
-                    
-                    // Данные
-                    const bodyRows = table.querySelectorAll('tbody tr');
-                    bodyRows.forEach(row => {
-                        const rowData = [];
-                        const cells = row.querySelectorAll('td');
-                        cells.forEach(cell => {
-                            rowData.push(getCellValue(cell));
-                        });
-                        if (rowData.length > 0) {
-                            rows.push(rowData);
-                        }
-                    });
-                    
-                    // Создаем лист в книге
-                    const sheetName = index === 0 ? 'Основные' : `Дополнительные_${index}`;
-                    const ws = XLSX.utils.aoa_to_sheet(rows);
-                    XLSX.utils.book_append_sheet(wb, ws, sheetName);
-                });
-                
-                // Сохраняем файл
-                XLSX.writeFile(wb, fileName);
-            });
-            
-            showNotification('📥 Excel файлы успешно скачаны!', 'success');
-        }
-
-        // Очистка всех сохраненных данных
-        function clearAllSavedData() {
-            if (confirm('⚠️ Очистить все сохраненные данные? Это действие нельзя отменить!')) {
-                const files = ['tarif.xlsx', 'Nasos.xlsx'];
-                files.forEach(fileName => {
-                    localStorage.removeItem(`price_data_${fileName}`);
-                });
-                
-                // Перезагружаем страницу для сброса всех значений к исходным
-                location.reload();
-                
-                showNotification('🗑️ Все сохраненные данные очищены', 'info');
-            }
-        }
-
-        // Добавление кнопок действий
-        function addActionButtons() {
-            const adminPanel = document.querySelector('.btn-group');
-            
-            // Проверяем, есть ли уже кнопка скачивания
-            if (!document.getElementById('downloadExcel')) {
-                const downloadBtn = document.createElement('button');
-                downloadBtn.className = 'btn btn-success';
-                downloadBtn.id = 'downloadExcel';
-                downloadBtn.innerHTML = '📥 Скачать Excel';
-                downloadBtn.onclick = downloadAllExcelFiles;
-                adminPanel.appendChild(downloadBtn);
-            }
-            
-            // Проверяем, есть ли уже кнопка очистки
-            if (!document.getElementById('clearData')) {
-                const clearBtn = document.createElement('button');
-                clearBtn.className = 'btn btn-warning';
-                clearBtn.id = 'clearData';
-                clearBtn.innerHTML = '🗑️ Очистить данные';
-                clearBtn.onclick = clearAllSavedData;
-                adminPanel.appendChild(clearBtn);
-            }
         }
 
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
             // Загружаем сохраненные данные
             loadFromLocalStorage();
-            
-            // Добавляем кнопки действий
-            addActionButtons();
             
             // Блокируем вставку форматированного текста
             document.addEventListener('paste', function(e) {
@@ -888,12 +844,16 @@
             window.addEventListener('beforeunload', function(e) {
                 if (isEditMode && changedCells.size > 0) {
                     e.preventDefault();
-                    e.returnValue = '⚠️ У вас есть несохраненные изменения. Точно покинуть страницу?';
+                    e.returnValue = 'У вас есть несохраненные изменения. Точно покинуть страницу?';
                 }
             });
 
-            showNotification('✨ Редактор готов к работе. Данные сохраняются локально.', 'info');
+            showNotification('Редактор готов к работе. Данные сохраняются локально.', 'info');
         });
     </script>
+    <!-- Скрипт для автоматической подгонки ширины страницы -->
+    <script src="js/layout-fixer.js"></script>
 </body>
 </html>
+
+
