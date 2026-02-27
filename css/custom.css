@@ -74,6 +74,13 @@
 
     background-clip: text;
 
+    font-size: 3rem; /* Уменьшили с 3.5rem до 3rem */
+
+}
+
+/* Исключение для страницы products.html - заголовок "Наш автопарк" больше */
+.products-page .hero-title {
+    font-size: 3.3rem; /* Чуть больше для "Наш автопарк" */
 }
 
 
@@ -882,7 +889,13 @@
 
     .delivery-page .hero-title {
 
-        font-size: 2.5rem;
+        font-size: 2.2rem; /* Уменьшили с 2.5rem до 2.2rem */
+
+    }
+
+    .products-page .hero-title {
+
+        font-size: 2.5rem; /* Чуть больше для "Наш автопарк" на мобильных */
 
     }
 
@@ -1094,5 +1107,16 @@
 main[role="main"] {
     margin-left: 0; /* Убеждаемся, что нет отступов слева */
     transform-origin: 0 0; /* Начало трансформации в левом верхнем углу (дублируем из скрипта для надежности) */
+}
+
+/* Дополнительный стиль для заголовка карты с увеличенным отступом */
+.map-title {
+    margin-top: 2rem !important; /* Увеличенный отступ сверху */
+    margin-bottom: 1.5rem !important; /* Сохраняем отступ снизу */
+}
+
+/* Стиль для заголовка "О НАС" с уменьшенным отступом снизу */
+.about-title {
+    margin-bottom: -1.5rem !important; /* Еще меньше отступ снизу */
 }
 
