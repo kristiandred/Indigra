@@ -3,221 +3,97 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Материал - ИНДИГРА</title>
+    <title>Производство и продажа бетона - ИНДИГРА</title>
     <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/site.css" />
     <link rel="stylesheet" href="css/custom.css" />
     <link rel="stylesheet" href="css/common.css" />
     <style>
-        .material-detail {
-            padding: 60px 0;
-        }
-        
-        .material-detail .material-image {
-            width: 70%;
-            height: 380px;
+        /* Дополнительные стили для прямоугольных карточек */
+        .concrete-card {
+            background: #fff;
+            border-radius: 8px;
             overflow: hidden;
-            position: relative;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            margin-bottom: 30px;
-            padding: 0;
-            margin-left: auto;
-            margin-right: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
         
-        .material-detail .material-image img {
+        .concrete-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .concrete-image {
+            height: 180px;
+            width: 100%;
+            overflow: hidden;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        
+        .concrete-image img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            object-position: center;
-            transition: transform 0.5s ease;
-            border-radius: 15px;
-            background: #f8f9fa;
-        }
-        
-        /* Специальные стили для разных материалов */
-        .material-detail .material-image.img-sand img {
             object-fit: cover;
-            object-position: center;
+            transition: transform 0.3s;
         }
         
-        .material-detail .material-image.img-gravel img {
-            object-fit: cover;
-            object-position: left center;
-        }
-        
-        .material-detail .material-image.img-concrete img {
-            object-fit: cover;
-            object-position: center;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: crisp-edges;
-            image-rendering: pixelated;
-            filter: contrast(1.1) brightness(1.05);
-        }
-        
-        .material-detail .material-image:hover img {
+        .concrete-card:hover .concrete-image img {
             transform: scale(1.05);
         }
         
-        .material-title {
-            color: var(--primary-blue);
-            margin-bottom: 30px;
-            font-weight: 700;
-            font-size: 2.5rem;
+        .concrete-body {
+            padding: 1.25rem;
+            background: #fff;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-top: 1px solid #eee;
         }
         
-        .material-info {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-            height: 100%;
-        }
-        
-        .material-info h3 {
-            color: var(--primary-blue);
-            margin: 25px 0 15px 0;
+        .concrete-body h5 {
+            margin-bottom: 0.5rem;
             font-weight: 600;
-            font-size: 1.5rem;
-        }
-        
-        .material-info h3:first-of-type {
-            margin-top: 0;
-        }
-        
-        .material-info ul {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .material-info ul li {
-            padding: 10px 0 10px 25px;
-            position: relative;
-            border-bottom: 1px solid var(--ice-blue);
-        }
-        
-        .material-info ul li:last-child {
-            border-bottom: none;
-        }
-        
-        .material-info ul li:before {
-            content: "✓";
-            color: #28a745;
-            position: absolute;
-            left: 0;
-            font-weight: bold;
-        }
-        
-        .material-order {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 25px;
-        }
-        
-        .material-order p {
-            margin-bottom: 10px;
-        }
-        
-        .material-order a {
-            color: var(--primary-blue);
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
-        .material-order a:hover {
-            text-decoration: underline;
-        }
-        
-        .btn-primary {
-            background: var(--gradient-primary);
-            border: none;
-            padding: 12px 30px;
-            font-weight: 600;
-            margin-top: 15px;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,123,255,0.3);
-        }
-        
-        .contacts {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            padding: 60px 0;
-            margin-top: 40px;
-        }
-        
-        .section-title {
-            text-align: center;
-            color: var(--primary-blue);
-            margin-bottom: 40px;
-            font-weight: 700;
-            font-size: 2rem;
-            position: relative;
-            padding-bottom: 15px;
-        }
-        
-        .section-title:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
-            background: var(--gradient-primary);
-            border-radius: 2px;
-        }
-        
-        .contact-info {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-        }
-        
-        .contact-info h4 {
-            color: var(--primary-blue);
-            margin: 20px 0 10px 0;
-            font-weight: 600;
-        }
-        
-        .contact-info h4:first-of-type {
-            margin-top: 0;
-        }
-        
-        .contact-info p {
-            margin-bottom: 5px;
+            color: #333;
             font-size: 1.1rem;
         }
         
-        .contact-info a {
-            color: var(--primary-blue);
-            text-decoration: none;
-            transition: color 0.3s ease;
+        .concrete-body p {
+            margin-bottom: 0;
+            color: #666;
+            font-size: 0.9rem;
         }
         
-        .contact-info a:hover {
-            color: var(--secondary-blue);
-            text-decoration: underline;
+        .modal-dialog-scrollable .modal-body {
+            padding: 1.5rem;
+        }
+        
+        #concreteCardsContainer .col-md-3,
+        #mortarCardsContainer .col-md-3 {
+            margin-bottom: 1.5rem;
+            max-width: 33.333333%;
+            flex: 0 0 33.333333%;
         }
         
         @media (max-width: 768px) {
-            .material-detail .material-image {
-                height: 300px;
+            .concrete-image {
+                height: 160px;
             }
             
-            .material-title {
-                font-size: 2rem;
+            .concrete-body {
+                padding: 1rem;
             }
             
-            .material-info {
-                margin-top: 30px;
+            .concrete-body h5 {
+                font-size: 1rem;
             }
         }
     </style>
@@ -268,30 +144,172 @@
     </header>
 
     <main role="main">
-        <section class="material-detail">
+        <section class="hero-section" style="background-image: url('images/Узел 1.png');">
             <div class="container">
-                <h1 class="material-title" id="materialTitle">Информация о материале</h1>
+                <div class="hero-content">
+                    <h1 class="hero-title">Бетон с доставкой в Минске</h1>
+                    <div class="hero-features">
+                        <div class="feature-item">✓ Полное соответствие СТБ</div>
+                        <div class="feature-item">✓ Ежедневные проверки качества</div>
+                        <div class="feature-item">✓ Марки бетона от М-100 до М-600</div>
+                        <div class="feature-item">✓ Доставка собственным транспортом</div>
+                        <div class="feature-item">✓ Возможность подачи автобетоносмесителем с насосом</div>
+                    </div>
+                    <div class="hero-buttons">
+                        <a href="#order" class="btn btn-primary btn-lg me-3">Купить бетон</a>
+                        <a href="#services" class="btn btn-outline-light btn-lg">Раствор и услуги</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="products" id="services">
+            <div class="container">
+                <h2 class="section-title">НАША ПРОДУКЦИЯ</h2>
                 <div class="row">
-                    <div class="col-lg-6">
-                        <div class="material-image">
-                            <img id="materialImage" src="images/товарный бетон.webp" alt="Материал" class="img-fluid">
+                    <div class="col-lg-6 mb-4">
+                        <div class="company-info">
+                            <div class="company-features">
+                                <div class="company-feature">
+                                    <div class="feature-text">Надежный поставщик бетона</div>
+                                </div>
+                                <div class="company-feature">
+                                    <div class="feature-text">Собственные производственные мощности</div>
+                                </div>
+                                <div class="company-feature">
+                                    <div class="feature-text">Соблюдение марки и качества</div>
+                                </div>
+                                <div class="company-feature">
+                                    <div class="feature-text">Соблюдение сроков доставки бетона</div>
+                                </div>
+                                <div class="company-feature">
+                                    <div class="feature-text">Современный автопарк, включая: автобетононасосы и автобетоносмесители</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-lg-6">
-                        <div class="material-info">
-                            <div class="material-description" id="materialDescription">
+                    
+                    <div class="col-lg-6 mb-4">
+                        <div class="materials-grid">
+                            <div class="material-card" onclick="openConcreteModal()">
+                                <div class="material-image">
+                                    <img src="images/товарный бетон.webp" alt="Товарный бетон">
+                                </div>
+                                <div class="material-name">Товарный бетон</div>
                             </div>
-                            <div class="material-specifications">
+                            <div class="material-card" onclick="openMortarModal()">
+                                <div class="material-image">
+                                    <img src="images/Растворная смесь.webp" alt="Растворная смесь">
+                                </div>
+                                <div class="material-name">Растворная смесь</div>
                             </div>
-                            <div class="material-order">
-                                <h3>Заказать материал</h3>
-                                <p>Свяжитесь с нами для заказа:</p>
-                                <p>
-                                    <a href="tel:+375291083083">📞 +375 29 108 30 83</a><br>
-                                    <a href="tel:+375291697227">📞 +375 29 169 72 27</a>
-                                </p>
-                                <a href="contact.html" class="btn btn-primary">📝 Отправить заявку</a>
+                            <div class="material-card" onclick="openMaterialPage('Щебень')">
+                                <div class="material-image">
+                                    <img src="images/Щебень.webp" alt="Щебень">
+                                </div>
+                                <div class="material-name">Щебень</div>
                             </div>
+                            <div class="material-card" onclick="openMaterialPage('Песок')">
+                                <div class="material-image">
+                                    <img src="images/Песок.png" alt="Песок">
+                                </div>
+                                <div class="material-name">Песок</div>
+                            </div>
+                            <div class="material-card" onclick="openMaterialPage('Гравий')">
+                                <div class="material-image">
+                                    <img src="images/Гравий.webp" alt="Гравий">
+                                </div>
+                                <div class="material-name">Гравий</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="modal fade" id="concreteModal" tabindex="-1" aria-labelledby="concreteModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="concreteModalLabel">Выберите тип бетона</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-grid gap-3">
+                            <button type="button" class="btn btn-primary btn-lg concrete-option" onclick="selectConcreteType('gravel')">
+                                🏔️ Бетон на гравии
+                            </button>
+                            <button type="button" class="btn btn-primary btn-lg concrete-option" onclick="selectConcreteType('crushed')">
+                                💎 Бетон на щебне
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="concreteCardsModal" tabindex="-1" aria-labelledby="concreteCardsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="concreteCardsModalLabel">Выберите марку бетона</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="concreteCardsContainer" class="row g-4">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="mortarCardsModal" tabindex="-1" aria-labelledby="mortarCardsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="mortarCardsModalLabel">Выберите марку растворной смеси</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="mortarCardsContainer" class="row g-4">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="calculator" id="calculator">
+            <div class="container">
+                <h2 class="section-title">РАССЧИТАТЬ СТОИМОСТЬ</h2>
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="calculator-card p-4">
+                            <form id="calcForm">
+                                <div class="mb-3">
+                                    <label for="productType" class="form-label">Тип бетона</label>
+                                    <select class="form-select" id="productType">
+                                        <option value="3800">Бетон М100-М300 (3 800 ₽/м³)</option>
+                                        <option value="4500">Бетон М350-М500 (4 500 ₽/м³)</option>
+                                        <option value="3200">Раствор кладочный (3 200 ₽/м³)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="volume" class="form-label">Объем, м³</label>
+                                    <input type="number" class="form-control" id="volume" min="1" max="100" value="10">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="delivery" class="form-label">Доставка</label>
+                                    <select class="form-select" id="delivery">
+                                        <option value="0">Самовывоз</option>
+                                        <option value="5000">В пределах города (+5 000 ₽)</option>
+                                        <option value="10000">За городом (+10 000 ₽)</option>
+                                    </select>
+                                </div>
+                                <div class="result mb-3 p-3 bg-light rounded">
+                                    <h5>Итого: <span id="totalPrice">0</span> ₽</h5>
+                                </div>
+                                <button type="button" class="btn btn-primary w-100" onclick="calculateTotal()">Рассчитать</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -306,10 +324,8 @@
                     <p>г. Минск, ул. Монтажников, д. 39</p>
 
                     <h4>📞 Телефон</h4>
-                    <p>
-                        <a href="tel:+375291083083">+375 29 108 30 83</a><br>
-                        <a href="tel:+375291697227">+375 29 169 72 27</a>
-                    </p>
+                    <p><a href="tel:+375291083083">+375 29 108 30 83</a><br>
+                       <a href="tel:+375291697227">+375 29 169 72 27</a></p>
 
                     <h4>📧 Email</h4>
                     <p><a href="mailto:indigra.beton@gmail.com">indigra.beton@gmail.com</a></p>
@@ -324,268 +340,154 @@
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
     <script>
-        function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            var results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        function calculateTotal() {
+            const price = parseInt(document.getElementById('productType').value);
+            const volume = parseInt(document.getElementById('volume').value);
+            const delivery = parseInt(document.getElementById('delivery').value);
+            const total = price * volume + delivery;
+            document.getElementById('totalPrice').textContent = total.toLocaleString('ru-RU');
         }
 
-        const materials = {
-            'Товарный бетон': {
-                title: 'Товарный бетон',
-                image: 'images/товарный бетон.webp',
-                description: 'Товарный бетон - это основа современного строительства. Мы производим бетон различных марок (М100-М600) для любых строительных нужд.',
-                specs: [
-                    'Марки: М100-М600',
-                    'Соответствие СТБ 1037-2013',
-                    'Доставка автобетоносмесителями',
-                    'Возможность подачи с насосом',
-                    'Гарантия качества'
-                ]
-            },
-            'Растворная смесь': {
-                title: 'Растворная смесь',
-                image: 'images/Растворная смесь.webp',
-                description: 'Строительные растворы для кладки, штукатурки и других работ. Готовые смеси с оптимальными характеристиками.',
-                specs: [
-                    'Кладочные растворы М75-М150',
-                    'Штукатурные растворы',
-                    'Готовые к использованию',
-                    'Доставка в миксерах',
-                    'Стабильное качество'
-                ]
-            },
-            'Щебень': {
-                title: 'Щебень',
-                image: 'images/Щебень.webp',
-                description: 'Щебень различных фракций для производства бетона и дорожного строительства. Качественный заполнитель.',
-                specs: [
-                    'Фракции: 5-20, 20-40, 40-70 мм',
-                    'Гранитный и известняковый',
-                    'Соответствие ГОСТ 8267-93',
-                    'Доставка самосвалами',
-                    'Сертифицированная продукция'
-                ]
-            },
-            'Песок': {
-                title: 'Песок',
-                image: 'images/Песок.png',
-                description: 'Строительный песок для бетона, растворов и других строительных нужд. Чистый и качественный материал.',
-                specs: [
-                    'Карьерный и речной песок',
-                    'Различная зернистость',
-                    'Низкое содержание глины',
-                    'Доставка навалом и в мешках',
-                    'Лабораторный контроль'
-                ]
-            },
-            'Гравий': {
-                title: 'Гравий',
-                image: 'images/Гравий.webp',
-                description: 'Природный гравий для строительных работ и ландшафтного дизайна. Экологически чистый материал.',
-                specs: [
-                    'Фракции 5-20, 20-40 мм',
-                    'Овальная форма зерен',
-                    'Высокая прочность',
-                    'Доставка самосвалами',
-                    'Природное происхождение'
-                ]
-            }
-        };
+        function openMaterialPage(materialName) {
+            window.location.href = `material.html?material=${encodeURIComponent(materialName)}`;
+        }
 
-        const concreteGrades = {
-            'Бетон М150': {
-                title: 'Бетон М150',
-                image: 'images/c 8 10 m 150.png',
-                description: 'Бетон - искусственный каменный строительный материал, получаемый в результате формования и затвердевания тщательно перемешанной и уплотнённой смеси из цемента, щебня, песка и воды. Наше предприятие производит большую номенклатуру бетонных смесей как рядового качества, так и бетонов со специальными требованиями и повышенными эксплуатационными качествами.\n\nОсновная сфера применения бетона марки М150 – подготовительные работы в строительстве. С его помощью выполняют строительные работы, которые не требуют высокого качества бетона, а именно, работы, результаты которых не предполагают повышенной нагрузки, температурного или прочего воздействия.\n\nВ частности, этот материал используют заливая каркасы из арматуры на подушках из песка, перед тем, как заливать непосредственно монолитные ленточные фундаменты или плиты. Фундаменты, которые создаются при помощи этого типа бетона, обязательно не должны нести высокой нагрузки, как правило, это небольшие конструкции.',
-                specs: [
-                    'Класс прочности B10',
-                    'Применение: подготовительные работы',
-                    'Морозостойкость F75',
-                    'Подвижность П2-П4',
-                    'Водонепроницаемость W4'
-                ]
-            },
-            'Бетон М200': {
-                title: 'Бетон М200',
-                image: 'images/c 12 15 m 200.png',
-                description: 'Бетон - искусственный каменный строительный материал, получаемый в результате формования и затвердевания тщательно перемешанной и уплотнённой смеси из цемента, щебня, песка и воды. Наше предприятие производит большую номенклатуру бетонных смесей как рядового качества, так и бетонов со специальными требованиями и повышенными эксплуатационными качествами.\n\nПрименение материала очень широко, благодаря, с одной стороны, высоким показателям прочности, с другой – невысокой стоимостью.\n\nВажная сфера применения бетона М200 – при заливке пола бетоном или изготовлении стяжек. Эта марка бетона обладает достаточной для этих работ прочностью, а характер работ (внутри помещения) не требует высоких показателей морозостойкости. Тем не менее, устойчивость бетона достаточна, чтобы противостоять давлению.',
-                specs: [
-                    'Класс прочности B15',
-                    'Применение: фундаменты, отмостки',
-                    'Морозостойкость F100',
-                    'Подвижность П2-П4',
-                    'Водонепроницаемость W4'
-                ]
-            },
-            'Бетон М250': {
-                title: 'Бетон М250',
-                image: 'images/c 16 20 m 250.png',
-                description: 'Бетон - искусственный каменный строительный материал, получаемый в результате формования и затвердевания тщательно перемешанной и уплотнённой смеси из цемента, щебня, песка и воды. Наше предприятие производит большую номенклатуру бетонных смесей как рядового качества, так и бетонов со специальными требованиями и повышенными эксплуатационными качествами.\n\nВажнейшая сфера применения бетона класса В20(M250) – заливка монолитного фундамента. Характеристики этого материала позволяют создать фундамент достаточно высокой прочности.\n\nИз этого типа бетона создают такие элементы здания, как лестничные пролёты, подпорные стены, разнообразные дорожки, перекрытия между этажами здания. Бетон М250 используют для сооружения вспомогательных конструкций – эстакадных опор, оснований для трубопроводов.',
-                specs: [
-                    'Класс прочности B20',
-                    'Применение: монолитные конструкции',
-                    'Морозостойкость F100',
-                    'Подвижность П2-П4',
-                    'Водонепроницаемость W6'
-                ]
-            },
-            'Бетон М300': {
-                title: 'Бетон М300',
-                image: 'images/c 18 22,5 m 300.png',
-                description: 'Бетон - искусственный каменный строительный материал, получаемый в результате формования и затвердевания тщательно перемешанной и уплотнённой смеси из цемента, щебня, песка и воды. Наше предприятие производит большую номенклатуру бетонных смесей как рядового качества, так и бетонов со специальными требованиями и повышенными эксплуатационными качествами.\n\nБетон класса В22,5(M300) обладает большей водонепроницаемостью по сравнению с предыдущими классами. В сочетании с высокой плотностью это позволяет отливать из такого бетона фундаменты, как малоэтажных, так и многоэтажных зданий.\n\nСфера применения чрезвычайно широка. В промышленном строительстве материал подходит для заливки полов. Железобетонные конструкции, выполненные с использованием этого материала, неизменно получаются прочными.',
-                specs: [
-                    'Класс прочности B22.5',
-                    'Применение: ответственные конструкции',
-                    'Морозостойкость F150',
-                    'Подвижность П2-П4',
-                    'Водонепроницаемость W6'
-                ]
-            },
-            'Бетон М350': {
-                title: 'Бетон М350',
-                image: 'images/c 20 25 m 350.png',
-                description: 'Бетон - искусственный каменный строительный материал, получаемый в результате формования и затвердевания тщательно перемешанной и уплотнённой смеси из цемента, щебня, песка и воды. Наше предприятие производит большую номенклатуру бетонных смесей как рядового качества, так и бетонов со специальными требованиями и повышенными эксплуатационными качествами.\n\nПрочный тип бетона класса В25(M350) используется для возведения конструкций, на которые приходятся повышенные нагрузки. Он подходит для возведения практически всех элементов промышленных или жилых зданий.\n\nС этим типом бетона возможна уверенная работа с монолитными фундаментами. Он используется также для строительства прочных железобетонных конструкций, в том числе свайно-ростверковых.',
-                specs: [
-                    'Класс прочности B25',
-                    'Применение: высоконагруженные конструкции',
-                    'Морозостойкость F200',
-                    'Подвижность П2-П4',
-                    'Водонепроницаемость W8'
-                ]
-            },
-            'Бетон М400': {
-                title: 'Бетон М400',
-                image: 'images/c 25 30 m 400.png',
-                description: 'Бетон - искусственный каменный строительный материал, получаемый в результате формования и затвердевания тщательно перемешанной и уплотнённой смеси из цемента, щебня, песка и воды. Наше предприятие производит большую номенклатуру бетонных смесей как рядового качества, так и бетонов со специальными требованиями и повышенными эксплуатационными качествами.\n\nВ силу высоких показателей прочности бетон класса В30(M400) применяется для создания конструкций и сооружений, на которые приходится повышенная нагрузка: ЖБ изделий и конструкций (колонны, ригели, балки, часто несущие элементы).\n\nРаспространено применение материала для строительства мостов и гидротехнических сооружений, так как он обладает не только высокими показателями прочности, но и водонепроницаемости.',
-                specs: [
-                    'Класс прочности B30',
-                    'Применение: особо ответственные конструкции',
-                    'Морозостойкость F200',
-                    'Подвижность П2-П4',
-                    'Водонепроницаемость W10'
-                ]
-            },
-            'Бетон М450': {
-                title: 'Бетон М450',
-                image: 'images/c 28 35 m 450.png',
-                description: 'Бетон - искусственный каменный строительный материал, получаемый в результате формования и затвердевания тщательно перемешанной и уплотнённой смеси из цемента, щебня, песка и воды. Наше предприятие производит большую номенклатуру бетонных смесей как рядового качества, так и бетонов со специальными требованиями и повышенными эксплуатационными качествами.\n\nИспользование настолько прочного материала(M450) целесообразно только для возведения сооружений, на которые оказывается существенное давление механического, климатического и прочих типов. В частности, это строительство в сейсмически активных районах, в условиях серьезных статических и динамических нагрузок, в агрессивных и экстремальных средах.',
-                specs: [
-                    'Класс прочности B35',
-                    'Применение: уникальные конструкции',
-                    'Морозостойкость F300',
-                    'Подвижность П2-П4',
-                    'Водонепроницаемость W12'
-                ]
-            },
-            'Бетон М500': {
-                title: 'Бетон М500',
-                image: 'images/c 30 37 m 500.png',
-                description: 'Бетон - искусственный каменный строительный материал, получаемый в результате формования и затвердевания тщательно перемешанной и уплотнённой смеси из цемента, щебня, песка и воды. Наше предприятие производит большую номенклатуру бетонных смесей как рядового качества, так и бетонов со специальными требованиями и повышенными эксплуатационными качествами.\n\nБлагодаря высокому показателю водонепроницаемости, бетон М500 распространен в строительстве гидротехнических объектов. Дамбы, плотины, бассейны, аквапарки требуют от материала не только повышенной прочности, но и высокой сопротивляемости водной стихии.',
-                specs: [
-                    'Класс прочности B40',
-                    'Применение: самые ответственные конструкции',
-                    'Морозостойкость F300',
-                    'Подвижность П2-П4',
-                    'Водонепроницаемость W14'
-                ]
-            }
-        };
+        function openConcreteModal() {
+            const modal = new bootstrap.Modal(document.getElementById('concreteModal'));
+            modal.show();
+        }
 
-        const mortarGrades = {
-            'РСГП М50': {
-                title: 'Раствор кладочный тяжелый М50',
-                image: 'images/РСГП М50.png',
-                description: 'Строительный раствор - искусственный каменный строительный материал, получаемый в результате затвердевания оптимально подобранной смеси из цемента, песка, воды и специальных добавок. В современном строительстве не обойтись без цементно-песчаных растворов. Они используются для кирпичной и каменной кладки, оштукатуривания цоколей и стен зданий, заливки стяжек пола.\n\nЦементный раствор M 50 используется для:\n- кладки кирпича или блоков при возведении стен;\n- устройства стяжки пола и отделки поверхностей;\n- монтажа плит перекрытий и других монолитных конструкций;\n- армирования бетонных изделий.',
-                specs: [
-                    'Марка по прочности: М50',
-                    'Класс по прочности: В3.5',
-                    'Морозостойкость: F35',
-                    'Подвижность: Пк2-Пк3',
-                    'Водонепроницаемость: W2',
-                    'Соответствие СТБ 1307-2012'
-                ]
-            },
-            'РСГП М100': {
-                title: 'Раствор кладочный тяжелый М100',
-                image: 'images/РСГП М100.png',
-                description: 'Строительный раствор - искусственный каменный строительный материал, получаемый в результате затвердевания оптимально подобранной смеси из цемента, песка, воды и специальных добавок. В современном строительстве не обойтись без цементно-песчаных растворов. Они используются для кирпичной и каменной кладки, оштукатуривания цоколей и стен зданий, заливки стяжек пола.\n\nСфера применения бетонной смеси М-100:\n- кладочные работы: прокладка кирпича или блоков;\n- формирования тротуаров;\n- чернового оштукатуривания стен;\n- устройство стяжки полов и отделка помещений;\n- армирование и монтирование монолитных конструкций;\n- ремонтные работы и усиление структур.',
-                specs: [
-                    'Марка по прочности: М100',
-                    'Класс по прочности: В7.5',
-                    'Морозостойкость: F50',
-                    'Подвижность: Пк2-Пк3',
-                    'Водонепроницаемость: W4',
-                    'Соответствие СТБ 1307-2012'
-                ]
-            },
-            'РСГП М150': {
-                title: 'Раствор кладочный тяжелый М150',
-                image: 'images/РСГП М150.png',
-                description: 'Строительный раствор - искусственный каменный строительный материал, получаемый в результате затвердевания оптимально подобранной смеси из цемента, песка, воды и специальных добавок. В современном строительстве не обойтись без цементно-песчаных растворов. Они используются для кирпичной и каменной кладки, оштукатуривания цоколей и стен зданий, заливки стяжек пола.\n\nГде используется раствор М150?\n- Первичном оштукатуривании стен;\n- Заливки полов внутри помещений;\n- Строительстве монолитных фундаментов;\n- Бетонировании столбов;\n- Заделывании швов в железобетонных сооружениях;\n- Укладке дорожных покрытий.',
-                specs: [
-                    'Марка по прочности: М150',
-                    'Класс по прочности: В12.5',
-                    'Морозостойкость: F75',
-                    'Подвижность: Пк2-Пк3',
-                    'Водонепроницаемость: W6',
-                    'Соответствие СТБ 1307-2012'
-                ]
-            },
-            'РСГП М200': {
-                title: 'Раствор кладочный тяжелый М200',
-                image: 'images/РСГП М200.png',
-                description: 'Строительный раствор - искусственный каменный строительный материал, получаемый в результате затвердевания оптимально подобранной смеси из цемента, песка, воды и специальных добавок. В современном строительстве не обойтись без цементно-песчаных растворов. Они используются для кирпичной и каменной кладки, оштукатуривания цоколей и стен зданий, заливки стяжек пола.\n\nРаствор М200 используется для решения множества строительных задач, таких как: кладка кирпичей и блоков, возведение стен, монтаж перегородок, заполнение швов, создание Цокольного уровня и многое другое. Основным преимуществом раствора М200 является его универсальность и высокое качество сцепления материалов.',
-                specs: [
-                    'Марка по прочности: М200',
-                    'Класс по прочности: В15',
-                    'Морозостойкость: F100',
-                    'Подвижность: Пк2-Пк3',
-                    'Водонепроницаемость: W8',
-                    'Соответствие СТБ 1307-2012'
-                ]
-            }
-        };
-
-        $(document).ready(function() {
-            const materialName = getUrlParameter('material');
-            const material = materials[materialName] || concreteGrades[materialName] || mortarGrades[materialName];
+        function selectConcreteType(type) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('concreteModal'));
+            modal.hide();
             
-            if (material) {
-                $('#materialTitle').text(material.title);
-                $('#materialImage').attr('src', material.image);
-                
-                // Применяем специальные классы для разных материалов
-                const imageContainer = $('.material-image');
-                imageContainer.removeClass('img-sand img-gravel img-concrete');
-                
-                if (materialName.includes('Песок')) {
-                    imageContainer.addClass('img-sand');
-                } else if (materialName.includes('Гравий')) {
-                    imageContainer.addClass('img-gravel');
-                } else if (materialName.includes('Бетон') || materialName.includes('бетон')) {
-                    imageContainer.addClass('img-concrete');
+            const concreteData = {
+                gravel: {
+                    title: 'Бетон на гравии',
+                    grades: ['М150', 'М200', 'М250', 'М300'],
+                    images: {
+                        'М150': 'images/c 8 10 m 150.png',
+                        'М200': 'images/c 12 15 m 200.png',
+                        'М250': 'images/c 16 20 m 250.png',
+                        'М300': 'images/c 18 22,5 m 300.png'
+                    }
+                },
+                crushed: {
+                    title: 'Бетон на гранитном щебне',
+                    grades: ['М150', 'М200', 'М250', 'М300', 'М350', 'М400', 'М450', 'М500'],
+                    images: {
+                        'М150': 'images/c 8 10 m 150.png',
+                        'М200': 'images/c 12 15 m 200.png',
+                        'М250': 'images/c 16 20 m 250.png',
+                        'М300': 'images/c 18 22,5 m 300.png',
+                        'М350': 'images/c 20 25 m 350.png',
+                        'М400': 'images/c 25 30 m 400.png',
+                        'М450': 'images/c 28 35 m 450.png',
+                        'М500': 'images/c 30 37 m 500.png'
+                    }
                 }
-                
-                const formattedDescription = material.description.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
-                $('#materialDescription').html(`
-                    <h3>Описание</h3>
-                    <p>${formattedDescription}</p>
-                `);
-                
-                let specsHtml = '<h3>Характеристики</h3><ul>';
-                material.specs.forEach(spec => {
-                    specsHtml += `<li>${spec}</li>`;
-                });
-                specsHtml += '</ul>';
-                $('.material-specifications').html(specsHtml);
-            } else {
-                $('#materialTitle').text('Материал не найден');
-                $('#materialDescription').html('<p>Извините, запрошенный материал не найден.</p>');
-                $('.material-specifications').empty();
-            }
-        });
+            };
+            
+            document.getElementById('concreteCardsModalLabel').textContent = concreteData[type].title;
+            
+            const container = document.getElementById('concreteCardsContainer');
+            container.innerHTML = '';
+            
+            concreteData[type].grades.forEach(grade => {
+                const col = document.createElement('div');
+                col.className = 'col-md-3';
+                col.innerHTML = `
+                    <div class="concrete-card" onclick="selectConcreteGrade('${type}', '${grade}')">
+                        <div class="concrete-image">
+                            <img src="${concreteData[type].images[grade]}" alt="${grade}" onerror="this.src='images/товарный бетон.webp'">
+                        </div>
+                        <div class="concrete-body">
+                            <h5>${grade}</h5>
+                            <p>${concreteData[type].title}</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+            
+            setTimeout(() => {
+                const cardsModal = new bootstrap.Modal(document.getElementById('concreteCardsModal'));
+                cardsModal.show();
+            }, 300);
+        }
+        
+        function selectConcreteGrade(type, grade) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('concreteCardsModal'));
+            modal.hide();
+            
+            const concreteName = `Бетон ${grade}`;
+            window.location.href = `material.html?material=${encodeURIComponent(concreteName)}`;
+        }
+
+        function openMortarModal() {
+            const mortarData = {
+                title: 'Растворная смесь',
+                grades: ['РСГП М50', 'РСГП М100', 'РСГП М150', 'РСГП М200'],
+                images: {
+                    'РСГП М50': 'images/РСГП М50.png',
+                    'РСГП М100': 'images/РСГП М100.png',
+                    'РСГП М150': 'images/РСГП М150.png',
+                    'РСГП М200': 'images/РСГП М200.png'
+                }
+            };
+            
+            document.getElementById('mortarCardsModalLabel').textContent = mortarData.title;
+            
+            const container = document.getElementById('mortarCardsContainer');
+            container.innerHTML = '';
+            
+            mortarData.grades.forEach(grade => {
+                const col = document.createElement('div');
+                col.className = 'col-md-3';
+                col.innerHTML = `
+                    <div class="concrete-card" onclick="selectMortarGrade('${grade}')">
+                        <div class="concrete-image">
+                            <img src="${mortarData.images[grade]}" alt="${grade}" onerror="this.src='images/Растворная смесь.webp'">
+                        </div>
+                        <div class="concrete-body">
+                            <h5>${grade}</h5>
+                            <p>Растворная смесь</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+            
+            const cardsModal = new bootstrap.Modal(document.getElementById('mortarCardsModal'));
+            cardsModal.show();
+        }
+
+        function selectMortarGrade(grade) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('mortarCardsModal'));
+            modal.hide();
+            
+            window.location.href = `material.html?material=${encodeURIComponent(grade)}`;
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+            notification.style.zIndex = '9999';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+
+        calculateTotal();
     </script>
     <!-- Скрипт для автоматической подгонки ширины страницы -->
     <script src="js/layout-fixer.js"></script>
