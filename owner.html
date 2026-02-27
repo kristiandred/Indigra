@@ -699,466 +699,448 @@
     <!-- Невидимый input для загрузки файлов -->
     <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" />
 
-    <script>
-        // Глобальные переменные
-        let adminChangedCells = new Map();
-        let adminEditMode = false;
-        let currentUser = 'Владелец'; // Имя текущего пользователя
+   <script>
+    // Глобальные переменные
+    let adminChangedCells = new Map();
+    let adminEditMode = false;
+    let currentUser = 'Владелец';
 
-        // ========== ФУНКЦИИ ДЛЯ БЕЗОПАСНОГО ХРАНЕНИЯ ПАРОЛЕЙ ==========
+    // ========== ФУНКЦИИ ДЛЯ УВЕДОМЛЕНИЙ И ЗАГРУЗКИ ==========
 
-        // Простая функция хеширования (для демонстрации)
-        function hashPassword(password) {
-            // В реальном приложении используйте bcrypt или другие надежные методы
-            let hash = 0;
-            for (let i = 0; i < password.length; i++) {
-                const char = password.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash; // Преобразование в 32-bit integer
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideIn 0.3s reverse';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    function showLoading(show = true) {
+        let overlay = document.querySelector('.loading-overlay');
+        if (show) {
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.className = 'loading-overlay';
+                overlay.innerHTML = '<div class="loading-spinner"></div>';
+                document.body.appendChild(overlay);
             }
-            return btoa(hash.toString()).replace(/[^a-zA-Z0-9]/g, '');
+        } else {
+            if (overlay) overlay.remove();
         }
+    }
 
-        // Проверка пароля
-        function verifyPassword(password, hashedPassword) {
-            return hashPassword(password) === hashedPassword;
+    function updateSaveIndicator() {
+        const dot = document.getElementById('saveIndicatorDot');
+        const text = document.getElementById('saveIndicatorText');
+        
+        if (adminChangedCells.size > 0) {
+            dot.className = 'save-indicator-dot modified';
+            text.textContent = 'Есть несохраненные изменения';
+        } else {
+            dot.className = 'save-indicator-dot saved';
+            text.textContent = 'Все изменения сохранены';
         }
+    }
 
-        // Сохранение администратора с хешированием пароля
-        function saveAdminWithPassword(adminData, plainPassword = null) {
-            // Если есть пароль в открытом виде, хешируем его
-            if (plainPassword && adminData.length >= 3) {
-                adminData[2] = hashPassword(plainPassword); // Email поле используем для хранения хеша
-                adminData[2] = adminData[2].replace(/@/g, '#'); // Меняем @ на # для индикации хеша
-            }
-            return adminData;
-        }
+    function updateRecordCount() {
+        const count = document.querySelectorAll('#admin-body tr').length;
+        document.getElementById('recordCount').textContent = `${count} записей`;
+    }
 
-        // Показать уведомление
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideIn 0.3s reverse';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
+    // ========== ФУНКЦИИ ДЛЯ ЖУРНАЛА ДЕЙСТВИЙ ==========
 
-        // Показать/скрыть загрузку
-        function showLoading(show = true) {
-            let overlay = document.querySelector('.loading-overlay');
-            if (show) {
-                if (!overlay) {
-                    overlay = document.createElement('div');
-                    overlay.className = 'loading-overlay';
-                    overlay.innerHTML = '<div class="loading-spinner"></div>';
-                    document.body.appendChild(overlay);
-                }
-            } else {
-                if (overlay) overlay.remove();
-            }
-        }
+    function loadActions() {
+        const actions = JSON.parse(localStorage.getItem('admin_actions') || '[]');
+        renderActions(actions);
+    }
 
-        // Обновить индикатор сохранения
-        function updateSaveIndicator() {
-            const dot = document.getElementById('saveIndicatorDot');
-            const text = document.getElementById('saveIndicatorText');
-            
-            if (adminChangedCells.size > 0) {
-                dot.className = 'save-indicator-dot modified';
-                text.textContent = 'Есть несохраненные изменения';
-            } else {
-                dot.className = 'save-indicator-dot saved';
-                text.textContent = 'Все изменения сохранены';
-            }
-        }
+    function addAction(actionType, details) {
+        const actions = JSON.parse(localStorage.getItem('admin_actions') || '[]');
+        
+        const newAction = {
+            id: Date.now() + Math.random(),
+            timestamp: new Date().toISOString(),
+            user: currentUser,
+            type: actionType,
+            details: details
+        };
+        
+        actions.unshift(newAction);
+        localStorage.setItem('admin_actions', JSON.stringify(actions));
+        renderActions(actions);
+        return newAction;
+    }
 
-        // Обновить счетчик записей
-        function updateRecordCount() {
-            const count = document.querySelectorAll('#admin-body tr').length;
-            document.getElementById('recordCount').textContent = `${count} записей`;
-        }
-
-        // ========== ФУНКЦИИ ДЛЯ ЖУРНАЛА ДЕЙСТВИЙ ==========
-
-        // Загрузить действия из localStorage
-        function loadActions() {
-            const actions = JSON.parse(localStorage.getItem('admin_actions') || '[]');
-            renderActions(actions);
-        }
-
-        // Сохранить действие
-        function addAction(actionType, details) {
-            const actions = JSON.parse(localStorage.getItem('admin_actions') || '[]');
-            
-            const newAction = {
-                id: Date.now() + Math.random(),
-                timestamp: new Date().toISOString(),
-                user: currentUser,
-                type: actionType,
-                details: details
-            };
-            
-            actions.unshift(newAction); // Добавляем в начало
-            localStorage.setItem('admin_actions', JSON.stringify(actions));
-            
-            renderActions(actions);
-            return newAction;
-        }
-
-        // Отрендерить действия
-        function renderActions(actions) {
-            const tbody = document.getElementById('actions-log-body');
-            const filterValue = document.getElementById('actionFilter').value.toLowerCase();
-            
-            let filteredActions = actions;
-            if (filterValue) {
-                filteredActions = actions.filter(action => {
-                    return action.user.toLowerCase().includes(filterValue) ||
-                           action.type.toLowerCase().includes(filterValue) ||
-                           JSON.stringify(action.details).toLowerCase().includes(filterValue);
-                });
-            }
-            
-            tbody.innerHTML = '';
-            
-            if (filteredActions.length === 0) {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td colspan="4" style="text-align: center; padding: 40px; color: #7f8c8d;">
-                    📭 Нет записей о действиях
-                </td>`;
-                tbody.appendChild(tr);
-                return;
-            }
-            
-            filteredActions.forEach(action => {
-                const tr = document.createElement('tr');
-                
-                // Время
-                const timeTd = document.createElement('td');
-                const actionTime = new Date(action.timestamp);
-                timeTd.className = 'action-time';
-                timeTd.innerHTML = `
-                    <div>${actionTime.toLocaleDateString()}</div>
-                    <div>${actionTime.toLocaleTimeString()}</div>
-                `;
-                
-                // Пользователь
-                const userTd = document.createElement('td');
-                userTd.className = 'action-user';
-                userTd.textContent = action.user;
-                
-                // Действие
-                const actionTd = document.createElement('td');
-                const actionBadge = document.createElement('span');
-                actionBadge.className = `action-badge ${action.type}`;
-                
-                let actionText = '';
-                switch(action.type) {
-                    case 'add': actionText = '➕ Добавление'; break;
-                    case 'edit': actionText = '✏️ Редактирование'; break;
-                    case 'delete': actionText = '🗑️ Удаление'; break;
-                    case 'status': actionText = '🔄 Изменение статуса'; break;
-                    case 'import': actionText = '📤 Импорт'; break;
-                    case 'export': actionText = '📥 Экспорт'; break;
-                    case 'clear': actionText = '🧹 Очистка журнала'; break;
-                    default: actionText = action.type;
-                }
-                
-                actionBadge.textContent = actionText;
-                actionTd.appendChild(actionBadge);
-                
-                // Детали
-                const detailsTd = document.createElement('td');
-                detailsTd.className = 'action-details';
-                
-                if (action.details) {
-                    if (action.details.field) {
-                        // Изменение поля
-                        detailsTd.innerHTML = `
-                            <strong>${action.details.adminName || 'Администратор'}</strong><br>
-                            Поле: ${action.details.field}<br>
-                            <span class="old-value">${action.details.oldValue}</span> → 
-                            <span class="new-value">${action.details.newValue}</span>
-                        `;
-                    } else if (action.details.adminName) {
-                        // Действие с администратором
-                        detailsTd.innerHTML = `
-                            <strong>${action.details.adminName}</strong><br>
-                            ${action.details.description || ''}
-                        `;
-                    } else {
-                        // Простое описание
-                        detailsTd.textContent = action.details;
-                    }
-                }
-                
-                tr.appendChild(timeTd);
-                tr.appendChild(userTd);
-                tr.appendChild(actionTd);
-                tr.appendChild(detailsTd);
-                
-                tbody.appendChild(tr);
+    function renderActions(actions) {
+        const tbody = document.getElementById('actions-log-body');
+        const filterValue = document.getElementById('actionFilter').value.toLowerCase();
+        
+        let filteredActions = actions;
+        if (filterValue) {
+            filteredActions = actions.filter(action => {
+                return action.user.toLowerCase().includes(filterValue) ||
+                       action.type.toLowerCase().includes(filterValue) ||
+                       JSON.stringify(action.details).toLowerCase().includes(filterValue);
             });
         }
-
-        // Очистить журнал
-        function clearActionsLog() {
-            if (confirm('Очистить весь журнал действий?')) {
-                localStorage.setItem('admin_actions', '[]');
-                addAction('clear', 'Журнал действий очищен');
-                loadActions();
-                showNotification('Журнал очищен', 'info');
-            }
+        
+        tbody.innerHTML = '';
+        
+        if (filteredActions.length === 0) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td colspan="4" style="text-align: center; padding: 40px; color: #7f8c8d;">
+                📭 Нет записей о действиях
+            </td>`;
+            tbody.appendChild(tr);
+            return;
         }
-
-        // ========== ФУНКЦИИ ДЛЯ ТАБЛИЦЫ АДМИНИСТРАТОРОВ ==========
-
-        // Загрузить данные администраторов
-        function loadAdminData() {
-            showLoading(true);
-            try {
-                // Сначала пытаемся загрузить из Админ.xlsx
-                loadFromAdminExcel();
-            } catch (error) {
-                console.error('Ошибка загрузки из Excel:', error);
-                
-                // Если не удалось, пробуем localStorage
-                const savedAdminData = localStorage.getItem('admin_data');
-                if (savedAdminData) {
-                    const data = JSON.parse(savedAdminData);
-                    renderAdminTable(data);
-                    showNotification('Данные загружены из локального хранилища', 'info');
+        
+        filteredActions.forEach(action => {
+            const tr = document.createElement('tr');
+            
+            const timeTd = document.createElement('td');
+            const actionTime = new Date(action.timestamp);
+            timeTd.className = 'action-time';
+            timeTd.innerHTML = `
+                <div>${actionTime.toLocaleDateString()}</div>
+                <div>${actionTime.toLocaleTimeString()}</div>
+            `;
+            
+            const userTd = document.createElement('td');
+            userTd.className = 'action-user';
+            userTd.textContent = action.user;
+            
+            const actionTd = document.createElement('td');
+            const actionBadge = document.createElement('span');
+            actionBadge.className = `action-badge ${action.type}`;
+            
+            let actionText = '';
+            switch(action.type) {
+                case 'add': actionText = '➕ Добавление'; break;
+                case 'edit': actionText = '✏️ Редактирование'; break;
+                case 'delete': actionText = '🗑️ Удаление'; break;
+                case 'status': actionText = '🔄 Изменение статуса'; break;
+                case 'import': actionText = '📤 Импорт'; break;
+                case 'export': actionText = '📥 Экспорт'; break;
+                case 'clear': actionText = '🧹 Очистка журнала'; break;
+                default: actionText = action.type;
+            }
+            
+            actionBadge.textContent = actionText;
+            actionTd.appendChild(actionBadge);
+            
+            const detailsTd = document.createElement('td');
+            detailsTd.className = 'action-details';
+            
+            if (action.details) {
+                if (action.details.field) {
+                    detailsTd.innerHTML = `
+                        <strong>${action.details.adminName || 'Администратор'}</strong><br>
+                        Поле: ${action.details.field}<br>
+                        <span class="old-value">${action.details.oldValue}</span> → 
+                        <span class="new-value">${action.details.newValue}</span>
+                    `;
+                } else if (action.details.adminName) {
+                    detailsTd.innerHTML = `
+                        <strong>${action.details.adminName}</strong><br>
+                        ${action.details.description || ''}
+                    `;
                 } else {
-                    // Создаем тестовые данные
-                    const testData = [
-                        ['Иван Петров', 'Главный администратор', 'ivan@indigra.ru', '+7 (495) 123-45-67', 'Активен'],
-                        ['Мария Сидорова', 'Менеджер по работе с клиентами', 'maria@indigra.ru', '+7 (495) 234-56-78', 'Активен'],
-                        ['Алексей Иванов', 'Технический специалист', 'aleksey@indigra.ru', '+7 (495) 345-67-89', 'Неактивен'],
-                        ['Елена Козлова', 'Бухгалтер', 'elena@indigra.ru', '+7 (495) 456-78-90', 'Активен'],
-                        ['Дмитрий Смирнов', 'Менеджер по продажам', 'dmitry@indigra.ru', '+7 (495) 567-89-01', 'Активен'],
-                        ['Ольга Новикова', 'HR-менеджер', 'olga@indigra.ru', '+7 (495) 678-90-12', 'Неактивен']
-                    ];
-                    renderAdminTable(testData);
-                    saveAdminToLocalStorage(testData);
-                    
-                    // Добавляем действия о создании тестовых данных
-                    addAction('add', { description: 'Созданы тестовые данные администраторов' });
-                    showNotification('Созданы тестовые данные', 'info');
+                    detailsTd.textContent = action.details;
                 }
-                updateRecordCount();
-            } finally {
-                showLoading(false);
             }
-        }
+            
+            tr.appendChild(timeTd);
+            tr.appendChild(userTd);
+            tr.appendChild(actionTd);
+            tr.appendChild(detailsTd);
+            
+            tbody.appendChild(tr);
+        });
+    }
 
-        // Загрузка из Админ.xlsx
-        function loadFromAdminExcel() {
+    function clearActionsLog() {
+        if (confirm('Очистить весь журнал действий?')) {
+            localStorage.setItem('admin_actions', '[]');
+            addAction('clear', 'Журнал действий очищен');
+            loadActions();
+            showNotification('Журнал очищен', 'info');
+        }
+    }
+
+    // ========== ОСНОВНЫЕ ФУНКЦИИ ДЛЯ РАБОТЫ С ДАННЫМИ ==========
+
+    // Создание тестовых данных
+    function createTestData() {
+        const testData = [
+            ['Иван Петров', 'Главный администратор', 'ivan@indigra.ru', '+7 (495) 123-45-67', 'Активен'],
+            ['Мария Сидорова', 'Менеджер по работе с клиентами', 'maria@indigra.ru', '+7 (495) 234-56-78', 'Активен'],
+            ['Алексей Иванов', 'Технический специалист', 'aleksey@indigra.ru', '+7 (495) 345-67-89', 'Неактивен'],
+            ['Елена Козлова', 'Бухгалтер', 'elena@indigra.ru', '+7 (495) 456-78-90', 'Активен'],
+            ['Дмитрий Смирнов', 'Менеджер по продажам', 'dmitry@indigra.ru', '+7 (495) 567-89-01', 'Активен'],
+            ['Ольга Новикова', 'HR-менеджер', 'olga@indigra.ru', '+7 (495) 678-90-12', 'Неактивен']
+        ];
+        
+        renderAdminTable(testData);
+        saveAdminToLocalStorage(testData);
+        addAction('add', { description: 'Созданы тестовые данные администраторов' });
+        showNotification('Созданы тестовые данные', 'info');
+        updateRecordCount();
+    }
+
+    // Загрузка из Админ.xlsx
+    function loadFromAdminExcel() {
+        return new Promise((resolve, reject) => {
             const excelUrl = 'data/Админ.xlsx';
             
-            // Пытаемся загрузить через fetch
-            fetch(excelUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Файл не найден');
-                    }
-                    return response.arrayBuffer();
-                })
-                .then(data => {
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-                    
-                    if (jsonData.length > 1) {
-                        // Пропускаем заголовки и берем данные
-                        const adminData = jsonData.slice(1).filter(row => row.length >= 5);
-                        
-                        if (adminData.length > 0) {
-                            renderAdminTable(adminData);
-                            saveAdminToLocalStorage(adminData);
-                            addAction('import', { 
-                                description: `Загружено ${adminData.length} записей из Админ.xlsx` 
-                            });
-                            showNotification(`Загружено ${adminData.length} записей из Админ.xlsx`, 'success');
-                        } else {
-                            throw new Error('Нет данных в файле');
-                        }
-                    } else {
-                        throw new Error('Файл пустой');
-                    }
-                })
-                .catch(error => {
-                    console.error('Ошибка загрузки Админ.xlsx:', error);
-                    // Не выбрасываем ошибку дальше, а просто логируем
-                    addAction('error', { 
-                        description: `Ошибка загрузки Админ.xlsx: ${error.message}` 
-                    });
-                    // Пробуем localStorage
-                    throw error;
-                });
-        }
-
-        // Отрендерить таблицу
-        function renderAdminTable(data) {
-            const tbody = document.getElementById('admin-body');
-            tbody.innerHTML = '';
+            console.log('Пытаемся загрузить файл:', excelUrl);
+            showNotification('Загрузка данных из Excel...', 'info');
             
-            data.forEach((row, rowIndex) => {
-                const tr = document.createElement('tr');
-                tr.dataset.rowIndex = rowIndex;
+            fetch(excelUrl, { 
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                }
+            })
+            .then(response => {
+                console.log('Ответ сервера:', response.status, response.statusText);
+                if (!response.ok) {
+                    throw new Error(`Файл не найден (статус: ${response.status})`);
+                }
+                return response.arrayBuffer();
+            })
+            .then(data => {
+                console.log('Файл загружен, размер:', data.byteLength, 'байт');
                 
-                // Чекбокс для выбора
-                const checkboxTd = document.createElement('td');
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.className = 'admin-checkbox';
-                checkbox.dataset.rowIndex = rowIndex;
-                checkboxTd.appendChild(checkbox);
-                tr.appendChild(checkboxTd);
-                
-                // Данные администратора
-                row.forEach((cell, cellIndex) => {
-                    const td = document.createElement('td');
-                    
-                    // Для статуса добавляем специальное оформление
-                    if (cellIndex === 4) {
-                        const statusSpan = document.createElement('span');
-                        statusSpan.className = `status-badge ${cell === 'Активен' ? 'active' : 'inactive'}`;
-                        statusSpan.textContent = cell;
-                        td.appendChild(statusSpan);
-                        td.dataset.value = cell;
-                    } else {
-                        td.textContent = cell;
-                    }
-                    
-                    td.dataset.cellIndex = cellIndex + 1; // +1 из-за чекбокса
-                    td.dataset.original = cell;
-                    td.classList.add('admin-cell');
-                    tr.appendChild(td);
-                });
-                
-                // Кнопка удаления
-                const actionTd = document.createElement('td');
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'btn btn-sm btn-danger';
-                deleteBtn.innerHTML = '🗑️';
-                deleteBtn.title = 'Удалить администратора';
-                deleteBtn.onclick = () => deleteAdmin(rowIndex, row[0]);
-                actionTd.appendChild(deleteBtn);
-                tr.appendChild(actionTd);
-                
-                tbody.appendChild(tr);
-            });
-        }
-
-        // Сохранить данные в localStorage
-        function saveAdminToLocalStorage(data) {
-            localStorage.setItem('admin_data', JSON.stringify(data));
-            console.log('Данные сохранены в localStorage');
-        }
-
-        // Включить режим редактирования
-        function enableAdminEditMode() {
-            adminEditMode = true;
-            document.querySelectorAll('#admin-body .admin-cell').forEach(cell => {
-                cell.setAttribute('contenteditable', 'true');
-                
-                // Для статуса делаем особое редактирование
-                if (parseInt(cell.dataset.cellIndex) === 4) {
-                    cell.setAttribute('contenteditable', 'false');
-                    cell.style.cursor = 'pointer';
-                    cell.addEventListener('click', function(e) {
-                        if (!adminEditMode) return;
-                        
-                        const row = this.parentElement;
-                        const adminName = row.children[0]?.textContent || 'Неизвестно';
-                        const currentValue = this.dataset.value || this.textContent;
-                        const newValue = currentValue === 'Активен' ? 'Неактивен' : 'Активен';
-                        
-                        // Обновляем отображение
-                        this.innerHTML = `<span class="status-badge ${newValue === 'Активен' ? 'active' : 'inactive'}">${newValue}</span>`;
-                        this.dataset.value = newValue;
-                        
-                        // Сохраняем изменение
-                        const rowIndex = row.dataset.rowIndex;
-                        const cellIndex = this.dataset.cellIndex;
-                        const cellId = `admin_${rowIndex}_${cellIndex}`;
-                        
-                        adminChangedCells.set(cellId, {
-                            row: row,
-                            cell: this,
-                            rowIndex: parseInt(rowIndex),
-                            cellIndex: parseInt(cellIndex),
-                            value: newValue
-                        });
-                        
-                        updateAdminSaveButton();
-                        updateSaveIndicator();
-                    });
+                if (data.byteLength === 0) {
+                    throw new Error('Файл пустой');
                 }
                 
+                const workbook = XLSX.read(data, { type: 'array' });
+                console.log('Листы в файле:', workbook.SheetNames);
+                
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                
+                console.log('Данные из Excel (первые 5 строк):', jsonData.slice(0, 5));
+                
+                if (jsonData.length > 1) {
+                    const adminData = jsonData.slice(1).filter(row => 
+                        row && row.length >= 5 && row.some(cell => cell && cell.toString().trim() !== '')
+                    );
+                    
+                    console.log('Отфильтрованные данные:', adminData.length, 'записей');
+                    
+                    if (adminData.length > 0) {
+                        renderAdminTable(adminData);
+                        saveAdminToLocalStorage(adminData);
+                        addAction('import', { 
+                            description: `Загружено ${adminData.length} записей из Админ.xlsx` 
+                        });
+                        showNotification(`Загружено ${adminData.length} записей из Админ.xlsx`, 'success');
+                        updateRecordCount();
+                        resolve(adminData);
+                    } else {
+                        reject(new Error('Нет данных в файле'));
+                    }
+                } else {
+                    reject(new Error('Файл пустой или имеет неверную структуру'));
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки Админ.xlsx:', error);
+                addAction('error', { 
+                    description: `Ошибка загрузки Админ.xlsx: ${error.message}` 
+                });
+                reject(error);
+            });
+        });
+    }
+
+    // Загрузка данных администраторов
+    function loadAdminData() {
+        showLoading(true);
+        
+        // Сначала пробуем загрузить из Excel
+        loadFromAdminExcel()
+            .then(() => {
+                showLoading(false);
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки из Excel:', error);
+                
+                // Если не удалось загрузить из Excel, пробуем localStorage
+                const savedAdminData = localStorage.getItem('admin_data');
+                if (savedAdminData) {
+                    try {
+                        const data = JSON.parse(savedAdminData);
+                        renderAdminTable(data);
+                        updateRecordCount();
+                        showNotification('Данные загружены из локального хранилища', 'info');
+                    } catch (e) {
+                        console.error('Ошибка парсинга localStorage:', e);
+                        createTestData();
+                    }
+                } else {
+                    createTestData();
+                }
+                showLoading(false);
+            });
+    }
+
+    // Отрисовка таблицы
+    function renderAdminTable(data) {
+        const tbody = document.getElementById('admin-body');
+        tbody.innerHTML = '';
+        
+        data.forEach((row, rowIndex) => {
+            const tr = document.createElement('tr');
+            tr.dataset.rowIndex = rowIndex;
+            
+            // Чекбокс
+            const checkboxTd = document.createElement('td');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'admin-checkbox';
+            checkbox.dataset.rowIndex = rowIndex;
+            checkboxTd.appendChild(checkbox);
+            tr.appendChild(checkboxTd);
+            
+            // Данные
+            row.forEach((cell, cellIndex) => {
+                const td = document.createElement('td');
+                
+                if (cellIndex === 4) {
+                    const statusSpan = document.createElement('span');
+                    statusSpan.className = `status-badge ${cell === 'Активен' ? 'active' : 'inactive'}`;
+                    statusSpan.textContent = cell;
+                    td.appendChild(statusSpan);
+                    td.dataset.value = cell;
+                } else {
+                    td.textContent = cell;
+                }
+                
+                td.dataset.cellIndex = cellIndex + 1;
+                td.dataset.original = cell;
+                td.classList.add('admin-cell');
+                tr.appendChild(td);
+            });
+            
+            // Кнопка удаления
+            const actionTd = document.createElement('td');
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-sm btn-danger';
+            deleteBtn.innerHTML = '🗑️';
+            deleteBtn.title = 'Удалить администратора';
+            deleteBtn.onclick = () => deleteAdmin(rowIndex, row[0]);
+            actionTd.appendChild(deleteBtn);
+            tr.appendChild(actionTd);
+            
+            tbody.appendChild(tr);
+        });
+        
+        updateRecordCount();
+    }
+
+    function saveAdminToLocalStorage(data) {
+        localStorage.setItem('admin_data', JSON.stringify(data));
+        console.log('Данные сохранены в localStorage');
+    }
+
+    // Включение режима редактирования
+    function enableAdminEditMode() {
+        adminEditMode = true;
+        document.querySelectorAll('#admin-body .admin-cell').forEach(cell => {
+            if (parseInt(cell.dataset.cellIndex) === 5) {
+                cell.setAttribute('contenteditable', 'false');
+                cell.style.cursor = 'pointer';
+                cell.addEventListener('click', function(e) {
+                    if (!adminEditMode) return;
+                    
+                    const row = this.parentElement;
+                    const adminName = row.children[1]?.textContent || 'Неизвестно';
+                    const currentValue = this.dataset.value || this.textContent;
+                    const newValue = currentValue === 'Активен' ? 'Неактивен' : 'Активен';
+                    
+                    this.innerHTML = `<span class="status-badge ${newValue === 'Активен' ? 'active' : 'inactive'}">${newValue}</span>`;
+                    this.dataset.value = newValue;
+                    
+                    const rowIndex = row.dataset.rowIndex;
+                    const cellIndex = this.dataset.cellIndex;
+                    const cellId = `admin_${rowIndex}_${cellIndex}`;
+                    
+                    adminChangedCells.set(cellId, {
+                        row: row,
+                        cell: this,
+                        rowIndex: parseInt(rowIndex),
+                        cellIndex: parseInt(cellIndex),
+                        value: newValue
+                    });
+                    
+                    updateAdminSaveButton();
+                    updateSaveIndicator();
+                });
+            } else {
+                cell.setAttribute('contenteditable', 'true');
                 cell.removeEventListener('input', handleAdminInput);
                 cell.addEventListener('input', handleAdminInput);
-            });
-            
-            document.getElementById('saveAdminChanges').disabled = false;
-            document.getElementById('cancelAdminChanges').disabled = false;
-        }
-
-        // Обработчик ввода
-        function handleAdminInput(e) {
-            const cell = e.target;
-            const row = cell.parentElement;
-            const rowIndex = row.dataset.rowIndex;
-            const cellIndex = cell.dataset.cellIndex;
-            const cellId = `admin_${rowIndex}_${cellIndex}`;
-            const newValue = cell.textContent.trim();
-            
-            adminChangedCells.set(cellId, {
-                row: row,
-                cell: cell,
-                rowIndex: parseInt(rowIndex),
-                cellIndex: parseInt(cellIndex),
-                value: newValue
-            });
-            
-            updateAdminSaveButton();
-            updateSaveIndicator();
-        }
-
-        // Обновить кнопку сохранения
-        function updateAdminSaveButton() {
-            const saveBtn = document.getElementById('saveAdminChanges');
-            const changesCount = adminChangedCells.size;
-            
-            if (changesCount > 0) {
-                saveBtn.innerHTML = `💾 Сохранить изменения (${changesCount})`;
-            } else {
-                saveBtn.innerHTML = '💾 Сохранить изменения';
             }
-        }
+        });
+        
+        document.getElementById('saveAdminChanges').disabled = false;
+        document.getElementById('cancelAdminChanges').disabled = false;
+    }
 
-        // Удалить администратора
-        function deleteAdmin(rowIndex, adminName) {
-            if (confirm(`Удалить администратора "${adminName}"?`)) {
-                const tbody = document.getElementById('admin-body');
-                const row = tbody.children[rowIndex];
-                
-                // Удаляем строку из таблицы
+    function handleAdminInput(e) {
+        const cell = e.target;
+        const row = cell.parentElement;
+        const rowIndex = row.dataset.rowIndex;
+        const cellIndex = cell.dataset.cellIndex;
+        const cellId = `admin_${rowIndex}_${cellIndex}`;
+        const newValue = cell.textContent.trim();
+        
+        adminChangedCells.set(cellId, {
+            row: row,
+            cell: cell,
+            rowIndex: parseInt(rowIndex),
+            cellIndex: parseInt(cellIndex),
+            value: newValue
+        });
+        
+        updateAdminSaveButton();
+        updateSaveIndicator();
+    }
+
+    function updateAdminSaveButton() {
+        const saveBtn = document.getElementById('saveAdminChanges');
+        const changesCount = adminChangedCells.size;
+        
+        if (changesCount > 0) {
+            saveBtn.innerHTML = `💾 Сохранить изменения (${changesCount})`;
+            saveBtn.disabled = false;
+        } else {
+            saveBtn.innerHTML = '💾 Сохранить изменения';
+            saveBtn.disabled = true;
+        }
+    }
+
+    function deleteAdmin(rowIndex, adminName) {
+        if (confirm(`Удалить администратора "${adminName}"?`)) {
+            const row = document.querySelector(`#admin-body tr[data-row-index="${rowIndex}"]`);
+            if (row) {
                 row.remove();
                 
-                // Обновляем данные
                 const allData = [];
                 document.querySelectorAll('#admin-body tr').forEach(tr => {
                     const rowData = [];
                     const cells = tr.querySelectorAll('td');
-                    // Пропускаем чекбокс и кнопку удаления
                     for (let i = 1; i < cells.length - 1; i++) {
                         const cell = cells[i];
-                        if (i === 5) { // Статус
+                        if (parseInt(cell.dataset.cellIndex) === 5) {
                             rowData.push(cell.dataset.value || cell.textContent);
                         } else {
                             rowData.push(cell.textContent.trim());
@@ -1167,10 +1149,7 @@
                     allData.push(rowData);
                 });
                 
-                // Сохраняем обновленные данные
                 saveAdminToLocalStorage(allData);
-                
-                // Логируем действие
                 addAction('delete', {
                     adminName: adminName,
                     description: `Администратор "${adminName}" удален`
@@ -1180,440 +1159,415 @@
                 showNotification(`Администратор "${adminName}" удален`, 'success');
             }
         }
+    }
 
-        // Добавить новую запись
-        document.getElementById('addAdminRow').addEventListener('click', function() {
-            const tbody = document.getElementById('admin-body');
-            const newRow = document.createElement('tr');
-            newRow.dataset.rowIndex = tbody.children.length;
+    // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadAdminData();
+        loadActions();
+        
+        addAction('info', { description: 'Панель управления открыта' });
+        
+        document.addEventListener('paste', function(e) {
+            if (e.target.closest('[contenteditable="true"]')) {
+                e.preventDefault();
+                const text = e.clipboardData.getData('text/plain');
+                document.execCommand('insertText', false, text);
+            }
+        });
+        
+        window.addEventListener('beforeunload', function(e) {
+            if (adminChangedCells.size > 0) {
+                e.preventDefault();
+                e.returnValue = 'У вас есть несохраненные изменения. Точно покинуть страницу?';
+            }
+        });
+    });
+
+    // Добавление новой записи
+    document.getElementById('addAdminRow').addEventListener('click', function() {
+        const tbody = document.getElementById('admin-body');
+        const newRow = document.createElement('tr');
+        newRow.dataset.rowIndex = tbody.children.length;
+        
+        const checkboxTd = document.createElement('td');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'admin-checkbox';
+        checkbox.dataset.rowIndex = tbody.children.length;
+        checkboxTd.appendChild(checkbox);
+        newRow.appendChild(checkboxTd);
+        
+        const defaultValues = ['Новый сотрудник', 'Должность', 'email@indigra.ru', '+7 (495) 000-00-00', 'Активен'];
+        
+        defaultValues.forEach((value, i) => {
+            const td = document.createElement('td');
             
-            // Чекбокс
-            const checkboxTd = document.createElement('td');
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.className = 'admin-checkbox';
-            checkbox.dataset.rowIndex = tbody.children.length;
-            checkboxTd.appendChild(checkbox);
-            newRow.appendChild(checkboxTd);
+            if (i === 4) {
+                const statusSpan = document.createElement('span');
+                statusSpan.className = 'status-badge active';
+                statusSpan.textContent = value;
+                td.appendChild(statusSpan);
+                td.dataset.value = value;
+            } else {
+                td.textContent = value;
+            }
             
-            // Добавляем пустые ячейки
-            const defaultValues = ['Новый сотрудник', 'Должность', 'email@indigra.ru', '+7 (495) 000-00-00', 'Активен'];
+            td.dataset.cellIndex = i + 1;
+            td.dataset.original = value;
+            td.classList.add('admin-cell');
+            newRow.appendChild(td);
+        });
+        
+        const actionTd = document.createElement('td');
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-sm btn-danger';
+        deleteBtn.innerHTML = '🗑️';
+        deleteBtn.title = 'Удалить администратора';
+        deleteBtn.onclick = () => deleteAdmin(newRow.dataset.rowIndex, 'Новый сотрудник');
+        actionTd.appendChild(deleteBtn);
+        newRow.appendChild(actionTd);
+        
+        tbody.appendChild(newRow);
+        
+        if (!adminEditMode) {
+            enableAdminEditMode();
+        }
+        
+        for (let i = 0; i < 5; i++) {
+            const cell = newRow.children[i + 1];
+            const cellId = `admin_${newRow.dataset.rowIndex}_${i}`;
             
-            defaultValues.forEach((value, i) => {
-                const td = document.createElement('td');
-                
-                if (i === 4) {
-                    const statusSpan = document.createElement('span');
-                    statusSpan.className = 'status-badge active';
-                    statusSpan.textContent = value;
-                    td.appendChild(statusSpan);
-                    td.dataset.value = value;
-                } else {
-                    td.textContent = value;
-                }
-                
-                td.dataset.cellIndex = i + 1; // +1 из-за чекбокса
-                td.dataset.original = value;
-                td.classList.add('admin-cell');
-                newRow.appendChild(td);
+            adminChangedCells.set(cellId, {
+                row: newRow,
+                cell: cell,
+                rowIndex: parseInt(newRow.dataset.rowIndex),
+                cellIndex: i,
+                value: defaultValues[i]
             });
-            
-            // Кнопка удаления
-            const actionTd = document.createElement('td');
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn btn-sm btn-danger';
-            deleteBtn.innerHTML = '🗑️';
-            deleteBtn.title = 'Удалить администратора';
-            deleteBtn.onclick = () => deleteAdmin(newRow.dataset.rowIndex, 'Новый сотрудник');
-            actionTd.appendChild(deleteBtn);
-            newRow.appendChild(actionTd);
-            
-            tbody.appendChild(newRow);
-            
-            if (!adminEditMode) {
-                enableAdminEditMode();
-            }
-            
-            // Добавляем в изменения
-            for (let i = 0; i < 5; i++) {
-                const cell = newRow.children[i + 1]; // +1 из-за чекбокса
-                const cellId = `admin_${newRow.dataset.rowIndex}_${i}`;
-                
-                adminChangedCells.set(cellId, {
-                    row: newRow,
-                    cell: cell,
-                    rowIndex: parseInt(newRow.dataset.rowIndex),
-                    cellIndex: i,
-                    value: defaultValues[i]
-                });
-            }
-            
-            updateAdminSaveButton();
-            updateSaveIndicator();
-            updateRecordCount();
-            showNotification('Новая запись добавлена', 'success');
+        }
+        
+        updateAdminSaveButton();
+        updateSaveIndicator();
+        updateRecordCount();
+        showNotification('Новая запись добавлена', 'success');
+    });
+
+    // Сохранение изменений
+    document.getElementById('saveAdminChanges').addEventListener('click', function() {
+        if (adminChangedCells.size === 0) {
+            showNotification('Нет изменений для сохранения', 'info');
+            return;
+        }
+
+        const allData = [];
+        const rows = document.querySelectorAll('#admin-body tr');
+        
+        rows.forEach(row => {
+            const rowData = [];
+            const cells = row.querySelectorAll('td');
+            cells.forEach(cell => {
+                if (parseInt(cell.dataset.cellIndex) === 5) {
+                    rowData.push(cell.dataset.value || cell.textContent);
+                } else {
+                    rowData.push(cell.textContent.trim());
+                }
+            });
+            allData.push(rowData);
         });
 
-        // Сохранить изменения
-        document.getElementById('saveAdminChanges').addEventListener('click', function() {
-            if (adminChangedCells.size === 0) {
-                showNotification('Нет изменений для сохранения', 'info');
-                return;
-            }
-
-            // Собираем все данные
-            const allData = [];
-            const rows = document.querySelectorAll('#admin-body tr');
+        adminChangedCells.forEach((data, cellId) => {
+            const rowIndex = data.rowIndex;
+            const cellIndex = data.cellIndex;
+            const adminName = rows[rowIndex]?.children[1]?.textContent || 'Неизвестно';
+            const oldValue = data.cell.dataset.original;
+            const newValue = data.value;
             
-            rows.forEach(row => {
-                const rowData = [];
-                const cells = row.querySelectorAll('td');
-                cells.forEach(cell => {
-                    if (parseInt(cell.dataset.cellIndex) === 4) {
-                        // Для статуса берем из dataset
-                        rowData.push(cell.dataset.value || cell.textContent);
-                    } else {
-                        rowData.push(cell.textContent.trim());
-                    }
-                });
-                allData.push(rowData);
-            });
-
-            // Записываем изменения в журнал
-            adminChangedCells.forEach((data, cellId) => {
-                const rowIndex = data.rowIndex;
-                const cellIndex = data.cellIndex;
-                const adminName = rows[rowIndex]?.children[0]?.textContent || 'Неизвестно';
-                const oldValue = data.cell.dataset.original;
-                const newValue = data.value;
-                
-                if (oldValue !== newValue) {
-                    let fieldName = '';
-                    switch(parseInt(cellIndex)) {
-                        case 0: fieldName = 'Имя'; break;
-                        case 1: fieldName = 'Должность'; break;
-                        case 2: fieldName = 'Email'; break;
-                        case 3: fieldName = 'Телефон'; break;
-                        case 4: fieldName = 'Статус'; break;
-                    }
-                    
-                    addAction('edit', {
-                        adminName: adminName,
-                        field: fieldName,
-                        oldValue: oldValue,
-                        newValue: newValue
-                    });
+            if (oldValue !== newValue) {
+                let fieldName = '';
+                switch(parseInt(cellIndex)) {
+                    case 0: fieldName = 'Имя'; break;
+                    case 1: fieldName = 'Должность'; break;
+                    case 2: fieldName = 'Email'; break;
+                    case 3: fieldName = 'Телефон'; break;
+                    case 4: fieldName = 'Статус'; break;
                 }
-            });
+                
+                addAction('edit', {
+                    adminName: adminName,
+                    field: fieldName,
+                    oldValue: oldValue,
+                    newValue: newValue
+                });
+            }
+        });
 
-            // Сохраняем
-            saveAdminToLocalStorage(allData);
+        saveAdminToLocalStorage(allData);
 
-            // Обновляем original значения
+        adminChangedCells.forEach((data, cellId) => {
+            if (parseInt(data.cellIndex) === 4) {
+                data.cell.dataset.original = data.cell.dataset.value;
+            } else {
+                data.cell.dataset.original = data.value;
+            }
+        });
+
+        adminChangedCells.clear();
+        updateAdminSaveButton();
+        updateSaveIndicator();
+        showNotification('Изменения успешно сохранены', 'success');
+    });
+
+    // Отмена изменений
+    document.getElementById('cancelAdminChanges').addEventListener('click', function() {
+        if (adminChangedCells.size === 0) {
+            showNotification('Нет изменений для отмены', 'info');
+            return;
+        }
+
+        if (confirm('Отменить все несохраненные изменения?')) {
             adminChangedCells.forEach((data, cellId) => {
+                const cell = data.cell;
                 if (parseInt(data.cellIndex) === 4) {
-                    data.cell.dataset.original = data.cell.dataset.value;
+                    const originalValue = cell.dataset.original;
+                    cell.innerHTML = `<span class="status-badge ${originalValue === 'Активен' ? 'active' : 'inactive'}">${originalValue}</span>`;
+                    cell.dataset.value = originalValue;
                 } else {
-                    data.cell.dataset.original = data.value;
+                    cell.textContent = cell.dataset.original;
                 }
             });
 
             adminChangedCells.clear();
             updateAdminSaveButton();
             updateSaveIndicator();
-            showNotification('Изменения успешно сохранены', 'success');
-        });
+            showNotification('Изменения отменены', 'info');
+        }
+    });
 
-        // Отменить изменения
-        document.getElementById('cancelAdminChanges').addEventListener('click', function() {
-            if (adminChangedCells.size === 0) {
-                showNotification('Нет изменений для отмены', 'info');
-                return;
-            }
-
-            if (confirm('Отменить все несохраненные изменения?')) {
-                adminChangedCells.forEach((data, cellId) => {
-                    const cell = data.cell;
-                    if (parseInt(data.cellIndex) === 4) {
-                        // Восстанавливаем статус
-                        const originalValue = cell.dataset.original;
-                        cell.innerHTML = `<span class="status-badge ${originalValue === 'Активен' ? 'active' : 'inactive'}">${originalValue}</span>`;
-                        cell.dataset.value = originalValue;
-                    } else {
-                        cell.textContent = cell.dataset.original;
-                    }
-                });
-
-                adminChangedCells.clear();
-                updateAdminSaveButton();
-                updateSaveIndicator();
-                showNotification('Изменения отменены', 'info');
-            }
-        });
-
-        // Экспорт в Excel
-        document.getElementById('exportAdminExcel').addEventListener('click', function() {
-            const allData = [];
-            
-            // Заголовки
-            const headers = ['Имя', 'Должность', 'Email', 'Телефон', 'Статус'];
-            allData.push(headers);
-            
-            // Данные
-            document.querySelectorAll('#admin-body tr').forEach(tr => {
-                const row = [];
-                tr.querySelectorAll('td').forEach(td => {
-                    if (parseInt(td.dataset.cellIndex) === 4) {
-                        row.push(td.dataset.value || td.textContent);
-                    } else {
-                        row.push(td.textContent.trim());
-                    }
-                });
+    // Экспорт в Excel
+    document.getElementById('exportAdminExcel').addEventListener('click', function() {
+        const allData = [];
+        const headers = ['Имя', 'Должность', 'Email', 'Телефон', 'Статус'];
+        allData.push(headers);
+        
+        document.querySelectorAll('#admin-body tr').forEach(tr => {
+            const row = [];
+            tr.querySelectorAll('td').forEach(td => {
+                if (parseInt(td.dataset.cellIndex) === 5) {
+                    row.push(td.dataset.value || td.textContent);
+                } else if (parseInt(td.dataset.cellIndex) !== undefined) {
+                    row.push(td.textContent.trim());
+                }
+            });
+            if (row.length > 0) {
                 allData.push(row);
-            });
-            
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(allData);
-            XLSX.utils.book_append_sheet(wb, ws, 'Администраторы');
-            XLSX.writeFile(wb, 'Админ.xlsx');
-            
-            addAction('export', { description: 'Экспорт данных в Excel' });
-            showNotification('Файл Админ.xlsx экспортирован', 'success');
+            }
         });
+        
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(allData);
+        XLSX.utils.book_append_sheet(wb, ws, 'Администраторы');
+        XLSX.writeFile(wb, 'Админ.xlsx');
+        
+        addAction('export', { description: 'Экспорт данных в Excel' });
+        showNotification('Файл Админ.xlsx экспортирован', 'success');
+    });
 
-        // Импорт из Excel
-        document.getElementById('importAdminExcel').addEventListener('click', function() {
-            document.getElementById('fileInput').onchange = function(e) {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    try {
-                        showLoading(true);
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+    // Импорт из Excel
+    document.getElementById('importAdminExcel').addEventListener('click', function() {
+        document.getElementById('fileInput').onchange = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    showLoading(true);
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                    
+                    if (jsonData.length > 1) {
+                        const importedData = jsonData.slice(1).filter(row => row.length >= 5);
                         
-                        // Проверяем структуру
-                        if (jsonData.length > 1) {
-                            // Пропускаем заголовки
-                            const importedData = jsonData.slice(1).filter(row => row.length >= 5);
+                        if (importedData.length > 0) {
+                            renderAdminTable(importedData);
+                            saveAdminToLocalStorage(importedData);
                             
-                            if (importedData.length > 0) {
-                                renderAdminTable(importedData);
-                                saveAdminToLocalStorage(importedData);
-                                
-                                addAction('import', { 
-                                    description: `Импортировано ${importedData.length} записей из Excel` 
-                                });
-                                
-                                adminChangedCells.clear();
-                                updateAdminSaveButton();
-                                updateSaveIndicator();
-                                updateRecordCount();
-                                showNotification(`Импортировано ${importedData.length} записей`, 'success');
-                            } else {
-                                showNotification('Нет данных для импорта', 'warning');
-                            }
+                            addAction('import', { 
+                                description: `Импортировано ${importedData.length} записей из Excel` 
+                            });
+                            
+                            adminChangedCells.clear();
+                            updateAdminSaveButton();
+                            updateSaveIndicator();
+                            showNotification(`Импортировано ${importedData.length} записей`, 'success');
+                        } else {
+                            showNotification('Нет данных для импорта', 'warning');
                         }
-                    } catch (error) {
-                        console.error('Ошибка импорта:', error);
-                        showNotification('Ошибка при импорте файла', 'error');
-                    } finally {
-                        showLoading(false);
                     }
-                };
-                
-                reader.readAsArrayBuffer(file);
-                document.getElementById('fileInput').value = '';
+                } catch (error) {
+                    console.error('Ошибка импорта:', error);
+                    showNotification('Ошибка при импорте файла', 'error');
+                } finally {
+                    showLoading(false);
+                }
             };
             
-            document.getElementById('fileInput').click();
-        });
+            reader.readAsArrayBuffer(file);
+            document.getElementById('fileInput').value = '';
+        };
+        
+        document.getElementById('fileInput').click();
+    });
 
-        // Загрузить файл Админ.xlsx вручную
-        document.getElementById('loadAdminFile').addEventListener('click', function() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.xlsx,.xls';
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                // Проверяем, что это именно Админ.xlsx
-                if (!file.name.includes('Админ')) {
-                    showNotification('Пожалуйста, выберите файл Админ.xlsx', 'warning');
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        showLoading(true);
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+    // Загрузка файла вручную
+    document.getElementById('loadAdminFile').addEventListener('click', function() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.xlsx,.xls';
+        input.onchange = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    showLoading(true);
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                    
+                    if (jsonData.length > 1) {
+                        const adminData = jsonData.slice(1).filter(row => row.length >= 5);
                         
-                        if (jsonData.length > 1) {
-                            // Пропускаем заголовки и берем данные
-                            const adminData = jsonData.slice(1).filter(row => row.length >= 5);
+                        if (adminData.length > 0) {
+                            adminChangedCells.clear();
+                            updateAdminSaveButton();
+                            updateSaveIndicator();
                             
-                            if (adminData.length > 0) {
-                                // Очищаем изменения перед загрузкой
-                                adminChangedCells.clear();
-                                updateAdminSaveButton();
-                                updateSaveIndicator();
-                                
-                                renderAdminTable(adminData);
-                                saveAdminToLocalStorage(adminData);
-                                
-                                addAction('import', { 
-                                    description: `Загружено ${adminData.length} записей из файла ${file.name}` 
-                                });
-                                
-                                showNotification(`Загружено ${adminData.length} записей из ${file.name}`, 'success');
-                            } else {
-                                showNotification('Нет данных в файле', 'warning');
-                            }
+                            renderAdminTable(adminData);
+                            saveAdminToLocalStorage(adminData);
+                            
+                            addAction('import', { 
+                                description: `Загружено ${adminData.length} записей из файла ${file.name}` 
+                            });
+                            
+                            showNotification(`Загружено ${adminData.length} записей`, 'success');
                         } else {
-                            showNotification('Файл пустой или имеет неверную структуру', 'warning');
+                            showNotification('Нет данных в файле', 'warning');
                         }
-                    } catch (error) {
-                        console.error('Ошибка чтения файла:', error);
-                        showNotification('Ошибка при чтении файла', 'error');
-                    } finally {
-                        showLoading(false);
+                    } else {
+                        showNotification('Файл пустой или имеет неверную структуру', 'warning');
                     }
-                };
-                
-                reader.readAsArrayBuffer(file);
+                } catch (error) {
+                    console.error('Ошибка чтения файла:', error);
+                    showNotification('Ошибка при чтении файла', 'error');
+                } finally {
+                    showLoading(false);
+                }
             };
             
-            input.click();
-        });
+            reader.readAsArrayBuffer(file);
+        };
+        
+        input.click();
+    });
 
-        // Обновить из Админ.xlsx
-        document.getElementById('refreshFromExcel').addEventListener('click', function() {
-            if (confirm('Обновить все данные из файла Админ.xlsx? Несохраненные изменения будут потеряны.')) {
-                adminChangedCells.clear();
-                updateAdminSaveButton();
-                updateSaveIndicator();
-                loadAdminData();
-            }
-        });
-
-        // Удалить выбранных администраторов
-        document.getElementById('deleteSelectedAdmin').addEventListener('click', function() {
-            const selectedCheckboxes = document.querySelectorAll('.admin-checkbox:checked');
-            if (selectedCheckboxes.length === 0) {
-                showNotification('Выберите администраторов для удаления', 'warning');
-                return;
-            }
-            
-            if (confirm(`Удалить ${selectedCheckboxes.length} выбранных администраторов?`)) {
-                const deletedNames = [];
-                selectedCheckboxes.forEach(checkbox => {
-                    const rowIndex = parseInt(checkbox.dataset.rowIndex);
-                    const row = checkbox.closest('tr');
-                    const adminName = row.children[1]?.textContent || 'Неизвестно';
-                    deletedNames.push(adminName);
-                    row.remove();
-                });
-                
-                // Обновляем данные
-                const allData = [];
-                document.querySelectorAll('#admin-body tr').forEach(tr => {
-                    const rowData = [];
-                    const cells = tr.querySelectorAll('td');
-                    // Пропускаем чекбокс и кнопку удаления
-                    for (let i = 1; i < cells.length - 1; i++) {
-                        const cell = cells[i];
-                        if (i === 5) { // Статус
-                            rowData.push(cell.dataset.value || cell.textContent);
-                        } else {
-                            rowData.push(cell.textContent.trim());
-                        }
-                    }
-                    allData.push(rowData);
-                });
-                
-                // Сохраняем обновленные данные
-                saveAdminToLocalStorage(allData);
-                
-                // Логируем действие
-                addAction('delete', {
-                    description: `Массовое удаление: ${deletedNames.join(', ')}`
-                });
-                
-                updateRecordCount();
-                showNotification(`Удалено ${selectedCheckboxes.length} администраторов`, 'success');
-            }
-        });
-
-        // Обработчик для чекбоксов
-        document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('admin-checkbox')) {
-                const selectedCount = document.querySelectorAll('.admin-checkbox:checked').length;
-                const deleteBtn = document.getElementById('deleteSelectedAdmin');
-                deleteBtn.disabled = selectedCount === 0;
-                deleteBtn.innerHTML = selectedCount > 0 
-                    ? `🗑️ Удалить выбранных (${selectedCount})`
-                    : '🗑️ Удалить выбранное';
-            }
-        });
-
-        // Клик по ячейке для редактирования
-        document.getElementById('admin-body').addEventListener('click', function(e) {
-            const cell = e.target.closest('.admin-cell');
-            if (cell && !adminEditMode) {
-                enableAdminEditMode();
-                if (parseInt(cell.dataset.cellIndex) !== 5) { // Не для статуса
-                    cell.focus();
-                }
-            }
-        });
-
-        // Обработчики для журнала
-        document.getElementById('refreshActions').addEventListener('click', function() {
-            loadActions();
-            showNotification('Журнал обновлен', 'info');
-        });
-
-        document.getElementById('clearActions').addEventListener('click', clearActionsLog);
-
-        document.getElementById('actionFilter').addEventListener('input', function() {
-            const actions = JSON.parse(localStorage.getItem('admin_actions') || '[]');
-            renderActions(actions);
-        });
-
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', function() {
+    // Обновление из файла
+    document.getElementById('refreshFromExcel').addEventListener('click', function() {
+        if (confirm('Обновить все данные из файла Админ.xlsx? Несохраненные изменения будут потеряны.')) {
+            adminChangedCells.clear();
+            updateAdminSaveButton();
+            updateSaveIndicator();
             loadAdminData();
-            loadActions();
-            
-            // Добавляем начальное действие
-            addAction('info', { description: 'Панель управления открыта' });
-            
-            // Блокируем вставку форматированного текста
-            document.addEventListener('paste', function(e) {
-                if (e.target.closest('[contenteditable="true"]')) {
-                    e.preventDefault();
-                    const text = e.clipboardData.getData('text/plain');
-                    document.execCommand('insertText', false, text);
-                }
+        }
+    });
+
+    // Удаление выбранных
+    document.getElementById('deleteSelectedAdmin').addEventListener('click', function() {
+        const selectedCheckboxes = document.querySelectorAll('.admin-checkbox:checked');
+        if (selectedCheckboxes.length === 0) {
+            showNotification('Выберите администраторов для удаления', 'warning');
+            return;
+        }
+        
+        if (confirm(`Удалить ${selectedCheckboxes.length} выбранных администраторов?`)) {
+            const deletedNames = [];
+            selectedCheckboxes.forEach(checkbox => {
+                const row = checkbox.closest('tr');
+                const adminName = row.children[1]?.textContent || 'Неизвестно';
+                deletedNames.push(adminName);
+                row.remove();
             });
             
-            // Предупреждение при уходе со страницы
-            window.addEventListener('beforeunload', function(e) {
-                if (adminChangedCells.size > 0) {
-                    e.preventDefault();
-                    e.returnValue = 'У вас есть несохраненные изменения. Точно покинуть страницу?';
+            const allData = [];
+            document.querySelectorAll('#admin-body tr').forEach(tr => {
+                const rowData = [];
+                const cells = tr.querySelectorAll('td');
+                for (let i = 1; i < cells.length - 1; i++) {
+                    const cell = cells[i];
+                    if (parseInt(cell.dataset.cellIndex) === 5) {
+                        rowData.push(cell.dataset.value || cell.textContent);
+                    } else {
+                        rowData.push(cell.textContent.trim());
+                    }
                 }
+                allData.push(rowData);
             });
-        });
-    </script>
+            
+            saveAdminToLocalStorage(allData);
+            
+            addAction('delete', {
+                description: `Массовое удаление: ${deletedNames.join(', ')}`
+            });
+            
+            updateRecordCount();
+            showNotification(`Удалено ${selectedCheckboxes.length} администраторов`, 'success');
+        }
+    });
+
+    // Обработчик чекбоксов
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('admin-checkbox')) {
+            const selectedCount = document.querySelectorAll('.admin-checkbox:checked').length;
+            const deleteBtn = document.getElementById('deleteSelectedAdmin');
+            deleteBtn.disabled = selectedCount === 0;
+            deleteBtn.innerHTML = selectedCount > 0 
+                ? `🗑️ Удалить выбранных (${selectedCount})`
+                : '🗑️ Удалить выбранное';
+        }
+    });
+
+    // Клик по ячейке для редактирования
+    document.getElementById('admin-body').addEventListener('click', function(e) {
+        const cell = e.target.closest('.admin-cell');
+        if (cell && !adminEditMode) {
+            enableAdminEditMode();
+            if (parseInt(cell.dataset.cellIndex) !== 5) {
+                cell.focus();
+            }
+        }
+    });
+
+    // Обработчики журнала
+    document.getElementById('refreshActions').addEventListener('click', function() {
+        loadActions();
+        showNotification('Журнал обновлен', 'info');
+    });
+
+    document.getElementById('clearActions').addEventListener('click', clearActionsLog);
+
+    document.getElementById('actionFilter').addEventListener('input', function() {
+        const actions = JSON.parse(localStorage.getItem('admin_actions') || '[]');
+        renderActions(actions);
+    });
+
+</script>
     <!-- Скрипт для автоматической подгонки ширины страницы -->
     <script src="js/layout-fixer.js"></script>
 </body>
