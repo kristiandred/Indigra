@@ -699,7 +699,7 @@
     <!-- Невидимый input для загрузки файлов -->
     <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" />
 
-   <script>
+  <script>
     // Глобальные переменные
     let adminChangedCells = new Map();
     let adminEditMode = false;
@@ -872,33 +872,15 @@
         }
     }
 
-    // ========== ОСНОВНЫЕ ФУНКЦИИ ДЛЯ РАБОТЫ С ДАННЫМИ ==========
+    // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С АДМИНИСТРАТОРАМИ ==========
 
-    // Создание тестовых данных
-    function createTestData() {
-        const testData = [
-            ['Иван Петров', 'Главный администратор', 'ivan@indigra.ru', '+7 (495) 123-45-67', 'Активен'],
-            ['Мария Сидорова', 'Менеджер по работе с клиентами', 'maria@indigra.ru', '+7 (495) 234-56-78', 'Активен'],
-            ['Алексей Иванов', 'Технический специалист', 'aleksey@indigra.ru', '+7 (495) 345-67-89', 'Неактивен'],
-            ['Елена Козлова', 'Бухгалтер', 'elena@indigra.ru', '+7 (495) 456-78-90', 'Активен'],
-            ['Дмитрий Смирнов', 'Менеджер по продажам', 'dmitry@indigra.ru', '+7 (495) 567-89-01', 'Активен'],
-            ['Ольга Новикова', 'HR-менеджер', 'olga@indigra.ru', '+7 (495) 678-90-12', 'Неактивен']
-        ];
-        
-        renderAdminTable(testData);
-        saveAdminToLocalStorage(testData);
-        addAction('add', { description: 'Созданы тестовые данные администраторов' });
-        showNotification('Созданы тестовые данные', 'info');
-        updateRecordCount();
-    }
-
-    // Загрузка из Админ.xlsx
+    // Загрузка из Админ.xlsx (логин и пароль)
     function loadFromAdminExcel() {
         return new Promise((resolve, reject) => {
             const excelUrl = 'data/Админ.xlsx';
             
             console.log('Пытаемся загрузить файл:', excelUrl);
-            showNotification('Загрузка данных из Excel...', 'info');
+            showNotification('Загрузка данных администраторов...', 'info');
             
             fetch(excelUrl, { 
                 method: 'GET',
@@ -924,41 +906,101 @@
                 console.log('Листы в файле:', workbook.SheetNames);
                 
                 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
                 
-                console.log('Данные из Excel (первые 5 строк):', jsonData.slice(0, 5));
+                // Получаем все данные
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { 
+                    header: 1,
+                    defval: '',
+                    blankrows: false
+                });
                 
-                if (jsonData.length > 1) {
-                    const adminData = jsonData.slice(1).filter(row => 
-                        row && row.length >= 5 && row.some(cell => cell && cell.toString().trim() !== '')
-                    );
+                console.log('Данные из Excel:', jsonData);
+                
+                // Обрабатываем данные
+                let adminData = [];
+                let foundData = false;
+                
+                for (let i = 0; i < jsonData.length; i++) {
+                    const row = jsonData[i];
+                    if (!row || row.length === 0) continue;
                     
-                    console.log('Отфильтрованные данные:', adminData.length, 'записей');
+                    // Получаем логин и пароль
+                    let login = row[0] ? row[0].toString().trim() : '';
+                    let password = row[1] ? row[1].toString().trim() : '';
                     
-                    if (adminData.length > 0) {
-                        renderAdminTable(adminData);
-                        saveAdminToLocalStorage(adminData);
-                        addAction('import', { 
-                            description: `Загружено ${adminData.length} записей из Админ.xlsx` 
-                        });
-                        showNotification(`Загружено ${adminData.length} записей из Админ.xlsx`, 'success');
-                        updateRecordCount();
-                        resolve(adminData);
-                    } else {
-                        reject(new Error('Нет данных в файле'));
+                    // Пропускаем строки с заголовками
+                    if (login.toLowerCase().includes('логин') || 
+                        login.toLowerCase().includes('login') ||
+                        login.toLowerCase().includes('пользователь') ||
+                        login === '') {
+                        continue;
                     }
+                    
+                    // Если есть логин
+                    if (login.length > 0) {
+                        // Формируем email
+                        let email = login;
+                        if (!login.includes('@')) {
+                            email = login + '@indigra.ru';
+                        }
+                        
+                        // Для каждого администратора создаем запись
+                        const adminRecord = [
+                            login,                          // Имя (логин)
+                            'Администратор',                 // Должность
+                            email,                           // Email
+                            '+7 (999) 000-00-00',           // Телефон
+                            'Активен',                       // Статус
+                            password                         // Пароль
+                        ];
+                        
+                        adminData.push(adminRecord);
+                        foundData = true;
+                    }
+                }
+                
+                console.log('Обработанные данные:', adminData);
+                
+                if (foundData && adminData.length > 0) {
+                    renderAdminTable(adminData);
+                    saveAdminToLocalStorage(adminData);
+                    addAction('import', { 
+                        description: `Загружено ${adminData.length} администраторов` 
+                    });
+                    showNotification(`Загружено ${adminData.length} администраторов`, 'success');
+                    updateRecordCount();
+                    resolve(adminData);
                 } else {
-                    reject(new Error('Файл пустой или имеет неверную структуру'));
+                    console.log('Нет данных в файле, создаем тестовые');
+                    createTestData();
+                    resolve();
                 }
             })
             .catch(error => {
-                console.error('Ошибка загрузки Админ.xlsx:', error);
+                console.error('Ошибка загрузки:', error);
                 addAction('error', { 
-                    description: `Ошибка загрузки Админ.xlsx: ${error.message}` 
+                    description: `Ошибка загрузки: ${error.message}` 
                 });
                 reject(error);
             });
         });
+    }
+
+    // Создание тестовых данных
+    function createTestData() {
+        const testData = [
+            ['admin', 'Главный администратор', 'admin@indigra.ru', '+7 (495) 111-11-11', 'Активен', 'admin123'],
+            ['ivanov', 'Менеджер', 'ivanov@indigra.ru', '+7 (495) 222-22-22', 'Активен', 'pass123'],
+            ['petrova', 'Бухгалтер', 'petrova@indigra.ru', '+7 (495) 333-33-33', 'Активен', 'pass456'],
+            ['sidorov', 'Наблюдатель', 'sidorov@indigra.ru', '+7 (495) 444-44-44', 'Неактивен', 'pass789'],
+            ['kozlov', 'Технический специалист', 'kozlov@indigra.ru', '+7 (495) 555-55-55', 'Активен', 'pass000']
+        ];
+        
+        renderAdminTable(testData);
+        saveAdminToLocalStorage(testData);
+        addAction('add', { description: 'Созданы тестовые данные администраторов' });
+        showNotification('Созданы тестовые данные', 'info');
+        updateRecordCount();
     }
 
     // Загрузка данных администраторов
@@ -1010,25 +1052,57 @@
             checkboxTd.appendChild(checkbox);
             tr.appendChild(checkboxTd);
             
-            // Данные
-            row.forEach((cell, cellIndex) => {
-                const td = document.createElement('td');
-                
-                if (cellIndex === 4) {
-                    const statusSpan = document.createElement('span');
-                    statusSpan.className = `status-badge ${cell === 'Активен' ? 'active' : 'inactive'}`;
-                    statusSpan.textContent = cell;
-                    td.appendChild(statusSpan);
-                    td.dataset.value = cell;
-                } else {
-                    td.textContent = cell;
-                }
-                
-                td.dataset.cellIndex = cellIndex + 1;
-                td.dataset.original = cell;
-                td.classList.add('admin-cell');
-                tr.appendChild(td);
-            });
+            // Имя (логин)
+            const nameTd = document.createElement('td');
+            nameTd.textContent = row[0] || 'Неизвестно';
+            nameTd.dataset.cellIndex = '1';
+            nameTd.dataset.original = row[0] || 'Неизвестно';
+            nameTd.classList.add('admin-cell');
+            tr.appendChild(nameTd);
+            
+            // Должность
+            const positionTd = document.createElement('td');
+            positionTd.textContent = row[1] || 'Администратор';
+            positionTd.dataset.cellIndex = '2';
+            positionTd.dataset.original = row[1] || 'Администратор';
+            positionTd.classList.add('admin-cell');
+            tr.appendChild(positionTd);
+            
+            // Email
+            const emailTd = document.createElement('td');
+            emailTd.textContent = row[2] || (row[0] + '@indigra.ru');
+            emailTd.dataset.cellIndex = '3';
+            emailTd.dataset.original = row[2] || (row[0] + '@indigra.ru');
+            emailTd.classList.add('admin-cell');
+            tr.appendChild(emailTd);
+            
+            // Телефон
+            const phoneTd = document.createElement('td');
+            phoneTd.textContent = row[3] || '+7 (999) 000-00-00';
+            phoneTd.dataset.cellIndex = '4';
+            phoneTd.dataset.original = row[3] || '+7 (999) 000-00-00';
+            phoneTd.classList.add('admin-cell');
+            tr.appendChild(phoneTd);
+            
+            // Статус
+            const statusTd = document.createElement('td');
+            const statusSpan = document.createElement('span');
+            const status = row[4] || 'Активен';
+            statusSpan.className = `status-badge ${status === 'Активен' ? 'active' : 'inactive'}`;
+            statusSpan.textContent = status;
+            statusTd.appendChild(statusSpan);
+            statusTd.dataset.value = status;
+            statusTd.dataset.cellIndex = '5';
+            statusTd.dataset.original = status;
+            statusTd.classList.add('admin-cell');
+            tr.appendChild(statusTd);
+            
+            // Скрытое поле для пароля
+            const passwordInput = document.createElement('input');
+            passwordInput.type = 'hidden';
+            passwordInput.className = 'admin-password';
+            passwordInput.value = row[5] || '';
+            tr.appendChild(passwordInput);
             
             // Кнопка удаления
             const actionTd = document.createElement('td');
@@ -1146,6 +1220,11 @@
                             rowData.push(cell.textContent.trim());
                         }
                     }
+                    // Добавляем пароль из скрытого поля
+                    const passwordInput = tr.querySelector('.admin-password');
+                    if (passwordInput) {
+                        rowData.push(passwordInput.value);
+                    }
                     allData.push(rowData);
                 });
                 
@@ -1159,6 +1238,33 @@
                 showNotification(`Администратор "${adminName}" удален`, 'success');
             }
         }
+    }
+
+    // Функция для отладки Excel файла
+    function debugAdminExcel() {
+        fetch('data/Админ.xlsx')
+            .then(response => response.arrayBuffer())
+            .then(data => {
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const allData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                
+                console.log('=== СОДЕРЖИМОЕ АДМИН.XLSX ===');
+                let message = 'Файл содержит:\n\n';
+                
+                allData.forEach((row, index) => {
+                    const login = row[0] || '(пусто)';
+                    const pass = row[1] ? '***' : '(пусто)';
+                    console.log(`Строка ${index + 1}: Логин="${row[0]}", Пароль="${row[1]}"`);
+                    message += `Строка ${index + 1}: Логин="${login}", Пароль=${pass}\n`;
+                });
+                
+                alert(message);
+            })
+            .catch(error => {
+                console.error('Ошибка отладки:', error);
+                alert('Ошибка чтения файла: ' + error.message);
+            });
     }
 
     // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
@@ -1199,33 +1305,73 @@
         checkboxTd.appendChild(checkbox);
         newRow.appendChild(checkboxTd);
         
-        const defaultValues = ['Новый сотрудник', 'Должность', 'email@indigra.ru', '+7 (495) 000-00-00', 'Активен'];
+        const defaultValues = [
+            'new_admin',           // Логин
+            'Администратор',       // Должность
+            'new_admin@indigra.ru', // Email
+            '+7 (999) 000-00-00',  // Телефон
+            'Активен',             // Статус
+            'password123'          // Пароль
+        ];
         
-        defaultValues.forEach((value, i) => {
-            const td = document.createElement('td');
-            
-            if (i === 4) {
-                const statusSpan = document.createElement('span');
-                statusSpan.className = 'status-badge active';
-                statusSpan.textContent = value;
-                td.appendChild(statusSpan);
-                td.dataset.value = value;
-            } else {
-                td.textContent = value;
-            }
-            
-            td.dataset.cellIndex = i + 1;
-            td.dataset.original = value;
-            td.classList.add('admin-cell');
-            newRow.appendChild(td);
-        });
+        // Имя (логин)
+        const nameTd = document.createElement('td');
+        nameTd.textContent = defaultValues[0];
+        nameTd.dataset.cellIndex = '1';
+        nameTd.dataset.original = defaultValues[0];
+        nameTd.classList.add('admin-cell');
+        newRow.appendChild(nameTd);
         
+        // Должность
+        const positionTd = document.createElement('td');
+        positionTd.textContent = defaultValues[1];
+        positionTd.dataset.cellIndex = '2';
+        positionTd.dataset.original = defaultValues[1];
+        positionTd.classList.add('admin-cell');
+        newRow.appendChild(positionTd);
+        
+        // Email
+        const emailTd = document.createElement('td');
+        emailTd.textContent = defaultValues[2];
+        emailTd.dataset.cellIndex = '3';
+        emailTd.dataset.original = defaultValues[2];
+        emailTd.classList.add('admin-cell');
+        newRow.appendChild(emailTd);
+        
+        // Телефон
+        const phoneTd = document.createElement('td');
+        phoneTd.textContent = defaultValues[3];
+        phoneTd.dataset.cellIndex = '4';
+        phoneTd.dataset.original = defaultValues[3];
+        phoneTd.classList.add('admin-cell');
+        newRow.appendChild(phoneTd);
+        
+        // Статус
+        const statusTd = document.createElement('td');
+        const statusSpan = document.createElement('span');
+        statusSpan.className = 'status-badge active';
+        statusSpan.textContent = defaultValues[4];
+        statusTd.appendChild(statusSpan);
+        statusTd.dataset.value = defaultValues[4];
+        statusTd.dataset.cellIndex = '5';
+        statusTd.dataset.original = defaultValues[4];
+        statusTd.classList.add('admin-cell');
+        newRow.appendChild(statusTd);
+        
+        // Скрытое поле для пароля
+        const passwordInput = document.createElement('input');
+        passwordInput.type = 'hidden';
+        passwordInput.className = 'admin-password';
+        passwordInput.value = defaultValues[5];
+        newRow.appendChild(passwordInput);
+        
+        // Кнопка удаления
         const actionTd = document.createElement('td');
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'btn btn-sm btn-danger';
         deleteBtn.innerHTML = '🗑️';
         deleteBtn.title = 'Удалить администратора';
-        deleteBtn.onclick = () => deleteAdmin(newRow.dataset.rowIndex, 'Новый сотрудник');
+        deleteBtn.onclick = () => deleteAdmin(newRow.dataset.rowIndex, defaultValues[0]);
         actionTd.appendChild(deleteBtn);
         newRow.appendChild(actionTd);
         
@@ -1235,6 +1381,7 @@
             enableAdminEditMode();
         }
         
+        // Добавляем все ячейки в изменения
         for (let i = 0; i < 5; i++) {
             const cell = newRow.children[i + 1];
             const cellId = `admin_${newRow.dataset.rowIndex}_${i}`;
@@ -1267,16 +1414,27 @@
         rows.forEach(row => {
             const rowData = [];
             const cells = row.querySelectorAll('td');
-            cells.forEach(cell => {
+            
+            // Собираем данные из видимых ячеек (кроме чекбокса и кнопки удаления)
+            for (let i = 1; i < cells.length - 1; i++) {
+                const cell = cells[i];
                 if (parseInt(cell.dataset.cellIndex) === 5) {
                     rowData.push(cell.dataset.value || cell.textContent);
                 } else {
                     rowData.push(cell.textContent.trim());
                 }
-            });
+            }
+            
+            // Добавляем пароль из скрытого поля
+            const passwordInput = row.querySelector('.admin-password');
+            if (passwordInput) {
+                rowData.push(passwordInput.value);
+            }
+            
             allData.push(rowData);
         });
 
+        // Записываем изменения в журнал
         adminChangedCells.forEach((data, cellId) => {
             const rowIndex = data.rowIndex;
             const cellIndex = data.cellIndex;
@@ -1287,7 +1445,7 @@
             if (oldValue !== newValue) {
                 let fieldName = '';
                 switch(parseInt(cellIndex)) {
-                    case 0: fieldName = 'Имя'; break;
+                    case 0: fieldName = 'Логин'; break;
                     case 1: fieldName = 'Должность'; break;
                     case 2: fieldName = 'Email'; break;
                     case 3: fieldName = 'Телефон'; break;
@@ -1305,6 +1463,7 @@
 
         saveAdminToLocalStorage(allData);
 
+        // Обновляем original значения
         adminChangedCells.forEach((data, cellId) => {
             if (parseInt(data.cellIndex) === 4) {
                 data.cell.dataset.original = data.cell.dataset.value;
@@ -1348,18 +1507,29 @@
     // Экспорт в Excel
     document.getElementById('exportAdminExcel').addEventListener('click', function() {
         const allData = [];
-        const headers = ['Имя', 'Должность', 'Email', 'Телефон', 'Статус'];
+        const headers = ['Логин', 'Должность', 'Email', 'Телефон', 'Статус', 'Пароль'];
         allData.push(headers);
         
         document.querySelectorAll('#admin-body tr').forEach(tr => {
             const row = [];
-            tr.querySelectorAll('td').forEach(td => {
-                if (parseInt(td.dataset.cellIndex) === 5) {
-                    row.push(td.dataset.value || td.textContent);
-                } else if (parseInt(td.dataset.cellIndex) !== undefined) {
-                    row.push(td.textContent.trim());
+            const cells = tr.querySelectorAll('td');
+            
+            // Собираем данные из видимых ячеек
+            for (let i = 1; i < cells.length - 1; i++) {
+                const cell = cells[i];
+                if (parseInt(cell.dataset.cellIndex) === 5) {
+                    row.push(cell.dataset.value || cell.textContent);
+                } else {
+                    row.push(cell.textContent.trim());
                 }
-            });
+            }
+            
+            // Добавляем пароль
+            const passwordInput = tr.querySelector('.admin-password');
+            if (passwordInput) {
+                row.push(passwordInput.value);
+            }
+            
             if (row.length > 0) {
                 allData.push(row);
             }
@@ -1391,14 +1561,38 @@
                     const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
                     
                     if (jsonData.length > 1) {
-                        const importedData = jsonData.slice(1).filter(row => row.length >= 5);
+                        const importedData = [];
+                        
+                        for (let i = 1; i < jsonData.length; i++) {
+                            const row = jsonData[i];
+                            if (!row || row.length < 2) continue;
+                            
+                            const login = row[0] ? row[0].toString().trim() : '';
+                            const password = row[1] ? row[1].toString().trim() : '';
+                            
+                            if (login && !login.toLowerCase().includes('логин')) {
+                                let email = login;
+                                if (!login.includes('@')) {
+                                    email = login + '@indigra.ru';
+                                }
+                                
+                                importedData.push([
+                                    login,
+                                    row[2] || 'Администратор',
+                                    row[3] || email,
+                                    row[4] || '+7 (999) 000-00-00',
+                                    row[5] || 'Активен',
+                                    password
+                                ]);
+                            }
+                        }
                         
                         if (importedData.length > 0) {
                             renderAdminTable(importedData);
                             saveAdminToLocalStorage(importedData);
                             
                             addAction('import', { 
-                                description: `Импортировано ${importedData.length} записей из Excel` 
+                                description: `Импортировано ${importedData.length} записей` 
                             });
                             
                             adminChangedCells.clear();
@@ -1442,8 +1636,32 @@
                     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                     const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
                     
-                    if (jsonData.length > 1) {
-                        const adminData = jsonData.slice(1).filter(row => row.length >= 5);
+                    if (jsonData.length > 0) {
+                        const adminData = [];
+                        
+                        for (let i = 0; i < jsonData.length; i++) {
+                            const row = jsonData[i];
+                            if (!row || row.length < 2) continue;
+                            
+                            const login = row[0] ? row[0].toString().trim() : '';
+                            const password = row[1] ? row[1].toString().trim() : '';
+                            
+                            if (login && !login.toLowerCase().includes('логин')) {
+                                let email = login;
+                                if (!login.includes('@')) {
+                                    email = login + '@indigra.ru';
+                                }
+                                
+                                adminData.push([
+                                    login,
+                                    'Администратор',
+                                    email,
+                                    '+7 (999) 000-00-00',
+                                    'Активен',
+                                    password
+                                ]);
+                            }
+                        }
                         
                         if (adminData.length > 0) {
                             adminChangedCells.clear();
@@ -1462,7 +1680,7 @@
                             showNotification('Нет данных в файле', 'warning');
                         }
                     } else {
-                        showNotification('Файл пустой или имеет неверную структуру', 'warning');
+                        showNotification('Файл пустой', 'warning');
                     }
                 } catch (error) {
                     console.error('Ошибка чтения файла:', error);
@@ -1517,6 +1735,10 @@
                         rowData.push(cell.textContent.trim());
                     }
                 }
+                const passwordInput = tr.querySelector('.admin-password');
+                if (passwordInput) {
+                    rowData.push(passwordInput.value);
+                }
                 allData.push(rowData);
             });
             
@@ -1567,6 +1789,8 @@
         renderActions(actions);
     });
 
+    // Функция отладки (можно вызвать из консоли)
+    window.debugAdminExcel = debugAdminExcel;
 </script>
     <!-- Скрипт для автоматической подгонки ширины страницы -->
     <script src="js/layout-fixer.js"></script>
