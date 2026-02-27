@@ -874,7 +874,7 @@
 
     // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С АДМИНИСТРАТОРАМИ ==========
 
-    // Загрузка из Админ.xlsx (логин и пароль)
+    // Загрузка из Админ.xlsx (только логин и пароль)
     function loadFromAdminExcel() {
         return new Promise((resolve, reject) => {
             const excelUrl = 'data/Админ.xlsx';
@@ -938,20 +938,10 @@
                     
                     // Если есть логин
                     if (login.length > 0) {
-                        // Формируем email
-                        let email = login;
-                        if (!login.includes('@')) {
-                            email = login + '@indigra.ru';
-                        }
-                        
-                        // Для каждого администратора создаем запись
+                        // Создаем запись только с логином и паролем
                         const adminRecord = [
-                            login,                          // Имя (логин)
-                            'Администратор',                 // Должность
-                            email,                           // Email
-                            '+7 (999) 000-00-00',           // Телефон
-                            'Активен',                       // Статус
-                            password                         // Пароль
+                            login,      // Логин
+                            password    // Пароль
                         ];
                         
                         adminData.push(adminRecord);
@@ -986,14 +976,14 @@
         });
     }
 
-    // Создание тестовых данных
+    // Создание тестовых данных (только логин и пароль)
     function createTestData() {
         const testData = [
-            ['admin', 'Главный администратор', 'admin@indigra.ru', '+7 (495) 111-11-11', 'Активен', 'admin123'],
-            ['ivanov', 'Менеджер', 'ivanov@indigra.ru', '+7 (495) 222-22-22', 'Активен', 'pass123'],
-            ['petrova', 'Бухгалтер', 'petrova@indigra.ru', '+7 (495) 333-33-33', 'Активен', 'pass456'],
-            ['sidorov', 'Наблюдатель', 'sidorov@indigra.ru', '+7 (495) 444-44-44', 'Неактивен', 'pass789'],
-            ['kozlov', 'Технический специалист', 'kozlov@indigra.ru', '+7 (495) 555-55-55', 'Активен', 'pass000']
+            ['admin', 'admin123'],
+            ['ivanov', 'pass123'],
+            ['petrova', 'pass456'],
+            ['sidorov', 'pass789'],
+            ['kozlov', 'pass000']
         ];
         
         renderAdminTable(testData);
@@ -1034,7 +1024,7 @@
             });
     }
 
-    // Отрисовка таблицы
+    // Отрисовка таблицы (только логин и пароль)
     function renderAdminTable(data) {
         const tbody = document.getElementById('admin-body');
         tbody.innerHTML = '';
@@ -1052,56 +1042,32 @@
             checkboxTd.appendChild(checkbox);
             tr.appendChild(checkboxTd);
             
-            // Имя (логин)
-            const nameTd = document.createElement('td');
-            nameTd.textContent = row[0] || 'Неизвестно';
-            nameTd.dataset.cellIndex = '1';
-            nameTd.dataset.original = row[0] || 'Неизвестно';
-            nameTd.classList.add('admin-cell');
-            tr.appendChild(nameTd);
+            // Логин
+            const loginTd = document.createElement('td');
+            loginTd.textContent = row[0] || 'Неизвестно';
+            loginTd.dataset.cellIndex = '1';
+            loginTd.dataset.original = row[0] || 'Неизвестно';
+            loginTd.classList.add('admin-cell');
+            tr.appendChild(loginTd);
             
-            // Должность
-            const positionTd = document.createElement('td');
-            positionTd.textContent = row[1] || 'Администратор';
-            positionTd.dataset.cellIndex = '2';
-            positionTd.dataset.original = row[1] || 'Администратор';
-            positionTd.classList.add('admin-cell');
-            tr.appendChild(positionTd);
+            // Пароль (скрытый)
+            const passwordTd = document.createElement('td');
+            const passwordSpan = document.createElement('span');
+            passwordSpan.textContent = '••••••••';
+            passwordSpan.style.opacity = '0.7';
+            passwordTd.appendChild(passwordSpan);
+            passwordTd.dataset.cellIndex = '2';
+            passwordTd.dataset.original = row[1] || '';
+            passwordTd.dataset.value = row[1] || '';
+            passwordTd.classList.add('admin-cell');
+            passwordTd.style.cursor = 'pointer';
+            tr.appendChild(passwordTd);
             
-            // Email
-            const emailTd = document.createElement('td');
-            emailTd.textContent = row[2] || (row[0] + '@indigra.ru');
-            emailTd.dataset.cellIndex = '3';
-            emailTd.dataset.original = row[2] || (row[0] + '@indigra.ru');
-            emailTd.classList.add('admin-cell');
-            tr.appendChild(emailTd);
-            
-            // Телефон
-            const phoneTd = document.createElement('td');
-            phoneTd.textContent = row[3] || '+7 (999) 000-00-00';
-            phoneTd.dataset.cellIndex = '4';
-            phoneTd.dataset.original = row[3] || '+7 (999) 000-00-00';
-            phoneTd.classList.add('admin-cell');
-            tr.appendChild(phoneTd);
-            
-            // Статус
-            const statusTd = document.createElement('td');
-            const statusSpan = document.createElement('span');
-            const status = row[4] || 'Активен';
-            statusSpan.className = `status-badge ${status === 'Активен' ? 'active' : 'inactive'}`;
-            statusSpan.textContent = status;
-            statusTd.appendChild(statusSpan);
-            statusTd.dataset.value = status;
-            statusTd.dataset.cellIndex = '5';
-            statusTd.dataset.original = status;
-            statusTd.classList.add('admin-cell');
-            tr.appendChild(statusTd);
-            
-            // Скрытое поле для пароля
+            // Скрытое поле для хранения реального пароля
             const passwordInput = document.createElement('input');
             passwordInput.type = 'hidden';
             passwordInput.className = 'admin-password';
-            passwordInput.value = row[5] || '';
+            passwordInput.value = row[1] || '';
             tr.appendChild(passwordInput);
             
             // Кнопка удаления
@@ -1129,40 +1095,9 @@
     function enableAdminEditMode() {
         adminEditMode = true;
         document.querySelectorAll('#admin-body .admin-cell').forEach(cell => {
-            if (parseInt(cell.dataset.cellIndex) === 5) {
-                cell.setAttribute('contenteditable', 'false');
-                cell.style.cursor = 'pointer';
-                cell.addEventListener('click', function(e) {
-                    if (!adminEditMode) return;
-                    
-                    const row = this.parentElement;
-                    const adminName = row.children[1]?.textContent || 'Неизвестно';
-                    const currentValue = this.dataset.value || this.textContent;
-                    const newValue = currentValue === 'Активен' ? 'Неактивен' : 'Активен';
-                    
-                    this.innerHTML = `<span class="status-badge ${newValue === 'Активен' ? 'active' : 'inactive'}">${newValue}</span>`;
-                    this.dataset.value = newValue;
-                    
-                    const rowIndex = row.dataset.rowIndex;
-                    const cellIndex = this.dataset.cellIndex;
-                    const cellId = `admin_${rowIndex}_${cellIndex}`;
-                    
-                    adminChangedCells.set(cellId, {
-                        row: row,
-                        cell: this,
-                        rowIndex: parseInt(rowIndex),
-                        cellIndex: parseInt(cellIndex),
-                        value: newValue
-                    });
-                    
-                    updateAdminSaveButton();
-                    updateSaveIndicator();
-                });
-            } else {
-                cell.setAttribute('contenteditable', 'true');
-                cell.removeEventListener('input', handleAdminInput);
-                cell.addEventListener('input', handleAdminInput);
-            }
+            cell.setAttribute('contenteditable', 'true');
+            cell.removeEventListener('input', handleAdminInput);
+            cell.addEventListener('input', handleAdminInput);
         });
         
         document.getElementById('saveAdminChanges').disabled = false;
@@ -1176,6 +1111,14 @@
         const cellIndex = cell.dataset.cellIndex;
         const cellId = `admin_${rowIndex}_${cellIndex}`;
         const newValue = cell.textContent.trim();
+        
+        // Если это поле пароля, показываем звездочки но сохраняем реальное значение
+        if (parseInt(cellIndex) === 2) {
+            const passwordInput = row.querySelector('.admin-password');
+            if (passwordInput) {
+                passwordInput.value = newValue;
+            }
+        }
         
         adminChangedCells.set(cellId, {
             row: row,
@@ -1210,22 +1153,10 @@
                 
                 const allData = [];
                 document.querySelectorAll('#admin-body tr').forEach(tr => {
-                    const rowData = [];
-                    const cells = tr.querySelectorAll('td');
-                    for (let i = 1; i < cells.length - 1; i++) {
-                        const cell = cells[i];
-                        if (parseInt(cell.dataset.cellIndex) === 5) {
-                            rowData.push(cell.dataset.value || cell.textContent);
-                        } else {
-                            rowData.push(cell.textContent.trim());
-                        }
-                    }
-                    // Добавляем пароль из скрытого поля
+                    const login = tr.children[1]?.textContent.trim() || '';
                     const passwordInput = tr.querySelector('.admin-password');
-                    if (passwordInput) {
-                        rowData.push(passwordInput.value);
-                    }
-                    allData.push(rowData);
+                    const password = passwordInput ? passwordInput.value : '';
+                    allData.push([login, password]);
                 });
                 
                 saveAdminToLocalStorage(allData);
@@ -1305,64 +1236,32 @@
         checkboxTd.appendChild(checkbox);
         newRow.appendChild(checkboxTd);
         
-        const defaultValues = [
-            'new_admin',           // Логин
-            'Администратор',       // Должность
-            'new_admin@indigra.ru', // Email
-            '+7 (999) 000-00-00',  // Телефон
-            'Активен',             // Статус
-            'password123'          // Пароль
-        ];
+        // Логин
+        const loginTd = document.createElement('td');
+        loginTd.textContent = 'new_admin';
+        loginTd.dataset.cellIndex = '1';
+        loginTd.dataset.original = 'new_admin';
+        loginTd.classList.add('admin-cell');
+        newRow.appendChild(loginTd);
         
-        // Имя (логин)
-        const nameTd = document.createElement('td');
-        nameTd.textContent = defaultValues[0];
-        nameTd.dataset.cellIndex = '1';
-        nameTd.dataset.original = defaultValues[0];
-        nameTd.classList.add('admin-cell');
-        newRow.appendChild(nameTd);
-        
-        // Должность
-        const positionTd = document.createElement('td');
-        positionTd.textContent = defaultValues[1];
-        positionTd.dataset.cellIndex = '2';
-        positionTd.dataset.original = defaultValues[1];
-        positionTd.classList.add('admin-cell');
-        newRow.appendChild(positionTd);
-        
-        // Email
-        const emailTd = document.createElement('td');
-        emailTd.textContent = defaultValues[2];
-        emailTd.dataset.cellIndex = '3';
-        emailTd.dataset.original = defaultValues[2];
-        emailTd.classList.add('admin-cell');
-        newRow.appendChild(emailTd);
-        
-        // Телефон
-        const phoneTd = document.createElement('td');
-        phoneTd.textContent = defaultValues[3];
-        phoneTd.dataset.cellIndex = '4';
-        phoneTd.dataset.original = defaultValues[3];
-        phoneTd.classList.add('admin-cell');
-        newRow.appendChild(phoneTd);
-        
-        // Статус
-        const statusTd = document.createElement('td');
-        const statusSpan = document.createElement('span');
-        statusSpan.className = 'status-badge active';
-        statusSpan.textContent = defaultValues[4];
-        statusTd.appendChild(statusSpan);
-        statusTd.dataset.value = defaultValues[4];
-        statusTd.dataset.cellIndex = '5';
-        statusTd.dataset.original = defaultValues[4];
-        statusTd.classList.add('admin-cell');
-        newRow.appendChild(statusTd);
+        // Пароль
+        const passwordTd = document.createElement('td');
+        const passwordSpan = document.createElement('span');
+        passwordSpan.textContent = '••••••••';
+        passwordSpan.style.opacity = '0.7';
+        passwordTd.appendChild(passwordSpan);
+        passwordTd.dataset.cellIndex = '2';
+        passwordTd.dataset.original = 'password123';
+        passwordTd.dataset.value = 'password123';
+        passwordTd.classList.add('admin-cell');
+        passwordTd.style.cursor = 'pointer';
+        newRow.appendChild(passwordTd);
         
         // Скрытое поле для пароля
         const passwordInput = document.createElement('input');
         passwordInput.type = 'hidden';
         passwordInput.className = 'admin-password';
-        passwordInput.value = defaultValues[5];
+        passwordInput.value = 'password123';
         newRow.appendChild(passwordInput);
         
         // Кнопка удаления
@@ -1371,7 +1270,7 @@
         deleteBtn.className = 'btn btn-sm btn-danger';
         deleteBtn.innerHTML = '🗑️';
         deleteBtn.title = 'Удалить администратора';
-        deleteBtn.onclick = () => deleteAdmin(newRow.dataset.rowIndex, defaultValues[0]);
+        deleteBtn.onclick = () => deleteAdmin(newRow.dataset.rowIndex, 'new_admin');
         actionTd.appendChild(deleteBtn);
         newRow.appendChild(actionTd);
         
@@ -1381,19 +1280,25 @@
             enableAdminEditMode();
         }
         
-        // Добавляем все ячейки в изменения
-        for (let i = 0; i < 5; i++) {
-            const cell = newRow.children[i + 1];
-            const cellId = `admin_${newRow.dataset.rowIndex}_${i}`;
-            
-            adminChangedCells.set(cellId, {
-                row: newRow,
-                cell: cell,
-                rowIndex: parseInt(newRow.dataset.rowIndex),
-                cellIndex: i,
-                value: defaultValues[i]
-            });
-        }
+        // Добавляем ячейки в изменения
+        const loginCell = newRow.children[1];
+        const passwordCell = newRow.children[2];
+        
+        adminChangedCells.set(`admin_${newRow.dataset.rowIndex}_0`, {
+            row: newRow,
+            cell: loginCell,
+            rowIndex: parseInt(newRow.dataset.rowIndex),
+            cellIndex: 0,
+            value: 'new_admin'
+        });
+        
+        adminChangedCells.set(`admin_${newRow.dataset.rowIndex}_1`, {
+            row: newRow,
+            cell: passwordCell,
+            rowIndex: parseInt(newRow.dataset.rowIndex),
+            cellIndex: 1,
+            value: 'password123'
+        });
         
         updateAdminSaveButton();
         updateSaveIndicator();
@@ -1412,26 +1317,10 @@
         const rows = document.querySelectorAll('#admin-body tr');
         
         rows.forEach(row => {
-            const rowData = [];
-            const cells = row.querySelectorAll('td');
-            
-            // Собираем данные из видимых ячеек (кроме чекбокса и кнопки удаления)
-            for (let i = 1; i < cells.length - 1; i++) {
-                const cell = cells[i];
-                if (parseInt(cell.dataset.cellIndex) === 5) {
-                    rowData.push(cell.dataset.value || cell.textContent);
-                } else {
-                    rowData.push(cell.textContent.trim());
-                }
-            }
-            
-            // Добавляем пароль из скрытого поля
+            const login = row.children[1]?.textContent.trim() || '';
             const passwordInput = row.querySelector('.admin-password');
-            if (passwordInput) {
-                rowData.push(passwordInput.value);
-            }
-            
-            allData.push(rowData);
+            const password = passwordInput ? passwordInput.value : '';
+            allData.push([login, password]);
         });
 
         // Записываем изменения в журнал
@@ -1443,20 +1332,13 @@
             const newValue = data.value;
             
             if (oldValue !== newValue) {
-                let fieldName = '';
-                switch(parseInt(cellIndex)) {
-                    case 0: fieldName = 'Логин'; break;
-                    case 1: fieldName = 'Должность'; break;
-                    case 2: fieldName = 'Email'; break;
-                    case 3: fieldName = 'Телефон'; break;
-                    case 4: fieldName = 'Статус'; break;
-                }
+                let fieldName = cellIndex === 0 ? 'Логин' : 'Пароль';
                 
                 addAction('edit', {
                     adminName: adminName,
                     field: fieldName,
-                    oldValue: oldValue,
-                    newValue: newValue
+                    oldValue: fieldName === 'Пароль' ? '••••••••' : oldValue,
+                    newValue: fieldName === 'Пароль' ? '••••••••' : newValue
                 });
             }
         });
@@ -1465,8 +1347,15 @@
 
         // Обновляем original значения
         adminChangedCells.forEach((data, cellId) => {
-            if (parseInt(data.cellIndex) === 4) {
-                data.cell.dataset.original = data.cell.dataset.value;
+            if (parseInt(data.cellIndex) === 1) {
+                // Для пароля обновляем скрытое поле
+                const row = data.row;
+                const passwordInput = row.querySelector('.admin-password');
+                if (passwordInput) {
+                    passwordInput.value = data.value;
+                }
+                data.cell.dataset.original = data.value;
+                data.cell.dataset.value = data.value;
             } else {
                 data.cell.dataset.original = data.value;
             }
@@ -1488,9 +1377,15 @@
         if (confirm('Отменить все несохраненные изменения?')) {
             adminChangedCells.forEach((data, cellId) => {
                 const cell = data.cell;
-                if (parseInt(data.cellIndex) === 4) {
+                if (parseInt(data.cellIndex) === 1) {
+                    // Для пароля восстанавливаем
                     const originalValue = cell.dataset.original;
-                    cell.innerHTML = `<span class="status-badge ${originalValue === 'Активен' ? 'active' : 'inactive'}">${originalValue}</span>`;
+                    const row = data.row;
+                    const passwordInput = row.querySelector('.admin-password');
+                    if (passwordInput) {
+                        passwordInput.value = originalValue;
+                    }
+                    cell.innerHTML = '<span style="opacity: 0.7;">••••••••</span>';
                     cell.dataset.value = originalValue;
                 } else {
                     cell.textContent = cell.dataset.original;
@@ -1507,32 +1402,14 @@
     // Экспорт в Excel
     document.getElementById('exportAdminExcel').addEventListener('click', function() {
         const allData = [];
-        const headers = ['Логин', 'Должность', 'Email', 'Телефон', 'Статус', 'Пароль'];
+        const headers = ['Логин', 'Пароль'];
         allData.push(headers);
         
         document.querySelectorAll('#admin-body tr').forEach(tr => {
-            const row = [];
-            const cells = tr.querySelectorAll('td');
-            
-            // Собираем данные из видимых ячеек
-            for (let i = 1; i < cells.length - 1; i++) {
-                const cell = cells[i];
-                if (parseInt(cell.dataset.cellIndex) === 5) {
-                    row.push(cell.dataset.value || cell.textContent);
-                } else {
-                    row.push(cell.textContent.trim());
-                }
-            }
-            
-            // Добавляем пароль
+            const login = tr.children[1]?.textContent.trim() || '';
             const passwordInput = tr.querySelector('.admin-password');
-            if (passwordInput) {
-                row.push(passwordInput.value);
-            }
-            
-            if (row.length > 0) {
-                allData.push(row);
-            }
+            const password = passwordInput ? passwordInput.value : '';
+            allData.push([login, password]);
         });
         
         const wb = XLSX.utils.book_new();
@@ -1571,19 +1448,7 @@
                             const password = row[1] ? row[1].toString().trim() : '';
                             
                             if (login && !login.toLowerCase().includes('логин')) {
-                                let email = login;
-                                if (!login.includes('@')) {
-                                    email = login + '@indigra.ru';
-                                }
-                                
-                                importedData.push([
-                                    login,
-                                    row[2] || 'Администратор',
-                                    row[3] || email,
-                                    row[4] || '+7 (999) 000-00-00',
-                                    row[5] || 'Активен',
-                                    password
-                                ]);
+                                importedData.push([login, password]);
                             }
                         }
                         
@@ -1647,19 +1512,7 @@
                             const password = row[1] ? row[1].toString().trim() : '';
                             
                             if (login && !login.toLowerCase().includes('логин')) {
-                                let email = login;
-                                if (!login.includes('@')) {
-                                    email = login + '@indigra.ru';
-                                }
-                                
-                                adminData.push([
-                                    login,
-                                    'Администратор',
-                                    email,
-                                    '+7 (999) 000-00-00',
-                                    'Активен',
-                                    password
-                                ]);
+                                adminData.push([login, password]);
                             }
                         }
                         
@@ -1725,21 +1578,10 @@
             
             const allData = [];
             document.querySelectorAll('#admin-body tr').forEach(tr => {
-                const rowData = [];
-                const cells = tr.querySelectorAll('td');
-                for (let i = 1; i < cells.length - 1; i++) {
-                    const cell = cells[i];
-                    if (parseInt(cell.dataset.cellIndex) === 5) {
-                        rowData.push(cell.dataset.value || cell.textContent);
-                    } else {
-                        rowData.push(cell.textContent.trim());
-                    }
-                }
+                const login = tr.children[1]?.textContent.trim() || '';
                 const passwordInput = tr.querySelector('.admin-password');
-                if (passwordInput) {
-                    rowData.push(passwordInput.value);
-                }
-                allData.push(rowData);
+                const password = passwordInput ? passwordInput.value : '';
+                allData.push([login, password]);
             });
             
             saveAdminToLocalStorage(allData);
@@ -1770,9 +1612,7 @@
         const cell = e.target.closest('.admin-cell');
         if (cell && !adminEditMode) {
             enableAdminEditMode();
-            if (parseInt(cell.dataset.cellIndex) !== 5) {
-                cell.focus();
-            }
+            cell.focus();
         }
     });
 
