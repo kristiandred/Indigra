@@ -8,6 +8,248 @@
     <link rel="stylesheet" href="css/site.css" />
     <link rel="stylesheet" href="css/custom.css" />
     <link rel="stylesheet" href="css/common.css" />
+    <style>
+        /* Стили в стиле price.html */
+        .about-section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--ice-blue);
+        }
+
+        .about-section h2 {
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        .about-section h3 {
+            color: var(--primary-blue);
+            margin: 20px 0 15px 0;
+            font-weight: 600;
+            font-size: 1.4rem;
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #2c3e50;
+        }
+
+        .about-subtitle {
+            color: var(--primary-blue);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .about-description {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .company-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            gap: 20px;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .about-image {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--ice-blue);
+            height: 100%;
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .advantage-card {
+            padding: 25px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--ice-blue);
+            height: 100%;
+            transition: transform 0.3s ease;
+            text-align: center;
+        }
+
+        .advantage-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .advantage-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .advantage-card h4 {
+            color: var(--primary-blue);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .advantage-card p {
+            color: #2c3e50;
+            margin-bottom: 0;
+        }
+
+        .product-category {
+            padding: 25px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--ice-blue);
+            height: 100%;
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--primary-blue);
+        }
+
+        .product-category h3 {
+            color: var(--primary-blue);
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .product-category p {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .product-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .product-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #2c3e50;
+        }
+
+        .product-list li:before {
+            content: "✓";
+            color: var(--primary-blue);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .geography-content {
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--ice-blue);
+        }
+
+        .geography-content p {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .regions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .region-item {
+            padding: 10px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 8px;
+            text-align: center;
+            color: var(--primary-blue);
+            font-weight: 500;
+            border-left: 3px solid var(--primary-blue);
+        }
+
+        .contact-info {
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--ice-blue);
+        }
+
+        .contact-info h4 {
+            color: var(--primary-blue);
+            font-weight: 600;
+            margin: 20px 0 10px 0;
+        }
+
+        .contact-info h4:first-child {
+            margin-top: 0;
+        }
+
+        .contact-info p {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .contact-info a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -55,10 +297,19 @@
     </header>
 
     <main role="main">
-        <!-- О компании -->
-        <section class="about-company">
+        <!-- Hero Section в стиле price.html -->
+        <section class="hero-section">
             <div class="container">
-                <h2 class="section-title">О НАС</h2>
+                <div class="hero-content">
+                    <h1 class="hero-title">О компании ИНДИГРА</h1>
+                </div>
+            </div>
+        </section>
+
+        <div class="container py-5">
+            <!-- О компании -->
+            <div class="about-section">
+                <h2>🚚 О НАС</h2>
                 <div class="row">
                     <div class="col-lg-6 mb-4">
                         <div class="about-text">
@@ -92,12 +343,10 @@
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Наши преимущества -->
-        <section class="advantages">
-            <div class="container">
-                <h2 class="section-title">НАШИ ПРЕИМУЩЕСТВА</h2>
+            <!-- Наши преимущества -->
+            <div class="about-section">
+                <h2>⭐ НАШИ ПРЕИМУЩЕСТВА</h2>
                 <div class="row">
                     <div class="col-md-6 col-lg-3 mb-4">
                         <div class="advantage-card">
@@ -129,12 +378,10 @@
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Наша продукция -->
-        <section class="products-overview">
-            <div class="container">
-                <h2 class="section-title">НАША ПРОДУКЦИЯ</h2>
+            <!-- Наша продукция -->
+            <div class="about-section">
+                <h2>🏗️ НАША ПРОДУКЦИЯ</h2>
                 <div class="row">
                     <div class="col-lg-6 mb-4">
                         <div class="product-category">
@@ -162,12 +409,10 @@
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- География деятельности -->
-        <section class="geography">
-            <div class="container">
-                <h2 class="section-title">ГЕОГРАФИЯ ДЕЯТЕЛЬНОСТИ</h2>
+            <!-- География деятельности -->
+            <div class="about-section">
+                <h2>📍 ГЕОГРАФИЯ ДЕЯТЕЛЬНОСТИ</h2>
                 <div class="row">
                     <div class="col-lg-8 mx-auto">
                         <div class="geography-content">
@@ -187,28 +432,43 @@
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Контакты -->
-        <section class="contacts">
-            <div class="container">
-                <h2 class="section-title">КОНТАКТЫ</h2>
-                <div class="contact-info">
-                    <h4>📍 Адрес</h4>
-                    <p>г. Минск, ул. Монтажников, 39</p>
+            <!-- Контакты -->
+            <div class="about-section">
+                <h2>📞 КОНТАКТЫ</h2>
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <div class="contact-info">
+                            <h4>📍 Адрес</h4>
+                            <p>г. Минск, ул. Монтажников, 39</p>
 
-                    <h4>📞 Телефон</h4>
-                    <p><a href="tel:+375291083083">+375 29 108 30 83</a><br>
-                       <a href="tel:+375291697227">+375 29 169 72 27</a></p>
+                            <h4>📞 Телефон</h4>
+                            <p><a href="tel:+375291083083">+375 29 108 30 83</a><br>
+                               <a href="tel:+375291697227">+375 29 169 72 27</a></p>
 
-                    <h4>📧 Email</h4>
-                    <p><a href="mailto:indigra.beton@gmail.com">indigra.beton@gmail.com</a></p>
+                            <h4>📧 Email</h4>
+                            <p><a href="mailto:indigra.beton@gmail.com">indigra.beton@gmail.com</a></p>
 
-                    <h4>🕐 Режим работы</h4>
-                    <p>Офис: Пн-Пт 9:00-18:00<br>Пр-во: Пн-Вс 8:00-20:00</p>
+                            <h4>🕐 Режим работы</h4>
+                            <p>Офис: Пн-Пт 9:00-18:00<br>Пр-во: Пн-Вс 8:00-20:00</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </section>
+
+            <!-- Контактная информация в стиле price.html -->
+            <div class="text-center mt-4">
+                <div class="info-box" style="background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);">
+                    <h3>📞 Для заказа и консультации</h3>
+                    <p style="font-size: 1.2rem; margin-bottom: 10px;">
+                        <strong>+375 29 108-30-83</strong> | <strong>+375 29 169-72-27</strong>
+                    </p>
+                    <p style="font-size: 1rem; margin-bottom: 0;">
+                        <a href="mailto:indigra.beton@gmail.com" style="color: var(--primary-blue);">indigra.beton@gmail.com</a>
+                    </p>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script src="js/jquery.min.js"></script>
