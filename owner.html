@@ -602,8 +602,11 @@
                 <button class="btn btn-info" id="refreshFromExcel">
                     🔄 Обновить из Админ.xlsx
                 </button>
-                <button class="btn btn-warning" id="debugExcelBtn" onclick="debugAdminExcel()">
+                <button class="btn btn-warning" onclick="debugAdminExcel()">
                     🔍 Проверить файл
+                </button>
+                <button class="btn btn-info" onclick="checkSavedData()">
+                    💾 Проверить сохраненные данные
                 </button>
             </div>
 
@@ -1006,21 +1009,21 @@
                 checkboxTd.appendChild(checkbox);
                 tr.appendChild(checkboxTd);
                 
-                // Логин
+                // Логин (индекс 1)
                 const loginTd = document.createElement('td');
                 loginTd.textContent = row[0] || 'Неизвестно';
-                loginTd.dataset.cellIndex = '1';
+                loginTd.dataset.cellIndex = '0'; // 0 - логин
                 loginTd.dataset.original = row[0] || 'Неизвестно';
                 loginTd.classList.add('admin-cell');
                 tr.appendChild(loginTd);
                 
-                // Пароль (скрытый)
+                // Пароль (индекс 2) - скрытый
                 const passwordTd = document.createElement('td');
                 const passwordSpan = document.createElement('span');
                 passwordSpan.className = 'password-mask';
                 passwordSpan.textContent = '••••••••';
                 passwordTd.appendChild(passwordSpan);
-                passwordTd.dataset.cellIndex = '2';
+                passwordTd.dataset.cellIndex = '1'; // 1 - пароль
                 passwordTd.dataset.original = row[1] || '';
                 passwordTd.dataset.value = row[1] || '';
                 passwordTd.classList.add('admin-cell');
@@ -1034,7 +1037,7 @@
                 passwordInput.value = row[1] || '';
                 tr.appendChild(passwordInput);
                 
-                // Кнопка удаления
+                // Кнопка удаления (индекс 3)
                 const actionTd = document.createElement('td');
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'btn btn-sm btn-danger';
@@ -1048,36 +1051,67 @@
             });
             
             updateRecordCount();
+            console.log('Таблица отрисована, строк:', data.length);
         }
 
         function saveAdminToLocalStorage(data) {
             localStorage.setItem('admin_data', JSON.stringify(data));
-            console.log('Данные сохранены в localStorage');
+            console.log('Данные сохранены в localStorage:', data);
+        }
+
+        // Функция для проверки сохраненных данных
+        function checkSavedData() {
+            const data = localStorage.getItem('admin_data');
+            console.log('Данные в localStorage:', data ? JSON.parse(data) : 'нет данных');
+            alert('Данные сохранены. Откройте консоль (F12) для просмотра.');
         }
 
         // Включение режима редактирования
         function enableAdminEditMode() {
             adminEditMode = true;
-            document.querySelectorAll('#admin-body .admin-cell').forEach(cell => {
-                cell.setAttribute('contenteditable', 'true');
-                cell.removeEventListener('input', handleAdminInput);
-                cell.addEventListener('input', handleAdminInput);
+            
+            document.querySelectorAll('#admin-body tr').forEach(row => {
+                // Ячейка с логином (индекс 1)
+                const loginCell = row.children[1];
+                if (loginCell) {
+                    loginCell.setAttribute('contenteditable', 'true');
+                    loginCell.removeEventListener('input', handleAdminInput);
+                    loginCell.addEventListener('input', handleAdminInput);
+                }
+                
+                // Ячейка с паролем (индекс 2)
+                const passwordCell = row.children[2];
+                if (passwordCell) {
+                    passwordCell.setAttribute('contenteditable', 'true');
+                    passwordCell.removeEventListener('input', handleAdminInput);
+                    passwordCell.addEventListener('input', handleAdminInput);
+                }
             });
             
             document.getElementById('saveAdminChanges').disabled = false;
             document.getElementById('cancelAdminChanges').disabled = false;
+            
+            console.log('Режим редактирования включен');
         }
 
         function handleAdminInput(e) {
             const cell = e.target;
             const row = cell.parentElement;
             const rowIndex = row.dataset.rowIndex;
-            const cellIndex = cell.dataset.cellIndex;
-            const cellId = `admin_${rowIndex}_${cellIndex}`;
-            const newValue = cell.textContent.trim();
             
-            // Если это поле пароля, показываем звездочки но сохраняем реальное значение
-            if (parseInt(cellIndex) === 2) {
+            // Определяем индекс ячейки: 0 - логин, 1 - пароль
+            let cellIndex = 0;
+            if (cell === row.children[2] || cell.closest('td') === row.children[2]) {
+                cellIndex = 1; // пароль
+            }
+            
+            const cellId = `admin_${rowIndex}_${cellIndex}`;
+            let newValue = cell.textContent.trim();
+            
+            console.log(`Редактирование: строка ${rowIndex}, ячейка ${cellIndex}, значение "${newValue}"`);
+            
+            // Если это поле пароля
+            if (cellIndex === 1) {
                 const passwordInput = row.querySelector('.admin-password');
                 if (passwordInput) {
                     passwordInput.value = newValue;
@@ -1090,7 +1124,7 @@
                 row: row,
                 cell: cell,
                 rowIndex: parseInt(rowIndex),
-                cellIndex: parseInt(cellIndex),
+                cellIndex: cellIndex,
                 value: newValue
             });
             
@@ -1202,21 +1236,21 @@
             checkboxTd.appendChild(checkbox);
             newRow.appendChild(checkboxTd);
             
-            // Логин
+            // Логин (индекс 1)
             const loginTd = document.createElement('td');
             loginTd.textContent = 'new_admin';
-            loginTd.dataset.cellIndex = '1';
+            loginTd.dataset.cellIndex = '0';
             loginTd.dataset.original = 'new_admin';
             loginTd.classList.add('admin-cell');
             newRow.appendChild(loginTd);
             
-            // Пароль
+            // Пароль (индекс 2)
             const passwordTd = document.createElement('td');
             const passwordSpan = document.createElement('span');
             passwordSpan.className = 'password-mask';
             passwordSpan.textContent = '••••••••';
             passwordTd.appendChild(passwordSpan);
-            passwordTd.dataset.cellIndex = '2';
+            passwordTd.dataset.cellIndex = '1';
             passwordTd.dataset.original = 'password123';
             passwordTd.dataset.value = 'password123';
             passwordTd.classList.add('admin-cell');
@@ -1230,7 +1264,7 @@
             passwordInput.value = 'password123';
             newRow.appendChild(passwordInput);
             
-            // Кнопка удаления
+            // Кнопка удаления (индекс 3)
             const actionTd = document.createElement('td');
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'btn btn-sm btn-danger';
@@ -1282,10 +1316,15 @@
             const allData = [];
             const rows = document.querySelectorAll('#admin-body tr');
             
-            rows.forEach(row => {
-                const login = row.children[1]?.textContent.trim() || '';
+            rows.forEach((row, index) => {
+                // Получаем ячейки: [чекбокс, логин, пароль, действия]
+                const loginCell = row.children[1]; // вторая ячейка (индекс 1) - логин
                 const passwordInput = row.querySelector('.admin-password');
+                
+                const login = loginCell ? loginCell.textContent.trim() : '';
                 const password = passwordInput ? passwordInput.value : '';
+                
+                console.log(`Строка ${index}: логин="${login}", пароль="${password}"`);
                 allData.push([login, password]);
             });
 
@@ -1293,7 +1332,10 @@
             adminChangedCells.forEach((data, cellId) => {
                 const rowIndex = data.rowIndex;
                 const cellIndex = data.cellIndex;
-                const adminName = rows[rowIndex]?.children[1]?.textContent || 'Неизвестно';
+                const row = rows[rowIndex];
+                if (!row) return;
+                
+                const adminName = row.children[1]?.textContent || 'Неизвестно';
                 const oldValue = data.cell.dataset.original;
                 const newValue = data.value;
                 
@@ -1309,21 +1351,24 @@
                 }
             });
 
+            // Сохраняем в localStorage
             saveAdminToLocalStorage(allData);
+            console.log('Сохраненные данные:', allData);
 
             // Обновляем original значения
             adminChangedCells.forEach((data, cellId) => {
-                if (parseInt(data.cellIndex) === 1) {
+                const cell = data.cell;
+                if (parseInt(data.cellIndex) === 1) { // Индекс 1 = пароль
                     // Для пароля обновляем скрытое поле
                     const row = data.row;
                     const passwordInput = row.querySelector('.admin-password');
                     if (passwordInput) {
                         passwordInput.value = data.value;
                     }
-                    data.cell.dataset.original = data.value;
-                    data.cell.dataset.value = data.value;
+                    cell.dataset.original = data.value;
+                    cell.dataset.value = data.value;
                 } else {
-                    data.cell.dataset.original = data.value;
+                    cell.dataset.original = data.value;
                 }
             });
 
@@ -1595,8 +1640,9 @@
             renderActions(actions);
         });
 
-        // Функция отладки (можно вызвать из консоли)
+        // Делаем функции доступными глобально
         window.debugAdminExcel = debugAdminExcel;
+        window.checkSavedData = checkSavedData;
     </script>
     <!-- Скрипт для автоматической подгонки ширины страницы -->
     <script src="js/layout-fixer.js"></script>
