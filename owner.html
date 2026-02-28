@@ -221,7 +221,40 @@
             box-shadow: inset 0 0 0 3px #3498db;
         }
 
-        /* Стили для журнала действий */
+        /* Стили для поля пароля */
+        .password-cell {
+            position: relative;
+        }
+
+        .password-mask {
+            opacity: 0.7;
+            font-family: monospace;
+            letter-spacing: 2px;
+            display: inline-block;
+        }
+
+        .password-input-hidden {
+            display: none;
+        }
+
+        .password-edit-mode .password-mask {
+            display: none;
+        }
+
+        .password-edit-mode .password-input {
+            display: inline-block;
+            width: 100%;
+            padding: 4px 8px;
+            border: 2px solid #3498db;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .password-input {
+            display: none;
+        }
+
+        /* Журнал действий */
         .actions-log-section {
             background: white;
             padding: 30px;
@@ -307,10 +340,6 @@
             vertical-align: middle;
         }
 
-        .actions-log-table tbody tr {
-            transition: all 0.2s ease;
-        }
-
         .actions-log-table tbody tr:hover {
             background: #e8f4fd;
         }
@@ -324,29 +353,11 @@
             color: white;
         }
 
-        .action-badge.add {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-        }
-
-        .action-badge.edit {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-        }
-
-        .action-badge.delete {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-        }
-
-        .action-badge.import {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-        }
-
-        .action-badge.export {
-            background: linear-gradient(135deg, #9b59b6, #8e44ad);
-        }
-
-        .action-details {
-            font-size: 0.9rem;
-        }
+        .action-badge.add { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .action-badge.edit { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .action-badge.delete { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .action-badge.import { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .action-badge.export { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
 
         .action-details .old-value {
             color: #e74c3c;
@@ -369,29 +380,6 @@
             color: #2c3e50;
         }
 
-        .info-box {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            border-left: 5px solid #28a745;
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 25px;
-        }
-
-        .info-box h4 {
-            color: #155724;
-            margin-bottom: 10px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .info-box p {
-            margin: 0;
-            color: #155724;
-            font-size: 1rem;
-        }
-
         .notification {
             position: fixed;
             top: 30px;
@@ -403,34 +391,16 @@
             z-index: 9999;
             animation: slideIn 0.3s ease;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            font-size: 1rem;
         }
 
-        .notification.success {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-        }
-
-        .notification.error {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-        }
-
-        .notification.info {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-        }
-
-        .notification.warning {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-        }
+        .notification.success { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .notification.error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .notification.info { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .notification.warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
 
         @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         .loading-overlay {
@@ -480,15 +450,8 @@
             display: inline-block;
         }
 
-        .save-indicator-dot.saved {
-            background: #2ecc71;
-            box-shadow: 0 0 10px #2ecc71;
-        }
-
-        .save-indicator-dot.modified {
-            background: #f39c12;
-            box-shadow: 0 0 10px #f39c12;
-        }
+        .save-indicator-dot.saved { background: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
+        .save-indicator-dot.modified { background: #f39c12; box-shadow: 0 0 10px #f39c12; }
 
         .filter-input {
             padding: 8px 15px;
@@ -503,7 +466,6 @@
             border-color: #3498db;
         }
 
-        /* Стили для чекбоксов и кнопок удаления */
         .admin-checkbox {
             width: 18px;
             height: 18px;
@@ -522,7 +484,6 @@
 
         .admin-table .btn-sm:hover {
             transform: scale(1.1);
-            box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
         }
 
         .admin-table td:first-child {
@@ -535,23 +496,6 @@
             text-align: center;
             vertical-align: middle;
             width: 100px;
-        }
-
-        .admin-table tbody tr:hover {
-            background-color: #f8f9fa;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: all 0.2s ease;
-        }
-
-        .admin-table tbody tr.selected {
-            background-color: #e3f2fd;
-        }
-
-        .password-mask {
-            opacity: 0.7;
-            font-family: monospace;
-            letter-spacing: 2px;
         }
     </style>
 </head>
@@ -630,22 +574,14 @@
 
         <!-- Журнал действий -->
         <div class="actions-log-section">
-            <h2>
-                📝 Журнал действий
-            </h2>
-
+            <h2>📝 Журнал действий</h2>
             <div class="actions-log-header">
                 <input type="text" class="filter-input" id="actionFilter" placeholder="🔍 Фильтр по имени, действию или деталям...">
                 <div class="actions-log-controls">
-                    <button class="btn btn-outline-primary" id="refreshActions">
-                        🔄 Обновить
-                    </button>
-                    <button class="btn btn-outline-danger" id="clearActions">
-                        🗑️ Очистить журнал
-                    </button>
+                    <button class="btn btn-outline-primary" id="refreshActions">🔄 Обновить</button>
+                    <button class="btn btn-outline-danger" id="clearActions">🗑️ Очистить журнал</button>
                 </div>
             </div>
-
             <div class="table-responsive">
                 <table class="actions-log-table" id="actions-log-table">
                     <thead>
@@ -672,8 +608,9 @@
         let adminChangedCells = new Map();
         let adminEditMode = false;
         let currentUser = 'Владелец';
+        let editTimeout = null;
 
-        // ========== ФУНКЦИИ ДЛЯ УВЕДОМЛЕНИЙ И ЗАГРУЗКИ ==========
+        // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
 
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
@@ -719,6 +656,21 @@
             document.getElementById('recordCount').textContent = `${count} записей`;
         }
 
+        function updateSaveButton() {
+            const saveBtn = document.getElementById('saveAdminChanges');
+            const changesCount = adminChangedCells.size;
+            
+            if (changesCount > 0) {
+                saveBtn.innerHTML = `💾 Сохранить изменения (${changesCount})`;
+                saveBtn.disabled = false;
+                document.getElementById('cancelAdminChanges').disabled = false;
+            } else {
+                saveBtn.innerHTML = '💾 Сохранить изменения';
+                saveBtn.disabled = true;
+                document.getElementById('cancelAdminChanges').disabled = true;
+            }
+        }
+
         // ========== ФУНКЦИИ ДЛЯ ЖУРНАЛА ДЕЙСТВИЙ ==========
 
         function loadActions() {
@@ -738,6 +690,9 @@
             };
             
             actions.unshift(newAction);
+            // Ограничим количество записей до 100
+            if (actions.length > 100) actions.pop();
+            
             localStorage.setItem('admin_actions', JSON.stringify(actions));
             renderActions(actions);
             return newAction;
@@ -759,11 +714,7 @@
             tbody.innerHTML = '';
             
             if (filteredActions.length === 0) {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td colspan="4" style="text-align: center; padding: 40px; color: #7f8c8d;">
-                    📭 Нет записей о действиях
-                </td>`;
-                tbody.appendChild(tr);
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 40px; color: #7f8c8d;">📭 Нет записей о действиях</td></tr>`;
                 return;
             }
             
@@ -771,12 +722,9 @@
                 const tr = document.createElement('tr');
                 
                 const timeTd = document.createElement('td');
-                const actionTime = new Date(action.timestamp);
                 timeTd.className = 'action-time';
-                timeTd.innerHTML = `
-                    <div>${actionTime.toLocaleDateString()}</div>
-                    <div>${actionTime.toLocaleTimeString()}</div>
-                `;
+                const actionTime = new Date(action.timestamp);
+                timeTd.innerHTML = `<div>${actionTime.toLocaleDateString()}</div><div>${actionTime.toLocaleTimeString()}</div>`;
                 
                 const userTd = document.createElement('td');
                 userTd.className = 'action-user';
@@ -793,7 +741,6 @@
                     case 'delete': actionText = '🗑️ Удаление'; break;
                     case 'import': actionText = '📤 Импорт'; break;
                     case 'export': actionText = '📥 Экспорт'; break;
-                    case 'clear': actionText = '🧹 Очистка журнала'; break;
                     default: actionText = action.type;
                 }
                 
@@ -811,13 +758,10 @@
                             <span class="old-value">${action.details.oldValue}</span> → 
                             <span class="new-value">${action.details.newValue}</span>
                         `;
-                    } else if (action.details.adminName) {
-                        detailsTd.innerHTML = `
-                            <strong>${action.details.adminName}</strong><br>
-                            ${action.details.description || ''}
-                        `;
                     } else {
-                        detailsTd.textContent = action.details;
+                        detailsTd.textContent = typeof action.details === 'string' 
+                            ? action.details 
+                            : action.details.description || JSON.stringify(action.details);
                     }
                 }
                 
@@ -839,9 +783,41 @@
             }
         }
 
+        // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ПАРОЛЕМ ==========
+
+        function createPasswordCell(password) {
+            const td = document.createElement('td');
+            td.className = 'admin-cell password-cell';
+            td.dataset.cellIndex = '1'; // 1 - пароль
+            td.dataset.original = password || '';
+            
+            // Скрытое поле для хранения реального пароля
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.className = 'password-value';
+            hiddenInput.value = password || '';
+            
+            // Отображение звездочек
+            const maskSpan = document.createElement('span');
+            maskSpan.className = 'password-mask';
+            maskSpan.textContent = '••••••••';
+            
+            // Поле ввода для редактирования
+            const inputField = document.createElement('input');
+            inputField.type = 'text';
+            inputField.className = 'password-input form-control form-control-sm';
+            inputField.value = password || '';
+            inputField.style.display = 'none';
+            
+            td.appendChild(maskSpan);
+            td.appendChild(inputField);
+            td.appendChild(hiddenInput);
+            
+            return td;
+        }
+
         // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С АДМИНИСТРАТОРАМИ ==========
 
-        // Загрузка из Админ.xlsx (только логин и пароль)
         function loadFromAdminExcel() {
             return new Promise((resolve, reject) => {
                 const excelUrl = 'data/Админ.xlsx';
@@ -851,79 +827,53 @@
                 
                 fetch(excelUrl, { 
                     method: 'GET',
-                    headers: {
-                        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    }
+                    headers: { 'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
                 })
                 .then(response => {
-                    console.log('Ответ сервера:', response.status, response.statusText);
-                    if (!response.ok) {
-                        throw new Error(`Файл не найден (статус: ${response.status})`);
-                    }
+                    console.log('Ответ сервера:', response.status);
+                    if (!response.ok) throw new Error(`Файл не найден (статус: ${response.status})`);
                     return response.arrayBuffer();
                 })
                 .then(data => {
                     console.log('Файл загружен, размер:', data.byteLength, 'байт');
-                    
-                    if (data.byteLength === 0) {
-                        throw new Error('Файл пустой');
-                    }
+                    if (data.byteLength === 0) throw new Error('Файл пустой');
                     
                     const workbook = XLSX.read(data, { type: 'array' });
                     console.log('Листы в файле:', workbook.SheetNames);
                     
                     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    
-                    // Получаем все данные
-                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { 
-                        header: 1,
-                        defval: '',
-                        blankrows: false
-                    });
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '', blankrows: false });
                     
                     console.log('Данные из Excel:', jsonData);
                     
                     // Обрабатываем данные
                     let adminData = [];
-                    let foundData = false;
                     
                     for (let i = 0; i < jsonData.length; i++) {
                         const row = jsonData[i];
                         if (!row || row.length === 0) continue;
                         
-                        // Получаем логин и пароль
                         let login = row[0] ? row[0].toString().trim() : '';
                         let password = row[1] ? row[1].toString().trim() : '';
                         
                         // Пропускаем строки с заголовками
                         if (login.toLowerCase().includes('логин') || 
                             login.toLowerCase().includes('login') ||
-                            login.toLowerCase().includes('пользователь') ||
                             login === '') {
                             continue;
                         }
                         
-                        // Если есть логин
                         if (login.length > 0) {
-                            // Создаем запись только с логином и паролем
-                            const adminRecord = [
-                                login,      // Логин
-                                password    // Пароль
-                            ];
-                            
-                            adminData.push(adminRecord);
-                            foundData = true;
+                            adminData.push([login, password]);
                         }
                     }
                     
                     console.log('Обработанные данные:', adminData);
                     
-                    if (foundData && adminData.length > 0) {
+                    if (adminData.length > 0) {
                         renderAdminTable(adminData);
                         saveAdminToLocalStorage(adminData);
-                        addAction('import', { 
-                            description: `Загружено ${adminData.length} администраторов` 
-                        });
+                        addAction('import', { description: `Загружено ${adminData.length} администраторов` });
                         showNotification(`Загружено ${adminData.length} администраторов`, 'success');
                         updateRecordCount();
                         resolve(adminData);
@@ -935,22 +885,17 @@
                 })
                 .catch(error => {
                     console.error('Ошибка загрузки:', error);
-                    addAction('error', { 
-                        description: `Ошибка загрузки: ${error.message}` 
-                    });
                     reject(error);
                 });
             });
         }
 
-        // Создание тестовых данных (только логин и пароль)
         function createTestData() {
             const testData = [
                 ['admin', 'admin123'],
                 ['ivanov', 'pass123'],
                 ['petrova', 'pass456'],
-                ['sidorov', 'pass789'],
-                ['kozlov', 'pass000']
+                ['sidorov', 'pass789']
             ];
             
             renderAdminTable(testData);
@@ -960,19 +905,13 @@
             updateRecordCount();
         }
 
-        // Загрузка данных администраторов
         function loadAdminData() {
             showLoading(true);
             
-            // Сначала пробуем загрузить из Excel
             loadFromAdminExcel()
-                .then(() => {
-                    showLoading(false);
-                })
                 .catch(error => {
                     console.error('Ошибка загрузки из Excel:', error);
                     
-                    // Если не удалось загрузить из Excel, пробуем localStorage
                     const savedAdminData = localStorage.getItem('admin_data');
                     if (savedAdminData) {
                         try {
@@ -987,11 +926,12 @@
                     } else {
                         createTestData();
                     }
+                })
+                .finally(() => {
                     showLoading(false);
                 });
         }
 
-        // Отрисовка таблицы (только логин и пароль)
         function renderAdminTable(data) {
             const tbody = document.getElementById('admin-body');
             tbody.innerHTML = '';
@@ -1009,41 +949,28 @@
                 checkboxTd.appendChild(checkbox);
                 tr.appendChild(checkboxTd);
                 
-                // Логин (индекс 1)
+                // Логин (индекс 0 в данных, ячейка 0 в таблице)
                 const loginTd = document.createElement('td');
-                loginTd.textContent = row[0] || 'Неизвестно';
-                loginTd.dataset.cellIndex = '0'; // 0 - логин
-                loginTd.dataset.original = row[0] || 'Неизвестно';
+                loginTd.textContent = row[0] || '';
+                loginTd.dataset.cellIndex = '0';
+                loginTd.dataset.original = row[0] || '';
                 loginTd.classList.add('admin-cell');
                 tr.appendChild(loginTd);
                 
-                // Пароль (индекс 2) - скрытый
-                const passwordTd = document.createElement('td');
-                const passwordSpan = document.createElement('span');
-                passwordSpan.className = 'password-mask';
-                passwordSpan.textContent = '••••••••';
-                passwordTd.appendChild(passwordSpan);
-                passwordTd.dataset.cellIndex = '1'; // 1 - пароль
-                passwordTd.dataset.original = row[1] || '';
-                passwordTd.dataset.value = row[1] || '';
-                passwordTd.classList.add('admin-cell');
-                passwordTd.style.cursor = 'pointer';
+                // Пароль (индекс 1 в данных, ячейка 1 в таблице)
+                const passwordTd = createPasswordCell(row[1] || '');
                 tr.appendChild(passwordTd);
                 
-                // Скрытое поле для хранения реального пароля
-                const passwordInput = document.createElement('input');
-                passwordInput.type = 'hidden';
-                passwordInput.className = 'admin-password';
-                passwordInput.value = row[1] || '';
-                tr.appendChild(passwordInput);
-                
-                // Кнопка удаления (индекс 3)
+                // Кнопка удаления
                 const actionTd = document.createElement('td');
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'btn btn-sm btn-danger';
                 deleteBtn.innerHTML = '🗑️';
                 deleteBtn.title = 'Удалить администратора';
-                deleteBtn.onclick = () => deleteAdmin(rowIndex, row[0]);
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteAdmin(rowIndex, row[0]);
+                };
                 actionTd.appendChild(deleteBtn);
                 tr.appendChild(actionTd);
                 
@@ -1059,32 +986,25 @@
             console.log('Данные сохранены в localStorage:', data);
         }
 
-        // Функция для проверки сохраненных данных
-        function checkSavedData() {
-            const data = localStorage.getItem('admin_data');
-            console.log('Данные в localStorage:', data ? JSON.parse(data) : 'нет данных');
-            alert('Данные сохранены. Откройте консоль (F12) для просмотра.');
-        }
-
-        // Включение режима редактирования
         function enableAdminEditMode() {
+            if (adminEditMode) return;
+            
             adminEditMode = true;
             
             document.querySelectorAll('#admin-body tr').forEach(row => {
-                // Ячейка с логином (индекс 1)
+                // Ячейка с логином
                 const loginCell = row.children[1];
                 if (loginCell) {
                     loginCell.setAttribute('contenteditable', 'true');
-                    loginCell.removeEventListener('input', handleAdminInput);
-                    loginCell.addEventListener('input', handleAdminInput);
+                    loginCell.addEventListener('input', handleLoginInput);
+                    loginCell.addEventListener('focus', handleCellFocus);
+                    loginCell.addEventListener('blur', handleCellBlur);
                 }
                 
-                // Ячейка с паролем (индекс 2)
+                // Ячейка с паролем
                 const passwordCell = row.children[2];
                 if (passwordCell) {
-                    passwordCell.setAttribute('contenteditable', 'true');
-                    passwordCell.removeEventListener('input', handleAdminInput);
-                    passwordCell.addEventListener('input', handleAdminInput);
+                    passwordCell.addEventListener('dblclick', handlePasswordDoubleClick);
                 }
             });
             
@@ -1094,55 +1014,84 @@
             console.log('Режим редактирования включен');
         }
 
-        function handleAdminInput(e) {
+        function handleLoginInput(e) {
             const cell = e.target;
-            const row = cell.parentElement;
+            const row = cell.closest('tr');
             const rowIndex = row.dataset.rowIndex;
+            const newValue = cell.textContent.trim();
             
-            // Определяем индекс ячейки: 0 - логин, 1 - пароль
-            let cellIndex = 0;
-            if (cell === row.children[2] || cell.closest('td') === row.children[2]) {
-                cellIndex = 1; // пароль
-            }
-            
-            const cellId = `admin_${rowIndex}_${cellIndex}`;
-            let newValue = cell.textContent.trim();
-            
-            console.log(`Редактирование: строка ${rowIndex}, ячейка ${cellIndex}, значение "${newValue}"`);
-            
-            // Если это поле пароля
-            if (cellIndex === 1) {
-                const passwordInput = row.querySelector('.admin-password');
-                if (passwordInput) {
-                    passwordInput.value = newValue;
-                }
-                // Визуально оставляем звездочки
-                cell.innerHTML = '<span class="password-mask">••••••••</span>';
-            }
+            const cellId = `admin_${rowIndex}_0`;
             
             adminChangedCells.set(cellId, {
                 row: row,
                 cell: cell,
                 rowIndex: parseInt(rowIndex),
-                cellIndex: cellIndex,
+                cellIndex: 0,
                 value: newValue
             });
             
-            updateAdminSaveButton();
+            updateSaveButton();
             updateSaveIndicator();
         }
 
-        function updateAdminSaveButton() {
-            const saveBtn = document.getElementById('saveAdminChanges');
-            const changesCount = adminChangedCells.size;
+        function handlePasswordDoubleClick(e) {
+            const cell = e.target.closest('.admin-cell');
+            if (!cell || !adminEditMode) return;
             
-            if (changesCount > 0) {
-                saveBtn.innerHTML = `💾 Сохранить изменения (${changesCount})`;
-                saveBtn.disabled = false;
-            } else {
-                saveBtn.innerHTML = '💾 Сохранить изменения';
-                saveBtn.disabled = true;
+            const row = cell.closest('tr');
+            const rowIndex = row.dataset.rowIndex;
+            const maskSpan = cell.querySelector('.password-mask');
+            const inputField = cell.querySelector('.password-input');
+            const hiddenInput = cell.querySelector('.password-value');
+            
+            if (maskSpan && inputField && hiddenInput) {
+                maskSpan.style.display = 'none';
+                inputField.style.display = 'block';
+                inputField.value = hiddenInput.value;
+                inputField.focus();
+                
+                const savePassword = () => {
+                    const newPassword = inputField.value.trim();
+                    
+                    if (newPassword !== hiddenInput.value) {
+                        hiddenInput.value = newPassword;
+                        
+                        const cellId = `admin_${rowIndex}_1`;
+                        
+                        adminChangedCells.set(cellId, {
+                            row: row,
+                            cell: cell,
+                            rowIndex: parseInt(rowIndex),
+                            cellIndex: 1,
+                            value: newPassword
+                        });
+                        
+                        updateSaveButton();
+                        updateSaveIndicator();
+                    }
+                    
+                    maskSpan.style.display = 'inline-block';
+                    inputField.style.display = 'none';
+                };
+                
+                inputField.onblur = savePassword;
+                inputField.onkeypress = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        inputField.blur();
+                    }
+                };
             }
+        }
+
+        function handleCellFocus(e) {
+            if (editTimeout) clearTimeout(editTimeout);
+        }
+
+        function handleCellBlur(e) {
+            editTimeout = setTimeout(() => {
+                // Действия при потере фокуса, если нужно
+            }, 200);
         }
 
         function deleteAdmin(rowIndex, adminName) {
@@ -1154,7 +1103,7 @@
                     const allData = [];
                     document.querySelectorAll('#admin-body tr').forEach(tr => {
                         const login = tr.children[1]?.textContent.trim() || '';
-                        const passwordInput = tr.querySelector('.admin-password');
+                        const passwordInput = tr.querySelector('.password-value');
                         const password = passwordInput ? passwordInput.value : '';
                         allData.push([login, password]);
                     });
@@ -1171,7 +1120,12 @@
             }
         }
 
-        // Функция для отладки Excel файла
+        function checkSavedData() {
+            const data = localStorage.getItem('admin_data');
+            console.log('Данные в localStorage:', data ? JSON.parse(data) : 'нет данных');
+            alert('Данные сохранены. Откройте консоль (F12) для просмотра.');
+        }
+
         function debugAdminExcel() {
             fetch('data/Админ.xlsx')
                 .then(response => response.arrayBuffer())
@@ -1185,9 +1139,9 @@
                     
                     allData.forEach((row, index) => {
                         const login = row[0] || '(пусто)';
-                        const pass = row[1] ? '***' : '(пусто)';
+                        const pass = row[1] || '(пусто)';
                         console.log(`Строка ${index + 1}: Логин="${row[0]}", Пароль="${row[1]}"`);
-                        message += `Строка ${index + 1}: Логин="${login}", Пароль=${pass}\n`;
+                        message += `Строка ${index + 1}: Логин="${login}", Пароль="${pass}"\n`;
                     });
                     
                     alert(message);
@@ -1206,14 +1160,7 @@
             
             addAction('info', { description: 'Панель управления открыта' });
             
-            document.addEventListener('paste', function(e) {
-                if (e.target.closest('[contenteditable="true"]')) {
-                    e.preventDefault();
-                    const text = e.clipboardData.getData('text/plain');
-                    document.execCommand('insertText', false, text);
-                }
-            });
-            
+            // Защита от потери данных
             window.addEventListener('beforeunload', function(e) {
                 if (adminChangedCells.size > 0) {
                     e.preventDefault();
@@ -1225,82 +1172,69 @@
         // Добавление новой записи
         document.getElementById('addAdminRow').addEventListener('click', function() {
             const tbody = document.getElementById('admin-body');
-            const newRow = document.createElement('tr');
-            newRow.dataset.rowIndex = tbody.children.length;
+            const newRowIndex = tbody.children.length;
             
+            const tr = document.createElement('tr');
+            tr.dataset.rowIndex = newRowIndex;
+            
+            // Чекбокс
             const checkboxTd = document.createElement('td');
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.className = 'admin-checkbox';
-            checkbox.dataset.rowIndex = tbody.children.length;
+            checkbox.dataset.rowIndex = newRowIndex;
             checkboxTd.appendChild(checkbox);
-            newRow.appendChild(checkboxTd);
+            tr.appendChild(checkboxTd);
             
-            // Логин (индекс 1)
+            // Логин
             const loginTd = document.createElement('td');
             loginTd.textContent = 'new_admin';
             loginTd.dataset.cellIndex = '0';
             loginTd.dataset.original = 'new_admin';
             loginTd.classList.add('admin-cell');
-            newRow.appendChild(loginTd);
+            tr.appendChild(loginTd);
             
-            // Пароль (индекс 2)
-            const passwordTd = document.createElement('td');
-            const passwordSpan = document.createElement('span');
-            passwordSpan.className = 'password-mask';
-            passwordSpan.textContent = '••••••••';
-            passwordTd.appendChild(passwordSpan);
-            passwordTd.dataset.cellIndex = '1';
-            passwordTd.dataset.original = 'password123';
-            passwordTd.dataset.value = 'password123';
-            passwordTd.classList.add('admin-cell');
-            passwordTd.style.cursor = 'pointer';
-            newRow.appendChild(passwordTd);
+            // Пароль
+            const passwordTd = createPasswordCell('password123');
+            tr.appendChild(passwordTd);
             
-            // Скрытое поле для пароля
-            const passwordInput = document.createElement('input');
-            passwordInput.type = 'hidden';
-            passwordInput.className = 'admin-password';
-            passwordInput.value = 'password123';
-            newRow.appendChild(passwordInput);
-            
-            // Кнопка удаления (индекс 3)
+            // Кнопка удаления
             const actionTd = document.createElement('td');
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'btn btn-sm btn-danger';
             deleteBtn.innerHTML = '🗑️';
             deleteBtn.title = 'Удалить администратора';
-            deleteBtn.onclick = () => deleteAdmin(newRow.dataset.rowIndex, 'new_admin');
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                deleteAdmin(newRowIndex, 'new_admin');
+            };
             actionTd.appendChild(deleteBtn);
-            newRow.appendChild(actionTd);
+            tr.appendChild(actionTd);
             
-            tbody.appendChild(newRow);
+            tbody.appendChild(tr);
             
             if (!adminEditMode) {
                 enableAdminEditMode();
             }
             
-            // Добавляем ячейки в изменения
-            const loginCell = newRow.children[1];
-            const passwordCell = newRow.children[2];
-            
-            adminChangedCells.set(`admin_${newRow.dataset.rowIndex}_0`, {
-                row: newRow,
-                cell: loginCell,
-                rowIndex: parseInt(newRow.dataset.rowIndex),
+            // Добавляем изменения
+            adminChangedCells.set(`admin_${newRowIndex}_0`, {
+                row: tr,
+                cell: loginTd,
+                rowIndex: newRowIndex,
                 cellIndex: 0,
                 value: 'new_admin'
             });
             
-            adminChangedCells.set(`admin_${newRow.dataset.rowIndex}_1`, {
-                row: newRow,
-                cell: passwordCell,
-                rowIndex: parseInt(newRow.dataset.rowIndex),
+            adminChangedCells.set(`admin_${newRowIndex}_1`, {
+                row: tr,
+                cell: passwordTd,
+                rowIndex: newRowIndex,
                 cellIndex: 1,
                 value: 'password123'
             });
             
-            updateAdminSaveButton();
+            updateSaveButton();
             updateSaveIndicator();
             updateRecordCount();
             showNotification('Новая запись добавлена', 'success');
@@ -1317,11 +1251,8 @@
             const rows = document.querySelectorAll('#admin-body tr');
             
             rows.forEach((row, index) => {
-                // Получаем ячейки: [чекбокс, логин, пароль, действия]
-                const loginCell = row.children[1]; // вторая ячейка (индекс 1) - логин
-                const passwordInput = row.querySelector('.admin-password');
-                
-                const login = loginCell ? loginCell.textContent.trim() : '';
+                const login = row.children[1]?.textContent.trim() || '';
+                const passwordInput = row.querySelector('.password-value');
                 const password = passwordInput ? passwordInput.value : '';
                 
                 console.log(`Строка ${index}: логин="${login}", пароль="${password}"`);
@@ -1330,17 +1261,13 @@
 
             // Записываем изменения в журнал
             adminChangedCells.forEach((data, cellId) => {
-                const rowIndex = data.rowIndex;
-                const cellIndex = data.cellIndex;
-                const row = rows[rowIndex];
-                if (!row) return;
-                
+                const row = data.row;
                 const adminName = row.children[1]?.textContent || 'Неизвестно';
                 const oldValue = data.cell.dataset.original;
                 const newValue = data.value;
                 
                 if (oldValue !== newValue) {
-                    let fieldName = cellIndex === 0 ? 'Логин' : 'Пароль';
+                    let fieldName = data.cellIndex === 0 ? 'Логин' : 'Пароль';
                     
                     addAction('edit', {
                         adminName: adminName,
@@ -1358,22 +1285,11 @@
             // Обновляем original значения
             adminChangedCells.forEach((data, cellId) => {
                 const cell = data.cell;
-                if (parseInt(data.cellIndex) === 1) { // Индекс 1 = пароль
-                    // Для пароля обновляем скрытое поле
-                    const row = data.row;
-                    const passwordInput = row.querySelector('.admin-password');
-                    if (passwordInput) {
-                        passwordInput.value = data.value;
-                    }
-                    cell.dataset.original = data.value;
-                    cell.dataset.value = data.value;
-                } else {
-                    cell.dataset.original = data.value;
-                }
+                cell.dataset.original = data.value;
             });
 
             adminChangedCells.clear();
-            updateAdminSaveButton();
+            updateSaveButton();
             updateSaveIndicator();
             showNotification('Изменения успешно сохранены', 'success');
         });
@@ -1388,23 +1304,26 @@
             if (confirm('Отменить все несохраненные изменения?')) {
                 adminChangedCells.forEach((data, cellId) => {
                     const cell = data.cell;
-                    if (parseInt(data.cellIndex) === 1) {
-                        // Для пароля восстанавливаем
-                        const originalValue = cell.dataset.original;
-                        const row = data.row;
-                        const passwordInput = row.querySelector('.admin-password');
-                        if (passwordInput) {
-                            passwordInput.value = originalValue;
-                        }
-                        cell.innerHTML = '<span class="password-mask">••••••••</span>';
-                        cell.dataset.value = originalValue;
+                    const originalValue = cell.dataset.original;
+                    
+                    if (data.cellIndex === 0) {
+                        // Логин
+                        cell.textContent = originalValue;
                     } else {
-                        cell.textContent = cell.dataset.original;
+                        // Пароль
+                        const hiddenInput = cell.querySelector('.password-value');
+                        const maskSpan = cell.querySelector('.password-mask');
+                        if (hiddenInput && maskSpan) {
+                            hiddenInput.value = originalValue;
+                            maskSpan.style.display = 'inline-block';
+                            const inputField = cell.querySelector('.password-input');
+                            if (inputField) inputField.style.display = 'none';
+                        }
                     }
                 });
 
                 adminChangedCells.clear();
-                updateAdminSaveButton();
+                updateSaveButton();
                 updateSaveIndicator();
                 showNotification('Изменения отменены', 'info');
             }
@@ -1412,13 +1331,11 @@
 
         // Экспорт в Excel
         document.getElementById('exportAdminExcel').addEventListener('click', function() {
-            const allData = [];
-            const headers = ['Логин', 'Пароль'];
-            allData.push(headers);
+            const allData = [['Логин', 'Пароль']];
             
             document.querySelectorAll('#admin-body tr').forEach(tr => {
                 const login = tr.children[1]?.textContent.trim() || '';
-                const passwordInput = tr.querySelector('.admin-password');
+                const passwordInput = tr.querySelector('.password-value');
                 const password = passwordInput ? passwordInput.value : '';
                 allData.push([login, password]);
             });
@@ -1472,7 +1389,7 @@
                                 });
                                 
                                 adminChangedCells.clear();
-                                updateAdminSaveButton();
+                                updateSaveButton();
                                 updateSaveIndicator();
                                 showNotification(`Импортировано ${importedData.length} записей`, 'success');
                             } else {
@@ -1494,7 +1411,7 @@
             document.getElementById('fileInput').click();
         });
 
-        // Загрузка файла вручную
+        // Загрузка файла
         document.getElementById('loadAdminFile').addEventListener('click', function() {
             const input = document.createElement('input');
             input.type = 'file';
@@ -1529,7 +1446,7 @@
                             
                             if (adminData.length > 0) {
                                 adminChangedCells.clear();
-                                updateAdminSaveButton();
+                                updateSaveButton();
                                 updateSaveIndicator();
                                 
                                 renderAdminTable(adminData);
@@ -1543,8 +1460,6 @@
                             } else {
                                 showNotification('Нет данных в файле', 'warning');
                             }
-                        } else {
-                            showNotification('Файл пустой', 'warning');
                         }
                     } catch (error) {
                         console.error('Ошибка чтения файла:', error);
@@ -1564,7 +1479,7 @@
         document.getElementById('refreshFromExcel').addEventListener('click', function() {
             if (confirm('Обновить все данные из файла Админ.xlsx? Несохраненные изменения будут потеряны.')) {
                 adminChangedCells.clear();
-                updateAdminSaveButton();
+                updateSaveButton();
                 updateSaveIndicator();
                 loadAdminData();
             }
@@ -1590,7 +1505,7 @@
                 const allData = [];
                 document.querySelectorAll('#admin-body tr').forEach(tr => {
                     const login = tr.children[1]?.textContent.trim() || '';
-                    const passwordInput = tr.querySelector('.admin-password');
+                    const passwordInput = tr.querySelector('.password-value');
                     const password = passwordInput ? passwordInput.value : '';
                     allData.push([login, password]);
                 });
@@ -1618,12 +1533,11 @@
             }
         });
 
-        // Клик по ячейке для редактирования
+        // Клик для включения режима редактирования
         document.getElementById('admin-body').addEventListener('click', function(e) {
             const cell = e.target.closest('.admin-cell');
             if (cell && !adminEditMode) {
                 enableAdminEditMode();
-                cell.focus();
             }
         });
 
@@ -1644,7 +1558,6 @@
         window.debugAdminExcel = debugAdminExcel;
         window.checkSavedData = checkSavedData;
     </script>
-    <!-- Скрипт для автоматической подгонки ширины страницы -->
     <script src="js/layout-fixer.js"></script>
 </body>
 </html>
