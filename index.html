@@ -278,43 +278,7 @@
             </div>
         </div>
 
-        <section class="calculator" id="calculator">
-            <div class="container">
-                <h2 class="section-title">РАССЧИТАТЬ СТОИМОСТЬ</h2>
-                <div class="row justify-content-center">
-                    <div class="col-md-6">
-                        <div class="calculator-card p-4">
-                            <form id="calcForm">
-                                <div class="mb-3">
-                                    <label for="productType" class="form-label">Тип бетона</label>
-                                    <select class="form-select" id="productType">
-                                        <option value="3800">Бетон М100-М300 (3 800 ₽/м³)</option>
-                                        <option value="4500">Бетон М350-М500 (4 500 ₽/м³)</option>
-                                        <option value="3200">Раствор кладочный (3 200 ₽/м³)</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="volume" class="form-label">Объем, м³</label>
-                                    <input type="number" class="form-control" id="volume" min="1" max="100" value="10">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="delivery" class="form-label">Доставка</label>
-                                    <select class="form-select" id="delivery">
-                                        <option value="0">Самовывоз</option>
-                                        <option value="5000">В пределах города (+5 000 ₽)</option>
-                                        <option value="10000">За городом (+10 000 ₽)</option>
-                                    </select>
-                                </div>
-                                <div class="result mb-3 p-3 bg-light rounded">
-                                    <h5>Итого: <span id="totalPrice">0</span> ₽</h5>
-                                </div>
-                                <button type="button" class="btn btn-primary w-100" onclick="calculateTotal()">Рассчитать</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+       
 
         <section class="contacts">
             <div class="container">
