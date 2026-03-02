@@ -121,6 +121,19 @@
         .text-center {
             text-align: center;
         }
+        
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -173,12 +186,91 @@
         <section class="hero-section delivery-page">
             <div class="container">
                 <div class="hero-content">
-                    <h1 class="hero-title">Прайс-лист на транспортные услуги</h1>
+                    <h1 class="hero-title">Прайс-лист на продукцию и услуги</h1>
                 </div>
             </div>
         </section>
 
         <div class="container py-5">
+            
+            <!-- ==================== ТОВАРНЫЙ БЕТОН ==================== -->
+            
+            <div class="price-section">
+                <h2>🏗️ Товарный бетон</h2>
+                
+                <div class="two-columns">
+                    <!-- Бетон на гравийном заполнителе -->
+                    <div>
+                        <h3>На гравийном заполнителе фр. 3-20 мм</h3>
+                        <div class="table-responsive">
+                            <table class="price-table" id="table-beton-gravel">
+                                <thead>
+                                    <tr>
+                                        <th>Марка бетона</th>
+                                        <th>Цена без НДС, руб. коп</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>С8/10 М100 гр</td><td><span class="badge-price">115</span></td></tr>
+                                    <tr><td>С 12/15 М200 гр</td><td><span class="badge-price">125</span></td></tr>
+                                    <tr><td>С16/20 М250 гр</td><td><span class="badge-price">135</span></td></tr>
+                                    <tr><td>С18/22,5 М300 гр</td><td><span class="badge-price">145</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Бетон на гранитном щебне -->
+                    <div>
+                        <h3>На гранитном щебне фр. 5-20 мм</h3>
+                        <div class="table-responsive">
+                            <table class="price-table" id="table-beton-granite">
+                                <thead>
+                                    <tr>
+                                        <th>Марка бетона</th>
+                                        <th>Цена без НДС, руб. коп.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>С8/10 М150 щ</td><td><span class="badge-price">166.5</span></td></tr>
+                                    <tr><td>С 12/15 М200 щ</td><td><span class="badge-price">175</span></td></tr>
+                                    <tr><td>С 16/20 М250 щ</td><td><span class="badge-price">180</span></td></tr>
+                                    <tr><td>С18/22,5 М300 щ</td><td><span class="badge-price">187.5</span></td></tr>
+                                    <tr><td>С 20/25 М350 щ</td><td><span class="badge-price">196</span></td></tr>
+                                    <tr><td>С 25/30 М400 щ</td><td><span class="badge-price">215</span></td></tr>
+                                    <tr><td>С 28/35 М450 щ</td><td><span class="badge-price">225</span></td></tr>
+                                    <tr><td>С 30/37 М500 щ</td><td><span class="badge-price">250</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ==================== РАСТВОРЫ ==================== -->
+            
+            <div class="price-section">
+                <h2>🧱 Растворы</h2>
+                
+                <div class="table-responsive">
+                    <table class="price-table" id="table-mortars">
+                        <thead>
+                            <tr>
+                                <th>Марка</th>
+                                <th>Цена без НДС, руб. коп</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>РСГП М50</td><td><span class="badge-price">105</span></td></tr>
+                            <tr><td>РСГП М100</td><td><span class="badge-price">126</span></td></tr>
+                            <tr><td>РСГП М150</td><td><span class="badge-price">138</span></td></tr>
+                            <tr><td>РСГП М200</td><td><span class="badge-price">147</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <p class="note-text">* Растворы готовые кладочные и штукатурные</p>
+            </div>
             
             <!-- ==================== ТАРИФЫ НА АВТОБЕТОНОСМЕСИТЕЛИ ==================== -->
             
@@ -354,8 +446,8 @@
     function loadPricesFromStorage() {
         console.log('Загружаем цены из хранилища...');
         
-        // Проверяем оба возможных ключа от админки
-        const keys = ['price_data_tarif.xlsx', 'price_data_Nasos.xlsx'];
+        // Проверяем все возможные ключи от админки
+        const keys = ['price_data_tarif.xlsx', 'price_data_Nasos.xlsx', 'price_data_beton.xlsx', 'price_data_rastvory.xlsx'];
         let allChanges = {};
         
         keys.forEach(key => {
@@ -446,7 +538,7 @@
     
     // Следим за изменениями в других вкладках
     window.addEventListener('storage', function(e) {
-        if (e.key && e.key.startsWith('price_data_')) {
+        if (e.key && (e.key.startsWith('price_data_') || e.key === 'price_updates')) {
             console.log('🔄 Обнаружены изменения в хранилище, обновляем...');
             loadPricesFromStorage();
         }
