@@ -291,6 +291,19 @@
             margin-right: 8px;
         }
 
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .mt-4 { margin-top: 1.5rem; }
         .mb-3 { margin-bottom: 1rem; }
         .text-center { text-align: center; }
@@ -323,6 +336,85 @@
             <div class="edit-hint" id="editHint">
                 <i>✏️</i> Режим редактирования активен. Нажмите на любую ячейку с ценой или текстом, чтобы изменить её. 
                 После внесения изменений нажмите "Сохранить все изменения".
+            </div>
+
+            <!-- ==================== ТОВАРНЫЙ БЕТОН ==================== -->
+            
+            <div class="price-section" id="section-beton">
+                <h2>🏗️ Товарный бетон</h2>
+                
+                <div class="two-columns">
+                    <!-- Бетон на гравийном заполнителе -->
+                    <div>
+                        <h3>На гравийном заполнителе фр. 3-20 мм</h3>
+                        <div class="table-responsive">
+                            <table class="price-table" id="table-beton-gravel" data-file="beton.xlsx">
+                                <thead>
+                                    <tr>
+                                        <th>Марка бетона</th>
+                                        <th>Цена без НДС, руб. коп</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td class="editable-cell">С8/10 М100 гр</td><td class="editable-cell price-cell"><span class="badge-price price-value">115</span></td></tr>
+                                    <tr><td class="editable-cell">С 12/15 М200 гр</td><td class="editable-cell price-cell"><span class="badge-price price-value">125</span></td></tr>
+                                    <tr><td class="editable-cell">С16/20 М250 гр</td><td class="editable-cell price-cell"><span class="badge-price price-value">135</span></td></tr>
+                                    <tr><td class="editable-cell">С18/22,5 М300 гр</td><td class="editable-cell price-cell"><span class="badge-price price-value">145</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Бетон на гранитном щебне -->
+                    <div>
+                        <h3>На гранитном щебне фр. 5-20 мм</h3>
+                        <div class="table-responsive">
+                            <table class="price-table" id="table-beton-granite" data-file="beton.xlsx">
+                                <thead>
+                                    <tr>
+                                        <th>Марка бетона</th>
+                                        <th>Цена без НДС, руб. коп.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td class="editable-cell">С8/10 М150 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">166.5</span></td></tr>
+                                    <tr><td class="editable-cell">С 12/15 М200 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">175</span></td></tr>
+                                    <tr><td class="editable-cell">С 16/20 М250 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">180</span></td></tr>
+                                    <tr><td class="editable-cell">С18/22,5 М300 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">187.5</span></td></tr>
+                                    <tr><td class="editable-cell">С 20/25 М350 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">196</span></td></tr>
+                                    <tr><td class="editable-cell">С 25/30 М400 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">215</span></td></tr>
+                                    <tr><td class="editable-cell">С 28/35 М450 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">225</span></td></tr>
+                                    <tr><td class="editable-cell">С 30/37 М500 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">250</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ==================== РАСТВОРЫ ==================== -->
+            
+            <div class="price-section" id="section-rastvory">
+                <h2>🧱 Растворы</h2>
+                
+                <div class="table-responsive">
+                    <table class="price-table" id="table-mortars" data-file="rastvory.xlsx">
+                        <thead>
+                            <tr>
+                                <th>Марка</th>
+                                <th>Цена без НДС, руб. коп</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="editable-cell">РСГП М50</td><td class="editable-cell price-cell"><span class="badge-price price-value">105</span></td></tr>
+                            <tr><td class="editable-cell">РСГП М100</td><td class="editable-cell price-cell"><span class="badge-price price-value">126</span></td></tr>
+                            <tr><td class="editable-cell">РСГП М150</td><td class="editable-cell price-cell"><span class="badge-price price-value">138</span></td></tr>
+                            <tr><td class="editable-cell">РСГП М200</td><td class="editable-cell price-cell"><span class="badge-price price-value">147</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <p class="note-text">* Растворы готовые кладочные и штукатурные</p>
             </div>
 
             <!-- ==================== ТАРИФЫ НА АВТОБЕТОНОСМЕСИТЕЛИ ==================== -->
@@ -791,7 +883,7 @@
 
         // Загрузка данных из localStorage при загрузке страницы
         function loadFromLocalStorage() {
-            const files = ['tarif.xlsx', 'Nasos.xlsx'];
+            const files = ['tarif.xlsx', 'Nasos.xlsx', 'beton.xlsx', 'rastvory.xlsx'];
             
             files.forEach(fileName => {
                 const key = `price_data_${fileName}`;
@@ -803,7 +895,11 @@
                         
                         // Применяем сохраненные изменения к ячейкам
                         Object.entries(changes).forEach(([cellId, value]) => {
-                            const [tableId, rowIndex, cellIndex] = cellId.split('_');
+                            const parts = cellId.split('_');
+                            const tableId = parts.slice(0, -2).join('_');
+                            const rowIndex = parseInt(parts[parts.length - 2]);
+                            const cellIndex = parseInt(parts[parts.length - 1]);
+                            
                             const table = document.getElementById(tableId);
                             
                             if (table) {
@@ -855,5 +951,3 @@
     <script src="js/layout-fixer.js"></script>
 </body>
 </html>
-
-
