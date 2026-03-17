@@ -1,6 +1,7 @@
 User-agent: *
 Disallow: /admin-panel.html
 Disallow: /AutorithAdmin.html
+Disallow: /owner.html
 Disallow: /delete_file.php
 Disallow: /save_excel.php
 Disallow: /sync_github.php
@@ -10,9 +11,11 @@ Disallow: /*.py$
 Disallow: /cgi-bin/
 Disallow: /tmp/
 
+# Отдельно для Яндекса
 User-agent: Yandex
 Disallow: /admin-panel.html
 Disallow: /AutorithAdmin.html
+Disallow: /owner.html
 Disallow: /delete_file.php
 Disallow: /save_excel.php
 Disallow: /sync_github.php
@@ -23,9 +26,11 @@ Disallow: /cgi-bin/
 Disallow: /tmp/
 Host: https://indigrastroy.by
 
+# Для Google (он Host не понимает, но и не мешает)
 User-agent: Googlebot
 Disallow: /admin-panel.html
 Disallow: /AutorithAdmin.html
+Disallow: /owner.html
 Disallow: /delete_file.php
 Disallow: /save_excel.php
 Disallow: /sync_github.php
