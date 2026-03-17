@@ -1,0 +1,38 @@
+User-agent: *
+Disallow: /admin-panel.html
+Disallow: /AutorithAdmin.html
+Disallow: /delete_file.php
+Disallow: /save_excel.php
+Disallow: /sync_github.php
+Disallow: /server.py
+Disallow: /*.php$
+Disallow: /*.py$
+Disallow: /cgi-bin/
+Disallow: /tmp/
+
+User-agent: Yandex
+Disallow: /admin-panel.html
+Disallow: /AutorithAdmin.html
+Disallow: /delete_file.php
+Disallow: /save_excel.php
+Disallow: /sync_github.php
+Disallow: /server.py
+Disallow: /*.php$
+Disallow: /*.py$
+Disallow: /cgi-bin/
+Disallow: /tmp/
+Host: https://indigrastroy.by
+
+User-agent: Googlebot
+Disallow: /admin-panel.html
+Disallow: /AutorithAdmin.html
+Disallow: /delete_file.php
+Disallow: /save_excel.php
+Disallow: /sync_github.php
+Disallow: /server.py
+Disallow: /*.php$
+Disallow: /*.py$
+Disallow: /cgi-bin/
+Disallow: /tmp/
+
+Sitemap: https://indigrastroy.by/sitemap.xml
