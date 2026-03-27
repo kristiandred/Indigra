@@ -15,7 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <style>
-        /* Все ваши стили остаются без изменений */
+        /* Все стили остаются как в предыдущей версии */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -132,7 +132,7 @@
                 </div>
 
                 <div class="edit-hint" id="editHint">
-                    <i>✏️</i> Режим редактирования активен. Нажмите на любую ячейку с ценой или текстом, чтобы изменить её.
+                    <i>✏️</i> Режим редактирования активен. Нажмите на любую ячейку с ценой, чтобы изменить её.
                 </div>
 
                 <div class="table-actions">
@@ -150,13 +150,13 @@
                         <div>
                             <h3>На гравийном заполнителе фр. 3-20 мм</h3>
                             <div class="table-responsive">
-                                <table class="price-table" id="table-beton-gravel" data-section="beton-gravel">
+                                <table class="price-table" id="table-beton-gravel">
                                     <thead><tr><th>Марка бетона</th><th>Цена без НДС, руб. коп</th></tr></thead>
                                     <tbody>
-                                        <tr><td class="editable-cell">С8/10 М100 гр</td><td class="editable-cell price-cell" data-cell-id="beton-gravel_0_1"><span class="badge-price price-value">115</span></td></tr>
-                                        <tr><td class="editable-cell">С12/15 М200 гр</td><td class="editable-cell price-cell" data-cell-id="beton-gravel_1_1"><span class="badge-price price-value">125</span></td></tr>
-                                        <tr><td class="editable-cell">С16/20 М250 гр</td><td class="editable-cell price-cell" data-cell-id="beton-gravel_2_1"><span class="badge-price price-value">135</span></td></tr>
-                                        <tr><td class="editable-cell">С18/22,5 М300 гр</td><td class="editable-cell price-cell" data-cell-id="beton-gravel_3_1"><span class="badge-price price-value">145</span></td></tr>
+                                        <tr><td>С8/10 М100 гр</td><td class="price-cell" data-key="beton_gravel_100">115</td></tr>
+                                        <tr><td>С12/15 М200 гр</td><td class="price-cell" data-key="beton_gravel_200">125</td></tr>
+                                        <tr><td>С16/20 М250 гр</td><td class="price-cell" data-key="beton_gravel_250">135</td></tr>
+                                        <tr><td>С18/22,5 М300 гр</td><td class="price-cell" data-key="beton_gravel_300">145</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -164,17 +164,17 @@
                         <div>
                             <h3>На гранитном щебне фр. 5-20 мм</h3>
                             <div class="table-responsive">
-                                <table class="price-table" id="table-beton-granite" data-section="beton-granite">
+                                <table class="price-table" id="table-beton-granite">
                                     <thead><tr><th>Марка бетона</th><th>Цена без НДС, руб. коп.</th></tr></thead>
                                     <tbody>
-                                        <tr><td class="editable-cell">С8/10 М150 щ</td><td class="editable-cell price-cell" data-cell-id="beton-granite_0_1"><span class="badge-price price-value">166.5</span></td></tr>
-                                        <tr><td class="editable-cell">С12/15 М200 щ</td><td class="editable-cell price-cell" data-cell-id="beton-granite_1_1"><span class="badge-price price-value">175</span></td></tr>
-                                        <tr><td class="editable-cell">С16/20 М250 щ</td><td class="editable-cell price-cell" data-cell-id="beton-granite_2_1"><span class="badge-price price-value">180</span></td></tr>
-                                        <tr><td class="editable-cell">С18/22,5 М300 щ</td><td class="editable-cell price-cell" data-cell-id="beton-granite_3_1"><span class="badge-price price-value">187.5</span></td></tr>
-                                        <tr><td class="editable-cell">С20/25 М350 щ</td><td class="editable-cell price-cell" data-cell-id="beton-granite_4_1"><span class="badge-price price-value">196</span></td></tr>
-                                        <tr><td class="editable-cell">С25/30 М400 щ</td><td class="editable-cell price-cell" data-cell-id="beton-granite_5_1"><span class="badge-price price-value">215</span></td></tr>
-                                        <tr><td class="editable-cell">С28/35 М450 щ</td><td class="editable-cell price-cell" data-cell-id="beton-granite_6_1"><span class="badge-price price-value">225</span></td></tr>
-                                        <tr><td class="editable-cell">С30/37 М500 щ</td><td class="editable-cell price-cell" data-cell-id="beton-granite_7_1"><span class="badge-price price-value">250</span></td></tr>
+                                        <tr><td>С8/10 М150 щ</td><td class="price-cell" data-key="beton_granite_150">166.5</td></tr>
+                                        <tr><td>С12/15 М200 щ</td><td class="price-cell" data-key="beton_granite_200">175</td></tr>
+                                        <tr><td>С16/20 М250 щ</td><td class="price-cell" data-key="beton_granite_250">180</td></tr>
+                                        <tr><td>С18/22,5 М300 щ</td><td class="price-cell" data-key="beton_granite_300">187.5</td></tr>
+                                        <tr><td>С20/25 М350 щ</td><td class="price-cell" data-key="beton_granite_350">196</td></tr>
+                                        <tr><td>С25/30 М400 щ</td><td class="price-cell" data-key="beton_granite_400">215</td></tr>
+                                        <tr><td>С28/35 М450 щ</td><td class="price-cell" data-key="beton_granite_450">225</td></tr>
+                                        <tr><td>С30/37 М500 щ</td><td class="price-cell" data-key="beton_granite_500">250</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -186,13 +186,13 @@
                 <div class="price-section" id="section-rastvory">
                     <h2>🧱 Растворы</h2>
                     <div class="table-responsive">
-                        <table class="price-table" id="table-mortars" data-section="rastvory">
-                            <thead><tr><th>Марка</th><th>Цена без НДС, руб. коп</th></tr></thead>
+                        <table class="price-table" id="table-mortars">
+                            <thead><tr><th>Марка</th><th>Цена без НДС, руб. коп</th>?</thead>
                             <tbody>
-                                <tr><td class="editable-cell">РСГП М50</td><td class="editable-cell price-cell" data-cell-id="rastvory_0_1"><span class="badge-price price-value">105</span></td></tr>
-                                <tr><td class="editable-cell">РСГП М100</td><td class="editable-cell price-cell" data-cell-id="rastvory_1_1"><span class="badge-price price-value">126</span></td></tr>
-                                <tr><td class="editable-cell">РСГП М150</td><td class="editable-cell price-cell" data-cell-id="rastvory_2_1"><span class="badge-price price-value">138</span></td></tr>
-                                <tr><td class="editable-cell">РСГП М200</td><td class="editable-cell price-cell" data-cell-id="rastvory_3_1"><span class="badge-price price-value">147</span></td></tr>
+                                <tr><td>РСГП М50</td><td class="price-cell" data-key="rastvor_50">105</td></tr>
+                                <tr><td>РСГП М100</td><td class="price-cell" data-key="rastvor_100">126</td></tr>
+                                <tr><td>РСГП М150</td><td class="price-cell" data-key="rastvor_150">138</td></tr>
+                                <tr><td>РСГП М200</td><td class="price-cell" data-key="rastvor_200">147</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -201,42 +201,43 @@
 
                 <!-- АБС -->
                 <div class="price-section" id="section-abs">
-                    <h2>🚚 Тарифы на транспортные услуги автобетоносмесителей (в пределах МКАД)</h2>
-                    <h3>📋 Основные услуги</h3>
+                    <h2>🚚 Тарифы на транспортные услуги автобетоносмесителей</h2>
                     <div class="table-responsive">
-                        <table class="price-table" id="table-abs-main" data-section="abs-main">
-                            <thead><tr><th>Наименование услуги</th><th>Ед. изм.</th><th>Тариф без НДС, руб.</th></tr></thead>
+                        <table class="price-table">
+                            <thead><tr><th>Наименование услуги</th><th>Тариф без НДС, руб.</th></tr></thead>
                             <tbody>
-                                <tr><td class="editable-cell">Услуги АБС 7 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell" data-cell-id="abs-main_0_2"><span class="badge-price price-value">200</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС 8 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell" data-cell-id="abs-main_1_2"><span class="badge-price price-value">210</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС 9 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell" data-cell-id="abs-main_2_2"><span class="badge-price price-value">220</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС 10 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell" data-cell-id="abs-main_3_2"><span class="badge-price price-value">240</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС 11 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell" data-cell-id="abs-main_4_2"><span class="badge-price price-value">300</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС 12 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell" data-cell-id="abs-main_5_2"><span class="badge-price price-value">320</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС 14 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell" data-cell-id="abs-main_6_2"><span class="badge-price price-value">350</span></td></tr>
+                                <tr><td>Услуги АБС 7 м³</td><td class="price-cell" data-key="abs_7">200</td></tr>
+                                <tr><td>Услуги АБС 8 м³</td><td class="price-cell" data-key="abs_8">210</td></tr>
+                                <tr><td>Услуги АБС 9 м³</td><td class="price-cell" data-key="abs_9">220</td></tr>
+                                <tr><td>Услуги АБС 10 м³</td><td class="price-cell" data-key="abs_10">240</td></tr>
+                                <tr><td>Услуги АБС 11 м³</td><td class="price-cell" data-key="abs_11">300</td></tr>
+                                <tr><td>Услуги АБС 12 м³</td><td class="price-cell" data-key="abs_12">320</td></tr>
+                                <tr><td>Услуги АБС 14 м³</td><td class="price-cell" data-key="abs_14">350</td></tr>
+                                <tr><td>Доп. время (свыше 1 часа)</td><td class="price-cell" data-key="abs_extra_time">100</td></tr>
+                                <tr><td>Доп. оборудование (лоток)</td><td class="price-cell" data-key="abs_extra_equip">50</td></tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="info-box"><h4>ℹ️ В стоимость рейса АБС входит:</h4><ul><li>Доставка продукции от узла до объекта строительства</li><li>Работа на объекте 1 машино-час (включая технологическую мойку)</li><li>Возврат транспорта на узел</li></ul></div>
                 </div>
 
                 <!-- АБС С НАСОСОМ -->
                 <div class="price-section" id="section-nasos">
-                    <h2>🚛 Тарифы на транспортные услуги автобетоносмесителей с насосом (в пределах МКАД)</h2>
-                    <h3>📋 Основные услуги</h3>
+                    <h2>🚛 Тарифы на услуги автобетоносмесителей с насосом</h2>
                     <div class="table-responsive">
-                        <table class="price-table" id="table-nasos-main" data-section="nasos-main">
-                            <thead><tr><th>Наименование услуги</th><th>Ед. изм.</th><th>Тариф без НДС, руб.</th></tr></thead>
+                        <table class="price-table">
+                            <thead><tr><th>Наименование услуги</th><th>Тариф без НДС, руб.</th></tr></thead>
                             <tbody>
-                                <tr><td class="editable-cell">Услуги АБС с насосом 7 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell" data-cell-id="nasos-main_0_2"><span class="badge-price price-value">600</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС с насосом 8 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell" data-cell-id="nasos-main_1_2"><span class="badge-price price-value">650</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС с насосом 7 м³ (стрела 28 м)</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell" data-cell-id="nasos-main_2_2"><span class="badge-price price-value">650</span></td></tr>
-                                <tr><td class="editable-cell">Услуги АБС с насосом 8 м³ (стрела 28 м)</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell" data-cell-id="nasos-main_3_2"><span class="badge-price price-value">700</span></td></tr>
+                                <tr><td>АБС с насосом 7 м³</td><td class="price-cell" data-key="nasos_7">600</td></tr>
+                                <tr><td>АБС с насосом 8 м³</td><td class="price-cell" data-key="nasos_8">650</td></tr>
+                                <tr><td>АБС с насосом 7 м³ (стрела 28м)</td><td class="price-cell" data-key="nasos_7_28">650</td></tr>
+                                <tr><td>АБС с насосом 8 м³ (стрела 28м)</td><td class="price-cell" data-key="nasos_8_28">700</td></tr>
+                                <tr><td>Доп. время (свыше 2 часов)</td><td class="price-cell" data-key="nasos_extra_time">200</td></tr>
+                                <tr><td>Прокачка свыше 15 м³</td><td class="price-cell" data-key="nasos_pump">25</td></tr>
+                                <tr><td>Доп. шланг 4 м</td><td class="price-cell" data-key="nasos_hose">50</td></tr>
+                                <tr><td>Отсутствие мойки</td><td class="price-cell" data-key="nasos_nowash">200</td></tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="warning-box"><h4>⚠️ Важное предупреждение!</h4><p class="mb-0"><strong>Отсутствие мойки приемника автобетононасоса - ЗАКАЗЫ НЕ ПРИНИМАЮТСЯ!</strong></p></div>
-                    <div class="info-box"><h4>ℹ️ В стоимость рейса АБС с насосом входит:</h4><ul><li>Доставка продукции от узла до объекта строительства</li><li>Работа на объекте 2 машино-часа</li><li>Возврат транспорта на узел</li></ul></div>
                 </div>
             </div>
         </main>
@@ -250,6 +251,7 @@
     <div id="modalOverlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999;"></div>
 
     <script>
+        // Конфигурация Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAr-lHRrv6aIm6djz2BlKkAwM4OWIAf85E",
             authDomain: "indigra-d956f.firebaseapp.com",
@@ -260,6 +262,7 @@
             appId: "1:541982595928:web:a45bec517d2c897ef6a32d"
         };
 
+        // Инициализация
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const auth = firebase.auth();
@@ -267,29 +270,18 @@
         let isEditMode = false;
         let changedCells = new Map();
 
+        // Получить значение ячейки
         function getCellValue(cell) {
-            const priceSpan = cell.querySelector('.price-value');
-            return priceSpan ? priceSpan.textContent.trim() : cell.textContent.trim();
+            return cell.textContent.trim();
         }
 
-        function getCellId(cell) {
-            return cell.getAttribute('data-cell-id');
-        }
-
+        // Установить значение ячейки
         function setCellValue(cell, value) {
-            const priceSpan = cell.querySelector('.price-value');
-            if (priceSpan) {
-                priceSpan.textContent = value;
-            } else {
-                cell.textContent = value;
-            }
+            cell.textContent = value;
             cell.setAttribute('data-original', value);
         }
 
-        function findCellById(cellId) {
-            return document.querySelector(`[data-cell-id="${cellId}"]`);
-        }
-
+        // Показать уведомление
         function showNotification(message, type) {
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
@@ -298,6 +290,7 @@
             setTimeout(() => notification.remove(), 3000);
         }
 
+        // Показать загрузку
         function showLoading(show) {
             let overlay = document.querySelector('.loading-overlay');
             if (show && !overlay) {
@@ -310,6 +303,7 @@
             }
         }
 
+        // Обновить счетчик изменений
         function updateChangesCounter() {
             const counter = document.getElementById('changesCount');
             const saveBtn = document.getElementById('saveChanges');
@@ -318,102 +312,115 @@
                 counter.style.display = 'inline';
                 saveBtn.textContent = `💾 Сохранить (${changedCells.size})`;
                 saveBtn.disabled = false;
+                document.getElementById('cancelChanges').disabled = false;
             } else {
                 counter.style.display = 'none';
                 saveBtn.textContent = '💾 Сохранить';
                 saveBtn.disabled = true;
+                document.getElementById('cancelChanges').disabled = true;
             }
         }
 
+        // Загрузка данных из Firebase
         async function loadDataFromFirebase() {
             showLoading(true);
             try {
                 const snapshot = await database.ref('prices').once('value');
                 const data = snapshot.val() || {};
                 
-                Object.entries(data).forEach(([cellId, value]) => {
-                    const cell = findCellById(cellId);
-                    if (cell) {
-                        setCellValue(cell, value);
+                // Применяем данные ко всем ячейкам
+                document.querySelectorAll('.price-cell').forEach(cell => {
+                    const key = cell.getAttribute('data-key');
+                    if (key && data[key]) {
+                        cell.textContent = data[key];
+                        cell.setAttribute('data-original', data[key]);
+                    } else {
+                        cell.setAttribute('data-original', cell.textContent);
                     }
                 });
-                showNotification('Данные загружены из Firebase', 'success');
+                showNotification('✅ Данные загружены из Firebase', 'success');
+                document.getElementById('connectionStatus').className = 'connection-status';
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
-                showNotification('Ошибка загрузки данных', 'error');
+                showNotification('❌ Ошибка загрузки данных', 'error');
+                document.getElementById('connectionStatus').className = 'connection-status disconnected';
             } finally {
                 showLoading(false);
             }
         }
 
+        // Слушаем изменения в реальном времени
         function listenForChanges() {
             database.ref('prices').on('child_changed', (snapshot) => {
-                const cellId = snapshot.key;
+                const key = snapshot.key;
                 const value = snapshot.val();
-                const cell = findCellById(cellId);
+                const cell = document.querySelector(`.price-cell[data-key="${key}"]`);
                 if (cell) {
-                    const currentValue = getCellValue(cell);
+                    const currentValue = cell.textContent;
                     if (currentValue !== value) {
-                        setCellValue(cell, value);
-                        if (changedCells.has(cellId)) {
-                            changedCells.delete(cellId);
+                        cell.textContent = value;
+                        cell.setAttribute('data-original', value);
+                        if (changedCells.has(key)) {
+                            changedCells.delete(key);
                             updateChangesCounter();
                         }
+                        showNotification(`🔄 Обновлено: ${key} = ${value}`, 'info');
                     }
                 }
             });
         }
 
+        // Обработчик изменения ячейки
         function handleCellInput(e) {
-            const cell = e.target.closest('.price-cell');
-            if (!cell) return;
-            
-            const cellId = getCellId(cell);
-            const newValue = getCellValue(cell);
+            const cell = e.target;
+            const key = cell.getAttribute('data-key');
+            const newValue = cell.textContent.trim();
             const oldValue = cell.getAttribute('data-original');
             
             if (newValue !== oldValue) {
-                changedCells.set(cellId, { cell, newValue, oldValue });
+                changedCells.set(key, { cell, newValue, oldValue });
                 cell.style.backgroundColor = '#fff9c4';
             } else {
-                changedCells.delete(cellId);
+                changedCells.delete(key);
                 cell.style.backgroundColor = '';
             }
             updateChangesCounter();
         }
 
+        // Сохранение изменений
         async function saveChanges() {
             if (changedCells.size === 0) return;
             if (!confirm(`Сохранить ${changedCells.size} изменений?`)) return;
             
             showLoading(true);
             const updates = {};
-            for (const [cellId, data] of changedCells) {
-                updates[cellId] = data.newValue;
+            for (const [key, data] of changedCells) {
+                updates[key] = data.newValue;
             }
             
             try {
                 await database.ref('prices').update(updates);
-                for (const [cellId, data] of changedCells) {
+                for (const [key, data] of changedCells) {
                     data.cell.setAttribute('data-original', data.newValue);
                     data.cell.style.backgroundColor = '';
                 }
                 changedCells.clear();
                 updateChangesCounter();
-                showNotification('Изменения сохранены!', 'success');
+                showNotification(`✅ Сохранено ${Object.keys(updates).length} изменений!`, 'success');
             } catch (error) {
                 console.error('Ошибка:', error);
-                showNotification('Ошибка сохранения', 'error');
+                showNotification('❌ Ошибка сохранения', 'error');
             } finally {
                 showLoading(false);
             }
         }
 
+        // Отмена изменений
         function cancelChanges() {
             if (changedCells.size === 0) return;
             if (confirm('Отменить все изменения?')) {
-                for (const [cellId, data] of changedCells) {
-                    setCellValue(data.cell, data.oldValue);
+                for (const [key, data] of changedCells) {
+                    data.cell.textContent = data.oldValue;
                     data.cell.style.backgroundColor = '';
                 }
                 changedCells.clear();
@@ -422,27 +429,25 @@
             }
         }
 
+        // Режим редактирования
         function toggleEditMode() {
             isEditMode = !isEditMode;
             const editBtn = document.getElementById('toggleEditMode');
-            const cancelBtn = document.getElementById('cancelChanges');
             const editHint = document.getElementById('editHint');
             const editStatus = document.getElementById('editStatus');
             
             if (isEditMode) {
                 editBtn.textContent = '🔒 Выйти';
-                cancelBtn.disabled = false;
                 editHint.style.display = 'block';
                 editStatus.textContent = 'Режим редактирования';
                 editStatus.className = 'badge bg-success';
                 document.querySelectorAll('.price-cell').forEach(cell => {
                     cell.setAttribute('contenteditable', 'true');
-                    cell.setAttribute('data-original', getCellValue(cell));
+                    cell.setAttribute('data-original', cell.textContent);
                     cell.addEventListener('input', handleCellInput);
                 });
             } else {
                 editBtn.textContent = '✏️ Редактировать';
-                cancelBtn.disabled = true;
                 editHint.style.display = 'none';
                 editStatus.textContent = 'Режим просмотра';
                 editStatus.className = 'badge bg-warning text-dark';
@@ -453,6 +458,7 @@
             }
         }
 
+        // Быстрое редактирование
         function quickEdit(section) {
             if (!isEditMode) toggleEditMode();
             const element = document.getElementById(`section-${section}`);
@@ -463,6 +469,7 @@
             }
         }
 
+        // Показать все изменения
         function showAllChanges() {
             const modal = document.getElementById('changesModal');
             const overlay = document.getElementById('modalOverlay');
@@ -472,9 +479,9 @@
                 changesList.innerHTML = '<p>Нет несохраненных изменений</p>';
             } else {
                 let html = '<ul style="list-style: none; padding: 0;">';
-                for (const [cellId, data] of changedCells) {
+                for (const [key, data] of changedCells) {
                     html += `<li style="margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px;">
-                        <strong>${cellId}</strong><br>
+                        <strong>${key}</strong><br>
                         <span style="color: #dc3545;">Было: ${data.oldValue}</span><br>
                         <span style="color: #28a745;">Стало: ${data.newValue}</span>
                     </li>`;
@@ -486,11 +493,7 @@
             overlay.style.display = 'block';
         }
 
-        function closeModal() {
-            document.getElementById('changesModal').style.display = 'none';
-            document.getElementById('modalOverlay').style.display = 'none';
-        }
-
+        // Экспорт в Excel
         function exportToExcel() {
             try {
                 const wb = XLSX.utils.book_new();
@@ -501,7 +504,7 @@
                     rows.forEach(row => {
                         const rowData = [];
                         row.querySelectorAll('th, td').forEach(cell => {
-                            rowData.push(getCellValue(cell));
+                            rowData.push(cell.textContent.trim());
                         });
                         if (rowData.length) allData.push(rowData);
                     });
@@ -516,12 +519,13 @@
             }
         }
 
+        // Сброс всех данных
         async function resetAllData() {
-            if (!confirm('ВНИМАНИЕ! Это удалит ВСЕ данные. Продолжить?')) return;
+            if (!confirm('ВНИМАНИЕ! Это удалит ВСЕ данные для всех пользователей. Продолжить?')) return;
             showLoading(true);
             try {
                 await database.ref('prices').remove();
-                showNotification('Все данные удалены', 'info');
+                showNotification('Все данные удалены. Страница будет обновлена.', 'info');
                 setTimeout(() => location.reload(), 1500);
             } catch (error) {
                 showNotification('Ошибка удаления', 'error');
@@ -530,6 +534,13 @@
             }
         }
 
+        // Закрыть модальное окно
+        function closeModal() {
+            document.getElementById('changesModal').style.display = 'none';
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+
+        // Авторизация
         function showAuthModal() {
             const modal = document.createElement('div');
             modal.className = 'auth-container';
@@ -567,9 +578,11 @@
             location.reload();
         };
 
+        // Инициализация приложения
         function initializeApp() {
             loadDataFromFirebase();
             listenForChanges();
+            
             document.getElementById('toggleEditMode').onclick = toggleEditMode;
             document.getElementById('saveChanges').onclick = saveChanges;
             document.getElementById('cancelChanges').onclick = cancelChanges;
@@ -584,11 +597,13 @@
             document.getElementById('modalOverlay').onclick = closeModal;
         }
 
+        // Следим за состоянием авторизации
         auth.onAuthStateChanged((user) => {
             if (user) {
                 document.getElementById('app').style.display = 'block';
                 document.getElementById('userEmail').textContent = `👤 ${user.email}`;
                 initializeApp();
+                showNotification(`Добро пожаловать, ${user.email}!`, 'success');
             } else {
                 document.getElementById('app').style.display = 'none';
                 showAuthModal();
