@@ -4,15 +4,31 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Редактор прайс-листа - ИНДИГРА</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/site.css" />
-    <link rel="stylesheet" href="css/custom.css" />
-    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <style>
-        /* Стили для прайс-листа */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #1e3c72;
+            --secondary-blue: #2a5298;
+            --light-blue: #e3f2fd;
+            --ice-blue: #bbdefb;
+            --dark-gray: #555;
+            --light-gray: #f8f9fa;
+            --gradient-primary: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            --gradient-secondary: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            --shadow-soft: 0 2px 10px rgba(0,0,0,0.05);
+            --shadow-medium: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
         .price-section {
             margin-bottom: 40px;
             padding: 25px;
@@ -75,7 +91,6 @@
             background: var(--ice-blue);
         }
 
-        /* Редактируемые ячейки */
         .price-table td[contenteditable="true"] {
             cursor: pointer;
             position: relative;
@@ -134,7 +149,6 @@
             font-style: italic;
         }
 
-        /* Панель администратора */
         .admin-panel {
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
@@ -235,7 +249,6 @@
             transform: translateY(-2px);
         }
 
-        /* Уведомления */
         .notification {
             position: fixed;
             top: 20px;
@@ -272,7 +285,6 @@
             }
         }
 
-        /* Индикатор загрузки */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -300,7 +312,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Подсказка */
         .edit-hint {
             background: #fff3cd;
             border: 1px solid #ffeeba;
@@ -309,10 +320,6 @@
             border-radius: 8px;
             margin-bottom: 20px;
             display: none;
-        }
-
-        .edit-hint i {
-            margin-right: 8px;
         }
 
         .two-columns {
@@ -328,11 +335,6 @@
             }
         }
 
-        .mt-4 { margin-top: 1.5rem; }
-        .mb-3 { margin-bottom: 1rem; }
-        .text-center { text-align: center; }
-        
-        /* Статистика изменений */
         .changes-badge {
             background: #ffc107;
             color: #1e3c72;
@@ -342,7 +344,6 @@
             margin-left: 10px;
         }
         
-        /* Кнопки действий с таблицами */
         .table-actions {
             margin-bottom: 10px;
             display: flex;
@@ -362,6 +363,35 @@
         .table-actions .btn-sm:hover {
             background: #dee2e6;
         }
+
+        .connection-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #28a745;
+            margin-left: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .connection-status.disconnected {
+            background: #dc3545;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--ice-blue);
+        }
     </style>
 </head>
 <body>
@@ -371,42 +401,43 @@
             <!-- Панель администратора -->
             <div class="admin-panel" id="adminPanel">
                 <h3>
-                    <span>🔧 Панель администратора</span>
+                    <span>🔧 Редактор прайс-листа</span>
                     <span id="editStatus" class="badge bg-warning text-dark" style="font-size: 0.8rem;">Режим просмотра</span>
                     <span id="changesCount" class="changes-badge" style="display: none;">0</span>
+                    <span id="connectionStatus" class="connection-status" title="Статус подключения к Firebase"></span>
                 </h3>
                 <div class="btn-group">
-                    <button class="btn btn-edit" id="toggleEditMode" onclick="toggleEditMode()">
+                    <button class="btn btn-edit" id="toggleEditMode">
                         ✏️ Войти в режим редактирования
                     </button>
-                    <button class="btn btn-save" id="saveChanges" onclick="saveAllChanges()" disabled>
+                    <button class="btn btn-save" id="saveChanges" disabled>
                         💾 Сохранить изменения
                     </button>
-                    <button class="btn btn-cancel" id="cancelChanges" onclick="cancelChanges()" disabled>
+                    <button class="btn btn-cancel" id="cancelChanges" disabled>
                         ❌ Отменить
                     </button>
-                    <button class="btn btn-export" id="exportExcel" onclick="exportToExcel()" title="Экспортировать в Excel">
+                    <button class="btn btn-export" id="exportExcel">
                         📥 Excel
                     </button>
-                    <button class="btn btn-reset" id="resetAll" onclick="resetAllChanges()" title="Сбросить все изменения">
+                    <button class="btn btn-reset" id="resetAll">
                         🔄 Сброс
                     </button>
                 </div>
             </div>
 
-            <!-- Подсказка для администратора -->
+            <!-- Подсказка -->
             <div class="edit-hint" id="editHint">
                 <i>✏️</i> Режим редактирования активен. Нажмите на любую ячейку с ценой или текстом, чтобы изменить её. 
-                После внесения изменений нажмите "Сохранить изменения". <strong>Изменения сохраняются локально в браузере!</strong>
+                После внесения изменений нажмите "Сохранить изменения". <strong>Изменения синхронизируются с Firebase и видны всем пользователям в реальном времени!</strong>
             </div>
 
-            <!-- Кнопки быстрых действий для новых таблиц -->
+            <!-- Кнопки быстрых действий -->
             <div class="table-actions">
-                <button class="btn-sm" onclick="quickEdit('beton')">✏️ Редактировать бетон</button>
-                <button class="btn-sm" onclick="quickEdit('rastvory')">✏️ Редактировать растворы</button>
-                <button class="btn-sm" onclick="quickEdit('abs')">✏️ Редактировать АБС</button>
-                <button class="btn-sm" onclick="quickEdit('nasos')">✏️ Редактировать АБС с насосом</button>
-                <button class="btn-sm" onclick="showAllChanges()">📋 Показать все изменения</button>
+                <button class="btn-sm" id="quickEditBeton">✏️ Редактировать бетон</button>
+                <button class="btn-sm" id="quickEditRastvory">✏️ Редактировать растворы</button>
+                <button class="btn-sm" id="quickEditAbs">✏️ Редактировать АБС</button>
+                <button class="btn-sm" id="quickEditNasos">✏️ Редактировать АБС с насосом</button>
+                <button class="btn-sm" id="showChanges">📋 Показать несохраненные</button>
             </div>
 
             <!-- ==================== ТОВАРНЫЙ БЕТОН ==================== -->
@@ -419,7 +450,7 @@
                     <div>
                         <h3>На гравийном заполнителе фр. 3-20 мм</h3>
                         <div class="table-responsive">
-                            <table class="price-table" id="table-beton-gravel" data-file="beton.xlsx" data-section="beton">
+                            <table class="price-table" id="table-beton-gravel" data-section="beton-gravel">
                                 <thead>
                                     <tr>
                                         <th>Марка бетона</th>
@@ -427,10 +458,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td class="editable-cell" data-original="С8/10 М100 гр">С8/10 М100 гр</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="115">115</span></td></tr>
-                                    <tr><td class="editable-cell" data-original="С 12/15 М200 гр">С 12/15 М200 гр</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="125">125</span></td></tr>
-                                    <tr><td class="editable-cell" data-original="С16/20 М250 гр">С16/20 М250 гр</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="135">135</span></td></tr>
-                                    <tr><td class="editable-cell" data-original="С18/22,5 М300 гр">С18/22,5 М300 гр</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="145">145</span></td></tr>
+                                    <tr><td class="editable-cell">С8/10 М100 гр</td><td class="editable-cell price-cell"><span class="badge-price price-value">115</span></td></tr>
+                                    <tr><td class="editable-cell">С12/15 М200 гр</td><td class="editable-cell price-cell"><span class="badge-price price-value">125</span></td></tr>
+                                    <tr><td class="editable-cell">С16/20 М250 гр</td><td class="editable-cell price-cell"><span class="badge-price price-value">135</span></td></tr>
+                                    <tr><td class="editable-cell">С18/22,5 М300 гр</td><td class="editable-cell price-cell"><span class="badge-price price-value">145</span></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -440,7 +471,7 @@
                     <div>
                         <h3>На гранитном щебне фр. 5-20 мм</h3>
                         <div class="table-responsive">
-                            <table class="price-table" id="table-beton-granite" data-file="beton.xlsx" data-section="beton">
+                            <table class="price-table" id="table-beton-granite" data-section="beton-granite">
                                 <thead>
                                     <tr>
                                         <th>Марка бетона</th>
@@ -448,14 +479,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td class="editable-cell" data-original="С8/10 М150 щ">С8/10 М150 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="166.5">166.5</span></td></tr>
-                                    <tr><td class="editable-cell" data-original="С 12/15 М200 щ">С 12/15 М200 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="175">175</span></td></tr>
-                                    <tr><td class="editable-cell" data-original="С 16/20 М250 щ">С 16/20 М250 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="180">180</span></td></tr>
-                                    <tr><td class="editable-cell" data-original="С18/22,5 М300 щ">С18/22,5 М300 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="187.5">187.5</span></td></tr>
-                                    <tr><td class="editable-cell" data-original="С 20/25 М350 щ">С 20/25 М350 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="196">196</span></td></tr>
-                                    <tr><td class="editable-cell" data-original="С 25/30 М400 щ">С 25/30 М400 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="215">215</span></td></tr>
-                                    <tr><td class="editable-cell" data-original="С 28/35 М450 щ">С 28/35 М450 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="225">225</span></td></tr>
-                                    <tr><td class="editable-cell" data-original="С 30/37 М500 щ">С 30/37 М500 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="250">250</span></td></tr>
+                                    <tr><td class="editable-cell">С8/10 М150 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">166.5</span></td></tr>
+                                    <tr><td class="editable-cell">С12/15 М200 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">175</span></td></tr>
+                                    <tr><td class="editable-cell">С16/20 М250 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">180</span></td></tr>
+                                    <tr><td class="editable-cell">С18/22,5 М300 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">187.5</span></td></tr>
+                                    <tr><td class="editable-cell">С20/25 М350 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">196</span></td></tr>
+                                    <tr><td class="editable-cell">С25/30 М400 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">215</span></td></tr>
+                                    <tr><td class="editable-cell">С28/35 М450 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">225</span></td></tr>
+                                    <tr><td class="editable-cell">С30/37 М500 щ</td><td class="editable-cell price-cell"><span class="badge-price price-value">250</span></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -469,7 +500,7 @@
                 <h2>🧱 Растворы</h2>
                 
                 <div class="table-responsive">
-                    <table class="price-table" id="table-mortars" data-file="rastvory.xlsx" data-section="rastvory">
+                    <table class="price-table" id="table-mortars" data-section="rastvory">
                         <thead>
                             <tr>
                                 <th>Марка</th>
@@ -477,10 +508,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td class="editable-cell" data-original="РСГП М50">РСГП М50</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="105">105</span></td></tr>
-                            <tr><td class="editable-cell" data-original="РСГП М100">РСГП М100</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="126">126</span></td></tr>
-                            <tr><td class="editable-cell" data-original="РСГП М150">РСГП М150</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="138">138</span></td></tr>
-                            <tr><td class="editable-cell" data-original="РСГП М200">РСГП М200</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="147">147</span></td></tr>
+                            <tr><td class="editable-cell">РСГП М50</td><td class="editable-cell price-cell"><span class="badge-price price-value">105</span></td></tr>
+                            <tr><td class="editable-cell">РСГП М100</td><td class="editable-cell price-cell"><span class="badge-price price-value">126</span></td></tr>
+                            <tr><td class="editable-cell">РСГП М150</td><td class="editable-cell price-cell"><span class="badge-price price-value">138</span></td></tr>
+                            <tr><td class="editable-cell">РСГП М200</td><td class="editable-cell price-cell"><span class="badge-price price-value">147</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -495,7 +526,7 @@
                 
                 <h3>📋 Основные услуги</h3>
                 <div class="table-responsive">
-                    <table class="price-table" id="table-abs-main" data-file="tarif.xlsx" data-section="abs">
+                    <table class="price-table" id="table-abs-main" data-section="abs-main">
                         <thead>
                             <tr>
                                 <th>Наименование услуги</th>
@@ -504,20 +535,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td class="editable-cell" data-original="Услуги АБС 7 м³">Услуги АБС 7 м³</td><td class="editable-cell" data-original="рейс">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="200">200</span></td></tr>
-                            <tr><td class="editable-cell" data-original="Услуги АБС 8 м³">Услуги АБС 8 м³</td><td class="editable-cell" data-original="рейс">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="210">210</span></td></tr>
-                            <tr><td class="editable-cell" data-original="Услуги АБС 9 м³">Услуги АБС 9 м³</td><td class="editable-cell" data-original="рейс">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="220">220</span></td></tr>
-                            <tr><td class="editable-cell" data-original="Услуги АБС 10 м³">Услуги АБС 10 м³</td><td class="editable-cell" data-original="рейс">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="240">240</span></td></tr>
-                            <tr><td class="editable-cell" data-original="Услуги АБС 11 м³">Услуги АБС 11 м³</td><td class="editable-cell" data-original="рейс">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="300">300</span></td></tr>
-                            <tr><td class="editable-cell" data-original="Услуги АБС 12 м³">Услуги АБС 12 м³</td><td class="editable-cell" data-original="рейс">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="320">320</span></td></tr>
-                            <tr><td class="editable-cell" data-original="Услуги АБС 14 м³">Услуги АБС 14 м³</td><td class="editable-cell" data-original="рейс">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="350">350</span></td></tr>
+                            <tr><td class="editable-cell">Услуги АБС 7 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">200</span></td></tr>
+                            <tr><td class="editable-cell">Услуги АБС 8 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">210</span></td></tr>
+                            <tr><td class="editable-cell">Услуги АБС 9 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">220</span></td></tr>
+                            <tr><td class="editable-cell">Услуги АБС 10 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">240</span></td></tr>
+                            <tr><td class="editable-cell">Услуги АБС 11 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">300</span></td></tr>
+                            <tr><td class="editable-cell">Услуги АБС 12 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">320</span></td></tr>
+                            <tr><td class="editable-cell">Услуги АБС 14 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">350</span></td></tr>
                         </tbody>
                     </table>
                 </div>
 
                 <h3>⏱️ Дополнительные услуги</h3>
                 <div class="table-responsive">
-                    <table class="price-table" id="table-abs-extra" data-file="tarif.xlsx" data-section="abs">
+                    <table class="price-table" id="table-abs-extra" data-section="abs-extra">
                         <thead>
                             <tr>
                                 <th>Наименование услуги</th>
@@ -526,8 +557,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td class="editable-cell" data-original="Дополнительное время работы на объекте (свыше 1 машино-часа)">Дополнительное время работы на объекте (свыше 1 машино-часа)</td><td class="editable-cell" data-original="час">час</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="100">100</span></td></tr>
-                            <tr><td class="editable-cell" data-original="Использование дополнительного оборудования (доп. лоток)">Использование дополнительного оборудования (доп. лоток)</td><td class="editable-cell" data-original="ед.">ед.</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="50">50</span></td></tr>
+                            <tr><td class="editable-cell">Дополнительное время работы на объекте (свыше 1 машино-часа)</td><td class="editable-cell">час</td><td class="editable-cell price-cell"><span class="badge-price price-value">100</span></td></tr>
+                            <tr><td class="editable-cell">Использование дополнительного оборудования (доп. лоток)</td><td class="editable-cell">ед.</td><td class="editable-cell price-cell"><span class="badge-price price-value">50</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -543,7 +574,7 @@
 
                 <h3>🛣️ Доставка продукции за пределы МКАД</h3>
                 <div class="table-responsive">
-                    <table class="price-table" id="table-abs-delivery" data-file="tarif.xlsx" data-section="abs">
+                    <table class="price-table" id="table-abs-delivery" data-section="abs-delivery">
                         <thead>
                             <tr>
                                 <th>Расстояние от МКАД</th>
@@ -551,10 +582,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td class="editable-cell" data-original="0-49 км">0-49 км</td><td class="editable-cell" data-original="Договорной тариф">Договорной тариф</td></tr>
-                            <tr><td class="editable-cell" data-original="50-99 км">50-99 км</td><td class="editable-cell" data-original="Договорной тариф">Договорной тариф</td></tr>
-                            <tr><td class="editable-cell" data-original="100-149 км">100-149 км</td><td class="editable-cell" data-original="Договорной тариф">Договорной тариф</td></tr>
-                            <tr><td class="editable-cell" data-original="свыше 150 км">свыше 150 км</td><td class="editable-cell" data-original="Договорной тариф">Договорной тариф</td></tr>
+                            <tr><td class="editable-cell">0-49 км</td><td class="editable-cell">Договорной тариф</td></tr>
+                            <tr><td class="editable-cell">50-99 км</td><td class="editable-cell">Договорной тариф</td></tr>
+                            <tr><td class="editable-cell">100-149 км</td><td class="editable-cell">Договорной тариф</td></tr>
+                            <tr><td class="editable-cell">свыше 150 км</td><td class="editable-cell">Договорной тариф</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -568,7 +599,7 @@
                 
                 <h3>📋 Основные услуги</h3>
                 <div class="table-responsive">
-                    <table class="price-table" id="table-nasos-main" data-file="Nasos.xlsx" data-section="nasos">
+                    <table class="price-table" id="table-nasos-main" data-section="nasos-main">
                         <thead>
                             <tr>
                                 <th>Наименование услуги</th>
@@ -577,17 +608,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td class="editable-cell" data-original="Услуги АБС с насосом 7 м³">Услуги АБС с насосом 7 м³</td><td class="editable-cell" data-original="рейс">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="600">600</span></td></tr>
-                            <tr><td class="editable-cell" data-original="Услуги АБС с насосом 8 м³">Услуги АБС с насосом 8 м³</td><td class="editable-cell" data-original="рейс">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="650">650</span></td></tr>
-                            <tr><td class="editable-cell" data-original="Услуги АБС с насосом 7 м³ (стрела 28 м)">Услуги АБС с насосом 7 м³ (стрела 28 м)</td><td class="editable-cell" data-original="рейс">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="650">650</span></td></tr>
-                            <tr><td class="editable-cell" data-original="Услуги АБС с насосом 8 м³ (стрела 28 м)">Услуги АБС с насосом 8 м³ (стрела 28 м)</td><td class="editable-cell" data-original="рейс">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="700">700</span></td></tr>
+                            <tr><td class="editable-cell">Услуги АБС с насосом 7 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">600</span></td></tr>
+                            <tr><td class="editable-cell">Услуги АБС с насосом 8 м³</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">650</span></td></tr>
+                            <tr><td class="editable-cell">Услуги АБС с насосом 7 м³ (стрела 28 м)</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">650</span></td></tr>
+                            <tr><td class="editable-cell">Услуги АБС с насосом 8 м³ (стрела 28 м)</td><td class="editable-cell">рейс</td><td class="editable-cell price-cell"><span class="badge-price price-value">700</span></td></tr>
                         </tbody>
                     </table>
                 </div>
 
                 <h3>⏱️ Дополнительные услуги</h3>
                 <div class="table-responsive">
-                    <table class="price-table" id="table-nasos-extra" data-file="Nasos.xlsx" data-section="nasos">
+                    <table class="price-table" id="table-nasos-extra" data-section="nasos-extra">
                         <thead>
                             <tr>
                                 <th>Наименование услуги</th>
@@ -596,10 +627,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td class="editable-cell" data-original="Дополнительное время работы на объекте (свыше 2 машино-часов)">Дополнительное время работы на объекте (свыше 2 машино-часов)</td><td class="editable-cell" data-original="час">час</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="200">200</span></td></tr>
-                            <tr><td class="editable-cell" data-original="Прокачка бетона свыше 15 м³">Прокачка бетона свыше 15 м³</td><td class="editable-cell" data-original="м³">м³</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="25">25</span></td></tr>
-                            <tr><td class="editable-cell" data-original="Использование дополнительного оборудования (доп. шланг 4 м)">Использование дополнительного оборудования (доп. шланг 4 м)</td><td class="editable-cell" data-original="ед.">ед.</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="50">50</span></td></tr>
-                            <tr><td class="editable-cell" data-original="Отсутствие места мойки смесительного барабана">Отсутствие места мойки смесительного барабана</td><td class="editable-cell" data-original="ед.">ед.</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="200">200</span></td></tr>
+                            <tr><td class="editable-cell">Дополнительное время работы на объекте (свыше 2 машино-часов)</td><td class="editable-cell">час</td><td class="editable-cell price-cell"><span class="badge-price price-value">200</span></td></tr>
+                            <tr><td class="editable-cell">Прокачка бетона свыше 15 м³</td><td class="editable-cell">м³</td><td class="editable-cell price-cell"><span class="badge-price price-value">25</span></td></tr>
+                            <tr><td class="editable-cell">Использование дополнительного оборудования (доп. шланг 4 м)</td><td class="editable-cell">ед.</td><td class="editable-cell price-cell"><span class="badge-price price-value">50</span></td></tr>
+                            <tr><td class="editable-cell">Отсутствие места мойки смесительного барабана</td><td class="editable-cell">ед.</td><td class="editable-cell price-cell"><span class="badge-price price-value">200</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -620,7 +651,7 @@
 
                 <h3>🗺️ Доставка продукции за пределы МКАД (АБС с насосом)</h3>
                 <div class="table-responsive">
-                    <table class="price-table" id="table-nasos-delivery" data-file="Nasos.xlsx" data-section="nasos">
+                    <table class="price-table" id="table-nasos-delivery" data-section="nasos-delivery">
                         <thead>
                             <tr>
                                 <th>Расстояние от МКАД</th>
@@ -628,80 +659,62 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td class="editable-cell" data-original="0-49 км">0-49 км</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="5">5</span></td></tr>
-                            <tr><td class="editable-cell" data-original="50-99 км">50-99 км</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="6">6</span></td></tr>
-                            <tr><td class="editable-cell" data-original="100-149 км">100-149 км</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="7">7</span></td></tr>
-                            <tr><td class="editable-cell" data-original="свыше 150 км">свыше 150 км</td><td class="editable-cell price-cell"><span class="badge-price price-value" data-original="8">8</span></td></tr>
+                            <tr><td class="editable-cell">0-49 км</td><td class="editable-cell price-cell"><span class="badge-price price-value">5</span></td></tr>
+                            <tr><td class="editable-cell">50-99 км</td><td class="editable-cell price-cell"><span class="badge-price price-value">6</span></td></tr>
+                            <tr><td class="editable-cell">100-149 км</td><td class="editable-cell price-cell"><span class="badge-price price-value">7</span></td></tr>
+                            <tr><td class="editable-cell">свыше 150 км</td><td class="editable-cell price-cell"><span class="badge-price price-value">8</span></td></tr>
                         </tbody>
                     </table>
                 </div>
                 <p class="note-text">* Тариф применяется за каждый километр от МКАД до объекта</p>
             </div>
 
-            <!-- Модальное окно для показа всех изменений -->
-            <div id="changesModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.3); z-index: 10000; max-width: 500px; max-height: 400px; overflow: auto;">
-                <h4>Текущие изменения <span onclick="closeModal()" style="float: right; cursor: pointer;">❌</span></h4>
-                <div id="changesList"></div>
+            <div class="footer-note">
+                🔥 Данные синхронизируются с Firebase. Изменения видны всем пользователям в реальном времени!
             </div>
-            <div id="modalOverlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999;" onclick="closeModal()"></div>
-           
         </div>
     </main>
 
-    <script>
-        // Глобальные переменные
+    <!-- Модальное окно -->
+    <div id="changesModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.3); z-index: 10000; max-width: 500px; max-height: 400px; overflow: auto;">
+        <h4>Текущие изменения <span id="closeModalBtn" style="float: right; cursor: pointer;">❌</span></h4>
+        <div id="changesList"></div>
+    </div>
+    <div id="modalOverlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999;"></div>
+
+    <script type="module">
+        // ========== ИМПОРТ FIREBASE ==========
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        
+        // ========== КОНФИГУРАЦИЯ FIREBASE ==========
+        const firebaseConfig = {
+            apiKey: "AIzaSyAr-lHRrv6aIm6djz2BlKkAwM4OWIAf85E",
+            authDomain: "indigra-d956f.firebaseapp.com",
+            projectId: "indigra-d956f",
+            storageBucket: "indigra-d956f.firebasestorage.app",
+            messagingSenderId: "541982595928",
+            appId: "1:541982595928:web:a45bec517d2c897ef6a32d",
+            measurementId: "G-E55NB0J8TP",
+            databaseURL: "https://indigra-d956f-default-rtdb.firebaseio.com"
+        };
+
+        // Инициализация
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        // Глобальное состояние
         let isEditMode = false;
-        let changedCells = new Map(); // Хранит изменения
-        let originalData = new Map(); // Хранит оригинальные значения для сброса
+        let changedCells = new Map();
+        let isSyncing = false;
 
-        // Функция для показа уведомлений
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideIn 0.3s reverse';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        // Функция для показа/скрытия индикатора загрузки
-        function showLoading(show = true) {
-            let overlay = document.querySelector('.loading-overlay');
-            if (show) {
-                if (!overlay) {
-                    overlay = document.createElement('div');
-                    overlay.className = 'loading-overlay';
-                    overlay.innerHTML = '<div class="loading-spinner"></div>';
-                    document.body.appendChild(overlay);
-                }
-            } else {
-                if (overlay) overlay.remove();
-            }
-        }
-
-        // Генерация уникального ID для ячейки
-        function getCellId(cell) {
-            const table = cell.closest('table');
-            const tableId = table.id;
-            const row = cell.parentElement;
-            const rowIndex = Array.from(row.parentElement.children).indexOf(row);
-            const cellIndex = Array.from(row.children).indexOf(cell);
-            return `${tableId}_${rowIndex}_${cellIndex}`;
-        }
-
-        // Получение текстового значения ячейки
+        // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
         function getCellValue(cell) {
             const priceSpan = cell.querySelector('.price-value');
-            if (priceSpan) {
-                return priceSpan.textContent.trim();
-            }
+            if (priceSpan) return priceSpan.textContent.trim();
             return cell.textContent.trim();
         }
 
-        // Установка значения ячейки
         function setCellValue(cell, value) {
             const priceSpan = cell.querySelector('.price-value');
             if (priceSpan) {
@@ -711,11 +724,60 @@
             }
         }
 
-        // Обновление счетчика изменений
+        function getCellId(cell) {
+            const table = cell.closest('table');
+            const section = table.dataset.section;
+            const row = cell.parentElement;
+            const rowIndex = Array.from(row.parentElement.children).indexOf(row);
+            const cellIndex = Array.from(row.children).indexOf(cell);
+            return `${section}_${rowIndex}_${cellIndex}`;
+        }
+
+        function findCellById(cellId) {
+            const parts = cellId.split('_');
+            const section = parts.slice(0, -2).join('_');
+            const rowIndex = parseInt(parts[parts.length - 2]);
+            const cellIndex = parseInt(parts[parts.length - 1]);
+            
+            const tables = document.querySelectorAll('.price-table');
+            for (const table of tables) {
+                if (table.dataset.section === section) {
+                    const rows = table.querySelectorAll('tbody tr');
+                    if (rows[rowIndex]) {
+                        const cells = rows[rowIndex].querySelectorAll('td');
+                        if (cells[cellIndex]) return cells[cellIndex];
+                    }
+                }
+            }
+            return null;
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function showLoading(show = true) {
+            let overlay = document.querySelector('.loading-overlay');
+            if (show && !overlay) {
+                overlay = document.createElement('div');
+                overlay.className = 'loading-overlay';
+                overlay.innerHTML = '<div class="loading-spinner"></div>';
+                document.body.appendChild(overlay);
+            } else if (!show && overlay) {
+                overlay.remove();
+            }
+        }
+
         function updateChangesCounter() {
             const counter = document.getElementById('changesCount');
             const count = changedCells.size;
-            
             if (count > 0) {
                 counter.textContent = count;
                 counter.style.display = 'inline';
@@ -724,69 +786,76 @@
             }
         }
 
-        // Переключение режима редактирования
-        function toggleEditMode() {
-            isEditMode = !isEditMode;
-            const editBtn = document.getElementById('toggleEditMode');
+        function updateSaveButtonText() {
             const saveBtn = document.getElementById('saveChanges');
-            const cancelBtn = document.getElementById('cancelChanges');
-            const editHint = document.getElementById('editHint');
-            const editStatus = document.getElementById('editStatus');
-            
-            if (isEditMode) {
-                // Вход в режим редактирования
-                editBtn.innerHTML = '🔒 Выйти из режима редактирования';
-                editBtn.classList.remove('btn-edit');
-                editBtn.classList.add('btn-cancel');
-                saveBtn.disabled = false;
-                cancelBtn.disabled = false;
-                editHint.style.display = 'block';
-                editStatus.textContent = 'Режим редактирования';
-                editStatus.className = 'badge bg-success';
-                
-                // Сохраняем оригинальные значения всех ячеек
-                document.querySelectorAll('.editable-cell').forEach(cell => {
-                    const originalValue = getCellValue(cell);
-                    cell.setAttribute('data-original', originalValue);
-                });
-                
-                // Делаем все ячейки с классом editable-cell редактируемыми
-                document.querySelectorAll('.editable-cell').forEach(cell => {
-                    cell.setAttribute('contenteditable', 'true');
-                    
-                    // Удаляем старый обработчик, если есть
-                    cell.removeEventListener('input', handleCellInput);
-                    cell.addEventListener('input', handleCellInput);
-                    
-                    // Добавляем обработчик для потери фокуса
-                    cell.removeEventListener('blur', handleCellBlur);
-                    cell.addEventListener('blur', handleCellBlur);
-                });
-                
+            const changesCount = changedCells.size;
+            if (changesCount > 0) {
+                saveBtn.innerHTML = `💾 Сохранить изменения (${changesCount})`;
             } else {
-                // Выход из режима редактирования
-                editBtn.innerHTML = '✏️ Войти в режим редактирования';
-                editBtn.classList.remove('btn-cancel');
-                editBtn.classList.add('btn-edit');
-                saveBtn.disabled = true;
-                cancelBtn.disabled = true;
-                editHint.style.display = 'none';
-                editStatus.textContent = 'Режим просмотра';
-                editStatus.className = 'badge bg-warning text-dark';
-                
-                // Убираем редактирование со всех ячеек
-                document.querySelectorAll('[contenteditable="true"]').forEach(cell => {
-                    cell.removeAttribute('contenteditable');
-                    cell.removeEventListener('input', handleCellInput);
-                    cell.removeEventListener('blur', handleCellBlur);
-                });
-                
-                // Не очищаем изменения, чтобы можно было вернуться
-                updateChangesCounter();
+                saveBtn.innerHTML = '💾 Сохранить изменения';
             }
         }
 
-        // Обработчик ввода в ячейку
+        // ========== FIREBASE ФУНКЦИИ ==========
+        async function loadFromFirebase() {
+            showLoading(true);
+            try {
+                const snapshot = await get(ref(database, 'prices'));
+                const prices = snapshot.val() || {};
+                
+                Object.entries(prices).forEach(([cellId, value]) => {
+                    const cell = findCellById(cellId);
+                    if (cell) {
+                        setCellValue(cell, value);
+                        cell.setAttribute('data-original', value);
+                    }
+                });
+                
+                showNotification('✅ Данные загружены из Firebase', 'success');
+                document.getElementById('connectionStatus').className = 'connection-status';
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showNotification('❌ Ошибка подключения к Firebase', 'error');
+                document.getElementById('connectionStatus').className = 'connection-status disconnected';
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function saveToFirebase(cellId, value) {
+            try {
+                await set(ref(database, `prices/${cellId}`), value);
+                return true;
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                return false;
+            }
+        }
+
+        function listenForChanges() {
+            onValue(ref(database, 'prices'), (snapshot) => {
+                if (!isSyncing) {
+                    const prices = snapshot.val() || {};
+                    Object.entries(prices).forEach(([cellId, value]) => {
+                        const cell = findCellById(cellId);
+                        if (cell) {
+                            const currentValue = getCellValue(cell);
+                            if (currentValue !== value) {
+                                setCellValue(cell, value);
+                                cell.setAttribute('data-original', value);
+                                if (changedCells.has(cellId)) {
+                                    changedCells.delete(cellId);
+                                    updateChangesCounter();
+                                    updateSaveButtonText();
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
         function handleCellInput(e) {
             const cell = e.target;
             const newValue = getCellValue(cell);
@@ -802,21 +871,15 @@
             updateChangesCounter();
         }
 
-        // Обработчик потери фокуса
         function handleCellBlur(e) {
             const cell = e.target;
             const newValue = getCellValue(cell);
             const originalValue = cell.getAttribute('data-original');
             
-            // Проверяем, изменилось ли значение
             if (newValue !== originalValue) {
-                // Подсвечиваем измененную ячейку
                 cell.style.backgroundColor = '#fff9c4';
             } else {
-                // Убираем подсветку
                 cell.style.backgroundColor = '';
-                
-                // Удаляем из changedCells, если значение вернулось к исходному
                 const cellId = getCellId(cell);
                 if (changedCells.has(cellId)) {
                     changedCells.delete(cellId);
@@ -826,183 +889,110 @@
             }
         }
 
-        // Обновление текста кнопки сохранения
-        function updateSaveButtonText() {
+        // ========== ОСНОВНЫЕ ФУНКЦИИ ==========
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const editBtn = document.getElementById('toggleEditMode');
             const saveBtn = document.getElementById('saveChanges');
-            const changesCount = changedCells.size;
+            const cancelBtn = document.getElementById('cancelChanges');
+            const editHint = document.getElementById('editHint');
+            const editStatus = document.getElementById('editStatus');
             
-            if (changesCount > 0) {
-                saveBtn.innerHTML = `💾 Сохранить изменения (${changesCount})`;
+            if (isEditMode) {
+                editBtn.innerHTML = '🔒 Выйти из режима редактирования';
+                editBtn.classList.remove('btn-edit');
+                editBtn.classList.add('btn-cancel');
+                saveBtn.disabled = false;
+                cancelBtn.disabled = false;
+                editHint.style.display = 'block';
+                editStatus.textContent = 'Режим редактирования';
+                editStatus.className = 'badge bg-success';
+                
+                document.querySelectorAll('.editable-cell').forEach(cell => {
+                    const originalValue = getCellValue(cell);
+                    cell.setAttribute('data-original', originalValue);
+                    cell.setAttribute('contenteditable', 'true');
+                    cell.addEventListener('input', handleCellInput);
+                    cell.addEventListener('blur', handleCellBlur);
+                });
             } else {
-                saveBtn.innerHTML = '💾 Сохранить изменения';
+                editBtn.innerHTML = '✏️ Войти в режим редактирования';
+                editBtn.classList.remove('btn-cancel');
+                editBtn.classList.add('btn-edit');
+                saveBtn.disabled = true;
+                cancelBtn.disabled = true;
+                editHint.style.display = 'none';
+                editStatus.textContent = 'Режим просмотра';
+                editStatus.className = 'badge bg-warning text-dark';
+                
+                document.querySelectorAll('[contenteditable="true"]').forEach(cell => {
+                    cell.removeAttribute('contenteditable');
+                    cell.removeEventListener('input', handleCellInput);
+                    cell.removeEventListener('blur', handleCellBlur);
+                });
             }
         }
 
-        // Отмена изменений
-        function cancelChanges() {
-            if (!isEditMode) return;
-            
-            if (changedCells.size > 0) {
-                if (confirm('Отменить все несохраненные изменения?')) {
-                    // Восстанавливаем оригинальные значения
-                    changedCells.forEach((data, cellId) => {
-                        const cell = data.element;
-                        const originalValue = cell.getAttribute('data-original');
-                        if (originalValue !== null) {
-                            setCellValue(cell, originalValue);
-                            cell.style.backgroundColor = '';
-                        }
-                    });
-                    
-                    changedCells.clear();
-                    updateSaveButtonText();
-                    updateChangesCounter();
-                    showNotification('Изменения отменены', 'info');
-                }
-            } else {
-                showNotification('Нет изменений для отмены', 'info');
-            }
-        }
-
-        // Сохранение всех изменений
         async function saveAllChanges() {
             if (!isEditMode || changedCells.size === 0) {
                 showNotification('Нет изменений для сохранения', 'info');
                 return;
             }
 
-            if (!confirm('Сохранить все изменения? Данные будут доступны на сайте после обновления страницы.')) {
-                return;
-            }
+            if (!confirm('Сохранить изменения? Они будут видны всем пользователям.')) return;
 
             showLoading(true);
+            isSyncing = true;
 
             try {
-                // Группируем изменения по файлам
-                const changesByFile = new Map();
-                
-                changedCells.forEach((data, cellId) => {
-                    const cell = data.element;
-                    const table = cell.closest('table');
-                    const fileName = table.dataset.file;
-                    const newValue = getCellValue(cell);
-                    
-                    if (!changesByFile.has(fileName)) {
-                        changesByFile.set(fileName, []);
+                let savedCount = 0;
+                for (const [cellId, data] of changedCells) {
+                    const success = await saveToFirebase(cellId, data.value);
+                    if (success) {
+                        savedCount++;
+                        data.element.setAttribute('data-original', data.value);
+                        data.element.style.backgroundColor = '';
                     }
-                    
-                    changesByFile.get(fileName).push({
-                        cellId: cellId,
-                        value: newValue
-                    });
-                });
-
-                // Сохраняем каждый файл
-                for (const [fileName, changes] of changesByFile) {
-                    // Сохраняем в localStorage
-                    saveToLocalStorage(fileName, changes);
                 }
-
-                // Обновляем data-original для всех измененных ячеек и убираем подсветку
-                changedCells.forEach((data, cellId) => {
-                    const cell = data.element;
-                    const currentValue = getCellValue(cell);
-                    cell.setAttribute('data-original', currentValue);
-                    cell.style.backgroundColor = '';
-                });
 
                 changedCells.clear();
                 updateSaveButtonText();
                 updateChangesCounter();
-                showNotification('Изменения успешно сохранены локально! Обновите страницу, чтобы увидеть изменения на сайте.', 'success');
-                
-                // Отправляем событие для других вкладок
-                localStorage.setItem('price_updates', Date.now().toString());
-                
+                showNotification(`✅ Сохранено ${savedCount} изменений!`, 'success');
             } catch (error) {
-                console.error('Ошибка сохранения:', error);
-                showNotification('Ошибка при сохранении изменений: ' + error.message, 'error');
+                showNotification('Ошибка сохранения', 'error');
             } finally {
+                isSyncing = false;
                 showLoading(false);
             }
         }
 
-        // Сохранение в localStorage
-        function saveToLocalStorage(fileName, changes) {
-            const key = `price_data_${fileName}`;
-            let savedData = JSON.parse(localStorage.getItem(key) || '{}');
+        function cancelChanges() {
+            if (!isEditMode) return;
             
-            changes.forEach(change => {
-                savedData[change.cellId] = change.value;
-            });
-            
-            localStorage.setItem(key, JSON.stringify(savedData));
-            console.log(`✅ Данные сохранены в localStorage для ${fileName}:`, changes.length, 'изменений');
-        }
-
-        // Загрузка данных из localStorage при загрузке страницы
-        function loadFromLocalStorage() {
-            const files = ['tarif.xlsx', 'Nasos.xlsx', 'beton.xlsx', 'rastvory.xlsx'];
-            
-            files.forEach(fileName => {
-                const key = `price_data_${fileName}`;
-                const savedData = localStorage.getItem(key);
-                
-                if (savedData) {
-                    try {
-                        const changes = JSON.parse(savedData);
-                        
-                        // Применяем сохраненные изменения к ячейкам
-                        Object.entries(changes).forEach(([cellId, value]) => {
-                            const parts = cellId.split('_');
-                            const tableId = parts.slice(0, -2).join('_');
-                            const rowIndex = parseInt(parts[parts.length - 2]);
-                            const cellIndex = parseInt(parts[parts.length - 1]);
-                            
-                            const table = document.getElementById(tableId);
-                            
-                            if (table) {
-                                const rows = table.querySelectorAll('tbody tr');
-                                if (rows[rowIndex]) {
-                                    const cells = rows[rowIndex].querySelectorAll('td');
-                                    if (cells[cellIndex]) {
-                                        setCellValue(cells[cellIndex], value);
-                                        cells[cellIndex].setAttribute('data-original', value);
-                                        console.log(`✅ Загружено значение для ${cellId}: ${value}`);
-                                    }
-                                }
-                            }
-                        });
-                        
-                        console.log(`✅ Загружены сохраненные данные для ${fileName}:`, Object.keys(changes).length, 'изменений');
-                    } catch (error) {
-                        console.error(`❌ Ошибка загрузки данных для ${fileName}:`, error);
-                    }
-                }
-            });
-        }
-
-        // Быстрое редактирование раздела
-        function quickEdit(section) {
-            if (!isEditMode) {
-                toggleEditMode();
+            if (changedCells.size > 0 && confirm('Отменить все изменения?')) {
+                changedCells.forEach((data) => {
+                    setCellValue(data.element, data.oldValue);
+                    data.element.style.backgroundColor = '';
+                });
+                changedCells.clear();
+                updateSaveButtonText();
+                updateChangesCounter();
+                showNotification('Изменения отменены', 'info');
             }
-            
-            // Прокрутка к разделу
-            const element = document.getElementById(`section-${section}`);
+        }
+
+        function quickEdit(sectionId) {
+            if (!isEditMode) toggleEditMode();
+            const element = document.getElementById(`section-${sectionId}`);
             if (element) {
                 element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                
-                // Подсветка раздела
                 element.style.transition = 'box-shadow 0.5s';
                 element.style.boxShadow = '0 0 20px #ffc107';
-                setTimeout(() => {
-                    element.style.boxShadow = '';
-                }, 2000);
+                setTimeout(() => element.style.boxShadow = '', 2000);
             }
         }
 
-        // Показать все изменения
         function showAllChanges() {
             const changesList = document.getElementById('changesList');
             const modal = document.getElementById('changesModal');
@@ -1013,10 +1003,10 @@
             } else {
                 let html = '<ul style="list-style: none; padding: 0;">';
                 changedCells.forEach((data, cellId) => {
-                    html += `<li style="margin-bottom: 10px; padding: 5px; background: #f8f9fa; border-radius: 4px;">
-                        <strong>Ячейка:</strong> ${cellId}<br>
-                        <strong>Было:</strong> ${data.oldValue}<br>
-                        <strong>Стало:</strong> <span style="color: #28a745;">${data.value}</span>
+                    html += `<li style="margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px;">
+                        <strong>${cellId}</strong><br>
+                        <span style="color: #dc3545;">Было: ${data.oldValue}</span><br>
+                        <span style="color: #28a745;">Стало: ${data.value}</span>
                     </li>`;
                 });
                 html += '</ul>';
@@ -1027,117 +1017,93 @@
             overlay.style.display = 'block';
         }
 
-        // Закрыть модальное окно
         function closeModal() {
             document.getElementById('changesModal').style.display = 'none';
             document.getElementById('modalOverlay').style.display = 'none';
         }
 
-        // Экспорт в Excel
         function exportToExcel() {
             try {
                 const wb = XLSX.utils.book_new();
-                
-                // Собираем данные из всех таблиц
                 const tables = document.querySelectorAll('.price-table');
                 let allData = [];
                 
-                tables.forEach((table, index) => {
+                tables.forEach(table => {
                     const section = table.closest('.price-section');
-                    const sectionTitle = section ? section.querySelector('h2').textContent : 'Прайс-лист';
+                    if (section) {
+                        const title = section.querySelector('h2')?.textContent || '';
+                        if (title) allData.push([title]);
+                    }
                     
-                    // Добавляем заголовок секции
-                    allData.push([sectionTitle]);
-                    
-                    // Собираем данные таблицы
                     const rows = table.querySelectorAll('tr');
                     rows.forEach(row => {
                         const rowData = [];
-                        const cells = row.querySelectorAll('th, td');
-                        cells.forEach(cell => {
+                        row.querySelectorAll('th, td').forEach(cell => {
                             rowData.push(getCellValue(cell));
                         });
-                        if (rowData.length > 0) {
-                            allData.push(rowData);
-                        }
+                        if (rowData.length) allData.push(rowData);
                     });
-                    
-                    // Добавляем пустую строку между таблицами
                     allData.push([]);
                 });
                 
                 const ws = XLSX.utils.aoa_to_sheet(allData);
                 XLSX.utils.book_append_sheet(wb, ws, 'Прайс-лист');
-                
-                // Генерируем файл
-                const fileName = `price_${new Date().toISOString().slice(0,10)}.xlsx`;
-                XLSX.writeFile(wb, fileName);
-                
-                showNotification('Excel файл успешно создан', 'success');
+                XLSX.writeFile(wb, `price_${new Date().toISOString().slice(0,10)}.xlsx`);
+                showNotification('Excel файл создан', 'success');
             } catch (error) {
                 console.error('Ошибка экспорта:', error);
-                showNotification('Ошибка при создании Excel файла', 'error');
+                showNotification('Ошибка экспорта', 'error');
             }
         }
 
-        // Сброс всех изменений
-        function resetAllChanges() {
-            if (confirm('ВНИМАНИЕ! Это удалит ВСЕ сохраненные изменения из localStorage. Продолжить?')) {
-                const files = ['tarif.xlsx', 'Nasos.xlsx', 'beton.xlsx', 'rastvory.xlsx'];
-                
-                files.forEach(fileName => {
-                    localStorage.removeItem(`price_data_${fileName}`);
-                });
-                
-                showNotification('Все сохраненные изменения удалены. Обновите страницу для загрузки исходных данных.', 'info');
-                
-                // Предлагаем обновить страницу
-                setTimeout(() => {
-                    if (confirm('Обновить страницу для загрузки исходных данных?')) {
-                        location.reload();
-                    }
-                }, 1000);
-            }
-        }
-
-        // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🟢 Admin panel загружена');
-            
-            // Загружаем сохраненные данные
-            loadFromLocalStorage();
-            
-            // Блокируем вставку форматированного текста
-            document.addEventListener('paste', function(e) {
-                if (isEditMode && e.target.closest('[contenteditable="true"]')) {
-                    e.preventDefault();
-                    const text = e.clipboardData.getData('text/plain');
-                    document.execCommand('insertText', false, text);
+        async function resetAllChanges() {
+            if (confirm('ВНИМАНИЕ! Это удалит ВСЕ сохраненные изменения для всех пользователей. Продолжить?')) {
+                showLoading(true);
+                try {
+                    await set(ref(database, 'prices'), null);
+                    showNotification('Все данные сброшены. Страница будет обновлена.', 'info');
+                    setTimeout(() => location.reload(), 1500);
+                } catch (error) {
+                    showNotification('Ошибка сброса', 'error');
+                } finally {
+                    showLoading(false);
                 }
-            });
+            }
+        }
+
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        async function init() {
+            // Загружаем данные
+            await loadFromFirebase();
+            listenForChanges();
             
-            // Предотвращаем потерю данных при уходе со страницы
-            window.addEventListener('beforeunload', function(e) {
+            // Назначаем обработчики
+            document.getElementById('toggleEditMode').onclick = toggleEditMode;
+            document.getElementById('saveChanges').onclick = saveAllChanges;
+            document.getElementById('cancelChanges').onclick = cancelChanges;
+            document.getElementById('exportExcel').onclick = exportToExcel;
+            document.getElementById('resetAll').onclick = resetAllChanges;
+            document.getElementById('quickEditBeton').onclick = () => quickEdit('beton');
+            document.getElementById('quickEditRastvory').onclick = () => quickEdit('rastvory');
+            document.getElementById('quickEditAbs').onclick = () => quickEdit('abs');
+            document.getElementById('quickEditNasos').onclick = () => quickEdit('nasos');
+            document.getElementById('showChanges').onclick = showAllChanges;
+            document.getElementById('closeModalBtn').onclick = closeModal;
+            document.getElementById('modalOverlay').onclick = closeModal;
+            
+            // Предотвращаем потерю данных
+            window.addEventListener('beforeunload', (e) => {
                 if (isEditMode && changedCells.size > 0) {
                     e.preventDefault();
-                    e.returnValue = 'У вас есть несохраненные изменения. Точно покинуть страницу?';
+                    e.returnValue = 'У вас есть несохраненные изменения';
                 }
             });
+            
+            showNotification('🔥 Firebase подключен! Изменения синхронизируются в реальном времени.', 'success');
+        }
 
-            // Обработка изменений в localStorage из других вкладок
-            window.addEventListener('storage', function(e) {
-                if (e.key && e.key.startsWith('price_data_')) {
-                    console.log('🔄 Обнаружены изменения в localStorage, перезагружаем...');
-                    if (confirm('Данные были изменены в другой вкладке. Обновить страницу?')) {
-                        location.reload();
-                    }
-                }
-            });
-
-            showNotification('Редактор готов к работе. Данные сохраняются локально в браузере.', 'info');
-        });
+        // Запуск
+        init();
     </script>
-    <!-- Скрипт для автоматической подгонки ширины страницы -->
-    <script src="js/layout-fixer.js"></script>
 </body>
 </html>
