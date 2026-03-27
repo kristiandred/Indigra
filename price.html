@@ -317,10 +317,10 @@
         <div class="container py-5">
             
             <!-- Индикатор подключения -->
-            <div class="connection-indicator" id="connectionIndicator">
+         <!--   <div class="connection-indicator" id="connectionIndicator">
                 <span class="connection-dot" id="connectionDot"></span>
                 <span id="connectionText">Подключение...</span>
-            </div>
+            </div> -->
             
             <!-- ==================== ТОВАРНЫЙ БЕТОН ==================== -->
             
@@ -702,12 +702,12 @@
                 minute: '2-digit',
                 second: '2-digit'
             });
-            document.getElementById('lastUpdateTime').innerHTML = `📅 Последнее обновление: ${timeStr}`;
+           // document.getElementById('lastUpdateTime').innerHTML = `📅 Последнее обновление: ${timeStr}`;
         }
         
         // Загрузка всех цен из Firebase
         async function loadAllPrices() {
-            console.log('🔄 Загружаем цены...');
+          //  console.log('🔄 Загружаем цены...');
             
             try {
                 const snapshot = await database.ref('prices').once('value');
@@ -782,11 +782,11 @@
             connectedRef.on('value', (snap) => {
                 if (snap.val() === true) {
                    // console.log('✅ Firebase подключен');
-                    document.getElementById('connectionDot').className = 'connection-dot';
+                 //   document.getElementById('connectionDot').className = 'connection-dot';
                   //  document.getElementById('connectionText').textContent = 'Подключено к Firebase';
                 } else {
-                    console.log('❌ Firebase отключен');
-                    document.getElementById('connectionDot').className = 'connection-dot disconnected';
+                  //  console.log('❌ Firebase отключен');
+                 //   document.getElementById('connectionDot').className = 'connection-dot disconnected';
                   //  document.getElementById('connectionText').textContent = 'Ожидание подключения...';
                 }
             });
@@ -811,7 +811,7 @@
         
         // Дополнительная загрузка после полной загрузки
         window.addEventListener('load', function() {
-            console.log('🟢 Страница полностью загружена');
+         //   console.log('🟢 Страница полностью загружена');
             setTimeout(loadAllPrices, 1000);
         });
         
