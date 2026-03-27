@@ -7,8 +7,32 @@
     <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/site.css" />
     <link rel="stylesheet" href="css/common.css" />
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
     <style>
         /* Стили для прайс-листа */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #1e3c72;
+            --secondary-blue: #2a5298;
+            --light-blue: #e3f2fd;
+            --ice-blue: #bbdefb;
+            --dark-gray: #555;
+            --light-gray: #f8f9fa;
+            --gradient-primary: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            --gradient-secondary: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            --shadow-soft: 0 2px 10px rgba(0,0,0,0.05);
+            --shadow-medium: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
         .price-section {
             margin-bottom: 40px;
             padding: 25px;
@@ -59,6 +83,7 @@
             padding: 12px 15px;
             border: 1px solid var(--ice-blue);
             background: white;
+            transition: all 0.3s ease;
         }
 
         .price-table tbody tr:nth-child(even) td {
@@ -67,23 +92,6 @@
 
         .price-table tbody tr:hover td {
             background: var(--ice-blue);
-            transition: background 0.3s ease;
-        }
-
-        .info-box {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            border-left: 4px solid var(--primary-blue);
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        .warning-box {
-            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
-            border-left: 4px solid #c62828;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
         }
 
         .badge-price {
@@ -112,16 +120,22 @@
             font-style: italic;
         }
 
-        .mt-4 {
-            margin-top: 1.5rem;
+        .info-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 4px solid var(--primary-blue);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
         }
-        .mb-3 {
-            margin-bottom: 1rem;
+
+        .warning-box {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border-left: 4px solid #c62828;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
         }
-        .text-center {
-            text-align: center;
-        }
-        
+
         .two-columns {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -134,6 +148,114 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        .mt-4 {
+            margin-top: 1.5rem;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        /* Анимация для обновления цен */
+        @keyframes priceUpdate {
+            0% {
+                background-color: #fff9c4;
+                transform: scale(1);
+            }
+            50% {
+                background-color: #ffc107;
+                transform: scale(1.05);
+            }
+            100% {
+                background-color: transparent;
+                transform: scale(1);
+            }
+        }
+        
+        .price-updated {
+            animation: priceUpdate 0.5s ease;
+        }
+        
+        /* Уведомление */
+        .live-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            z-index: 9999;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: slideInRight 0.3s ease;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        /* Индикатор подключения */
+        .connection-indicator {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+        
+        .connection-dot.disconnected {
+            background: #dc3545;
+            animation: none;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        /* Обновление времени */
+        .last-update {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -142,7 +264,7 @@
             <div class="container">
                 <div class="navbar-brand-wrapper">
                     <a class="navbar-brand d-flex align-items-center" href="index.html">
-                        <img src="images/Логотип 1.svg" alt="ИНДИГРА" class="navbar-logo me-2">
+                        <img src="images/Логотип 1.svg" alt="ИНДИГРА" class="navbar-logo me-2" style="height: 40px;">
                         <span>ИНДИГРА</span>
                     </a>
                 </div>
@@ -187,11 +309,18 @@
             <div class="container">
                 <div class="hero-content">
                     <h1 class="hero-title">Прайс-лист на продукцию и услуги</h1>
+                    <p class="hero-subtitle">Актуальные цены обновляются автоматически</p>
                 </div>
             </div>
         </section>
 
         <div class="container py-5">
+            
+            <!-- Индикатор подключения -->
+            <div class="connection-indicator" id="connectionIndicator">
+                <span class="connection-dot" id="connectionDot"></span>
+                <span id="connectionText">Подключение...</span>
+            </div>
             
             <!-- ==================== ТОВАРНЫЙ БЕТОН ==================== -->
             
@@ -211,10 +340,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td>С8/10 М100 гр</td><td><span class="badge-price">115</span></td></tr>
-                                    <tr><td>С 12/15 М200 гр</td><td><span class="badge-price">125</span></td></tr>
-                                    <tr><td>С16/20 М250 гр</td><td><span class="badge-price">135</span></td></tr>
-                                    <tr><td>С18/22,5 М300 гр</td><td><span class="badge-price">145</span></td></tr>
+                                    <tr><td>С8/10 М100 гр</td><td class="price-cell" data-key="beton_gravel_100"><span class="badge-price">115</span></td></tr>
+                                    <tr><td>С12/15 М200 гр</td><td class="price-cell" data-key="beton_gravel_200"><span class="badge-price">125</span></td></tr>
+                                    <tr><td>С16/20 М250 гр</td><td class="price-cell" data-key="beton_gravel_250"><span class="badge-price">135</span></td></tr>
+                                    <tr><td>С18/22,5 М300 гр</td><td class="price-cell" data-key="beton_gravel_300"><span class="badge-price">145</span></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -232,14 +361,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td>С8/10 М150 щ</td><td><span class="badge-price">166.5</span></td></tr>
-                                    <tr><td>С 12/15 М200 щ</td><td><span class="badge-price">175</span></td></tr>
-                                    <tr><td>С 16/20 М250 щ</td><td><span class="badge-price">180</span></td></tr>
-                                    <tr><td>С18/22,5 М300 щ</td><td><span class="badge-price">187.5</span></td></tr>
-                                    <tr><td>С 20/25 М350 щ</td><td><span class="badge-price">196</span></td></tr>
-                                    <tr><td>С 25/30 М400 щ</td><td><span class="badge-price">215</span></td></tr>
-                                    <tr><td>С 28/35 М450 щ</td><td><span class="badge-price">225</span></td></tr>
-                                    <tr><td>С 30/37 М500 щ</td><td><span class="badge-price">250</span></td></tr>
+                                    <tr><td>С8/10 М150 щ</td><td class="price-cell" data-key="beton_granite_150"><span class="badge-price">166.5</span></td></tr>
+                                    <tr><td>С12/15 М200 щ</td><td class="price-cell" data-key="beton_granite_200"><span class="badge-price">175</span></td></tr>
+                                    <tr><td>С16/20 М250 щ</td><td class="price-cell" data-key="beton_granite_250"><span class="badge-price">180</span></td></tr>
+                                    <tr><td>С18/22,5 М300 щ</td><td class="price-cell" data-key="beton_granite_300"><span class="badge-price">187.5</span></td></tr>
+                                    <tr><td>С20/25 М350 щ</td><td class="price-cell" data-key="beton_granite_350"><span class="badge-price">196</span></td></tr>
+                                    <tr><td>С25/30 М400 щ</td><td class="price-cell" data-key="beton_granite_400"><span class="badge-price">215</span></td></tr>
+                                    <tr><td>С28/35 М450 щ</td><td class="price-cell" data-key="beton_granite_450"><span class="badge-price">225</span></td></tr>
+                                    <tr><td>С30/37 М500 щ</td><td class="price-cell" data-key="beton_granite_500"><span class="badge-price">250</span></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -261,10 +390,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>РСГП М50</td><td><span class="badge-price">105</span></td></tr>
-                            <tr><td>РСГП М100</td><td><span class="badge-price">126</span></td></tr>
-                            <tr><td>РСГП М150</td><td><span class="badge-price">138</span></td></tr>
-                            <tr><td>РСГП М200</td><td><span class="badge-price">147</span></td></tr>
+                            <tr><td>РСГП М50</td><td class="price-cell" data-key="rastvor_50"><span class="badge-price">105</span></td></tr>
+                            <tr><td>РСГП М100</td><td class="price-cell" data-key="rastvor_100"><span class="badge-price">126</span></td></tr>
+                            <tr><td>РСГП М150</td><td class="price-cell" data-key="rastvor_150"><span class="badge-price">138</span></td></tr>
+                            <tr><td>РСГП М200</td><td class="price-cell" data-key="rastvor_200"><span class="badge-price">147</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -288,13 +417,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>Услуги АБС 7 м³</td><td>рейс</td><td><span class="badge-price">200</span></td></tr>
-                            <tr><td>Услуги АБС 8 м³</td><td>рейс</td><td><span class="badge-price">210</span></td></tr>
-                            <tr><td>Услуги АБС 9 м³</td><td>рейс</td><td><span class="badge-price">220</span></td></tr>
-                            <tr><td>Услуги АБС 10 м³</td><td>рейс</td><td><span class="badge-price">240</span></td></tr>
-                            <tr><td>Услуги АБС 11 м³</td><td>рейс</td><td><span class="badge-price">300</span></td></tr>
-                            <tr><td>Услуги АБС 12 м³</td><td>рейс</td><td><span class="badge-price">320</span></td></tr>
-                            <tr><td>Услуги АБС 14 м³</td><td>рейс</td><td><span class="badge-price">350</span></td></tr>
+                            <tr><td>Услуги АБС 7 м³</td><td>рейс</td><td class="price-cell" data-key="abs_7"><span class="badge-price">200</span></td></tr>
+                            <tr><td>Услуги АБС 8 м³</td><td>рейс</td><td class="price-cell" data-key="abs_8"><span class="badge-price">210</span></td></tr>
+                            <tr><td>Услуги АБС 9 м³</td><td>рейс</td><td class="price-cell" data-key="abs_9"><span class="badge-price">220</span></td></tr>
+                            <tr><td>Услуги АБС 10 м³</td><td>рейс</td><td class="price-cell" data-key="abs_10"><span class="badge-price">240</span></td></tr>
+                            <tr><td>Услуги АБС 11 м³</td><td>рейс</td><td class="price-cell" data-key="abs_11"><span class="badge-price">300</span></td></tr>
+                            <tr><td>Услуги АБС 12 м³</td><td>рейс</td><td class="price-cell" data-key="abs_12"><span class="badge-price">320</span></td></tr>
+                            <tr><td>Услуги АБС 14 м³</td><td>рейс</td><td class="price-cell" data-key="abs_14"><span class="badge-price">350</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -310,8 +439,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>Дополнительное время работы на объекте (свыше 1 машино-часа)</td><td>час</td><td><span class="badge-price">100</span></td></tr>
-                            <tr><td>Использование дополнительного оборудования (доп. лоток)</td><td>ед.</td><td><span class="badge-price">50</span></td></tr>
+                            <tr><td>Дополнительное время работы на объекте (свыше 1 машино-часа)</td><td>час</td><td class="price-cell" data-key="abs_extra_time"><span class="badge-price">100</span></td></tr>
+                            <tr><td>Использование дополнительного оборудования (доп. лоток)</td><td>ед.</td><td class="price-cell" data-key="abs_extra_equip"><span class="badge-price">50</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -361,10 +490,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>Услуги АБС с насосом 7 м³</td><td>рейс</td><td><span class="badge-price">600</span></td></tr>
-                            <tr><td>Услуги АБС с насосом 8 м³</td><td>рейс</td><td><span class="badge-price">650</span></td></tr>
-                            <tr><td>Услуги АБС с насосом 7 м³ (стрела 28 м)</td><td>рейс</td><td><span class="badge-price">650</span></td></tr>
-                            <tr><td>Услуги АБС с насосом 8 м³ (стрела 28 м)</td><td>рейс</td><td><span class="badge-price">700</span></td></tr>
+                            <tr><td>Услуги АБС с насосом 7 м³</td><td>рейс</td><td class="price-cell" data-key="nasos_7"><span class="badge-price">600</span></td></tr>
+                            <tr><td>Услуги АБС с насосом 8 м³</td><td>рейс</td><td class="price-cell" data-key="nasos_8"><span class="badge-price">650</span></td></tr>
+                            <tr><td>Услуги АБС с насосом 7 м³ (стрела 28 м)</td><td>рейс</td><td class="price-cell" data-key="nasos_7_28"><span class="badge-price">650</span></td></tr>
+                            <tr><td>Услуги АБС с насосом 8 м³ (стрела 28 м)</td><td>рейс</td><td class="price-cell" data-key="nasos_8_28"><span class="badge-price">700</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -380,10 +509,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>Дополнительное время работы на объекте (свыше 2 машино-часов)</td><td>час</td><td><span class="badge-price">200</span></td></tr>
-                            <tr><td>Прокачка бетона свыше 15 м³</td><td>м³</td><td><span class="badge-price">25</span></td></tr>
-                            <tr><td>Использование дополнительного оборудования (доп. шланг 4 м)</td><td>ед.</td><td><span class="badge-price">50</span></td></tr>
-                            <tr><td>Отсутствие места мойки смесительного барабана</td><td>ед.</td><td><span class="badge-price">200</span></td></tr>
+                            <tr><td>Дополнительное время работы на объекте (свыше 2 машино-часов)</td><td>час</td><td class="price-cell" data-key="nasos_extra_time"><span class="badge-price">200</span></td></tr>
+                            <tr><td>Прокачка бетона свыше 15 м³</td><td>м³</td><td class="price-cell" data-key="nasos_pump"><span class="badge-price">25</span></td></tr>
+                            <tr><td>Использование дополнительного оборудования (доп. шланг 4 м)</td><td>ед.</td><td class="price-cell" data-key="nasos_hose"><span class="badge-price">50</span></td></tr>
+                            <tr><td>Отсутствие места мойки смесительного барабана</td><td>ед.</td><td class="price-cell" data-key="nasos_nowash"><span class="badge-price">200</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -412,10 +541,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>0-49 км</td><td><span class="badge-price">5</span></td></tr>
-                            <tr><td>50-99 км</td><td><span class="badge-price">6</span></td></tr>
-                            <tr><td>100-149 км</td><td><span class="badge-price">7</span></td></tr>
-                            <tr><td>свыше 150 км</td><td><span class="badge-price">8</span></td></tr>
+                            <tr><td>0-49 км</td><td class="price-cell" data-key="nasos_delivery_49"><span class="badge-price">5</span></td></tr>
+                            <tr><td>50-99 км</td><td class="price-cell" data-key="nasos_delivery_99"><span class="badge-price">6</span></td></tr>
+                            <tr><td>100-149 км</td><td class="price-cell" data-key="nasos_delivery_149"><span class="badge-price">7</span></td></tr>
+                            <tr><td>свыше 150 км</td><td class="price-cell" data-key="nasos_delivery_150"><span class="badge-price">8</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -435,115 +564,265 @@
                 </div>
             </div>
             
+            <div class="last-update" id="lastUpdateTime">
+                Последнее обновление: загрузка...
+            </div>
         </div>
     </main>
 
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
     
-    <!-- ИСПРАВЛЕННЫЙ СКРИПТ ДЛЯ ЗАГРУЗКИ ЦЕН -->
-  <script>
-    function loadPricesFromStorage() {
-        console.log('Загружаем цены из хранилища...');
+    <script>
+        // ========== КОНФИГУРАЦИЯ FIREBASE ==========
+        const firebaseConfig = {
+            apiKey: "AIzaSyAr-lHRrv6aIm6djz2BlKkAwM4OWIAf85E",
+            authDomain: "indigra-d956f.firebaseapp.com",
+            databaseURL: "https://indigra-d956f-default-rtdb.firebaseio.com",
+            projectId: "indigra-d956f",
+            storageBucket: "indigra-d956f.firebasestorage.app",
+            messagingSenderId: "541982595928",
+            appId: "1:541982595928:web:a45bec517d2c897ef6a32d"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
         
-        // Проверяем все возможные ключи от админки
-        const keys = ['price_data_tarif.xlsx', 'price_data_Nasos.xlsx', 'price_data_beton.xlsx', 'price_data_rastvory.xlsx'];
-        let allChanges = {};
+        // Переменные
+        let lastUpdateTime = null;
         
-        keys.forEach(key => {
-            const savedData = localStorage.getItem(key);
-            if (savedData) {
-                try {
-                    const changes = JSON.parse(savedData);
-                    allChanges = {...allChanges, ...changes};
-                    console.log(`✅ Загружены данные из ${key}:`, Object.keys(changes).length, 'изменений');
-                } catch (e) {
-                    console.error(`❌ Ошибка загрузки из ${key}:`, e);
+        // Маппинг ключей Firebase к ячейкам
+        const priceMapping = {
+            // Бетон на гравии
+            'beton_gravel_100': { table: 'table-beton-gravel', row: 0, col: 1 },
+            'beton_gravel_200': { table: 'table-beton-gravel', row: 1, col: 1 },
+            'beton_gravel_250': { table: 'table-beton-gravel', row: 2, col: 1 },
+            'beton_gravel_300': { table: 'table-beton-gravel', row: 3, col: 1 },
+            
+            // Бетон на граните
+            'beton_granite_150': { table: 'table-beton-granite', row: 0, col: 1 },
+            'beton_granite_200': { table: 'table-beton-granite', row: 1, col: 1 },
+            'beton_granite_250': { table: 'table-beton-granite', row: 2, col: 1 },
+            'beton_granite_300': { table: 'table-beton-granite', row: 3, col: 1 },
+            'beton_granite_350': { table: 'table-beton-granite', row: 4, col: 1 },
+            'beton_granite_400': { table: 'table-beton-granite', row: 5, col: 1 },
+            'beton_granite_450': { table: 'table-beton-granite', row: 6, col: 1 },
+            'beton_granite_500': { table: 'table-beton-granite', row: 7, col: 1 },
+            
+            // Растворы
+            'rastvor_50': { table: 'table-mortars', row: 0, col: 1 },
+            'rastvor_100': { table: 'table-mortars', row: 1, col: 1 },
+            'rastvor_150': { table: 'table-mortars', row: 2, col: 1 },
+            'rastvor_200': { table: 'table-mortars', row: 3, col: 1 },
+            
+            // АБС основные
+            'abs_7': { table: 'table-abs-main', row: 0, col: 2 },
+            'abs_8': { table: 'table-abs-main', row: 1, col: 2 },
+            'abs_9': { table: 'table-abs-main', row: 2, col: 2 },
+            'abs_10': { table: 'table-abs-main', row: 3, col: 2 },
+            'abs_11': { table: 'table-abs-main', row: 4, col: 2 },
+            'abs_12': { table: 'table-abs-main', row: 5, col: 2 },
+            'abs_14': { table: 'table-abs-main', row: 6, col: 2 },
+            
+            // АБС дополнительные
+            'abs_extra_time': { table: 'table-abs-extra', row: 0, col: 2 },
+            'abs_extra_equip': { table: 'table-abs-extra', row: 1, col: 2 },
+            
+            // АБС с насосом основные
+            'nasos_7': { table: 'table-nasos-main', row: 0, col: 2 },
+            'nasos_8': { table: 'table-nasos-main', row: 1, col: 2 },
+            'nasos_7_28': { table: 'table-nasos-main', row: 2, col: 2 },
+            'nasos_8_28': { table: 'table-nasos-main', row: 3, col: 2 },
+            
+            // АБС с насосом дополнительные
+            'nasos_extra_time': { table: 'table-nasos-extra', row: 0, col: 2 },
+            'nasos_pump': { table: 'table-nasos-extra', row: 1, col: 2 },
+            'nasos_hose': { table: 'table-nasos-extra', row: 2, col: 2 },
+            'nasos_nowash': { table: 'table-nasos-extra', row: 3, col: 2 },
+            
+            // Доставка
+            'nasos_delivery_49': { table: 'table-nasos-delivery', row: 0, col: 1 },
+            'nasos_delivery_99': { table: 'table-nasos-delivery', row: 1, col: 1 },
+            'nasos_delivery_149': { table: 'table-nasos-delivery', row: 2, col: 1 },
+            'nasos_delivery_150': { table: 'table-nasos-delivery', row: 3, col: 1 }
+        };
+        
+        // Функция обновления ячейки
+        function updateCellValue(tableId, rowIndex, colIndex, value) {
+            const table = document.getElementById(tableId);
+            if (!table) return false;
+            
+            const tbody = table.querySelector('tbody');
+            if (!tbody) return false;
+            
+            const rows = tbody.querySelectorAll('tr');
+            if (!rows[rowIndex]) return false;
+            
+            const cells = rows[rowIndex].querySelectorAll('td');
+            if (!cells[colIndex]) return false;
+            
+            const cell = cells[colIndex];
+            const priceSpan = cell.querySelector('.badge-price');
+            
+            if (priceSpan) {
+                const oldValue = priceSpan.textContent;
+                if (oldValue !== String(value)) {
+                    priceSpan.textContent = value;
+                    // Анимация обновления
+                    cell.classList.add('price-updated');
+                    setTimeout(() => cell.classList.remove('price-updated'), 500);
+                    return true;
                 }
             }
+            return false;
+        }
+        
+        // Показать уведомление
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'live-notification';
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Обновить время последнего обновления
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('lastUpdateTime').innerHTML = `📅 Последнее обновление: ${timeStr}`;
+        }
+        
+        // Загрузка всех цен из Firebase
+        async function loadAllPrices() {
+            console.log('🔄 Загружаем цены из Firebase...');
+            
+            try {
+                const snapshot = await database.ref('prices').once('value');
+                const prices = snapshot.val() || {};
+                
+                let updatedCount = 0;
+                
+                for (const [key, value] of Object.entries(prices)) {
+                    const mapping = priceMapping[key];
+                    if (mapping) {
+                        const updated = updateCellValue(mapping.table, mapping.row, mapping.col, value);
+                        if (updated) updatedCount++;
+                    }
+                }
+                
+                console.log(`✅ Загружено ${Object.keys(prices).length} цен, обновлено ${updatedCount} ячеек`);
+                
+                if (updatedCount > 0) {
+                    showNotification(`🔄 Обновлено ${updatedCount} позиций`);
+                }
+                
+                updateLastUpdateTime();
+                
+                // Обновляем индикатор подключения
+                document.getElementById('connectionDot').className = 'connection-dot';
+                document.getElementById('connectionText').textContent = 'Подключено к Firebase';
+                
+            } catch (error) {
+                console.error('❌ Ошибка загрузки из Firebase:', error);
+                document.getElementById('connectionDot').className = 'connection-dot disconnected';
+                document.getElementById('connectionText').textContent = 'Ошибка подключения';
+                showNotification('⚠️ Ошибка подключения к серверу цен');
+            }
+        }
+        
+        // Слушаем изменения в реальном времени
+        function listenForRealtimeUpdates() {
+            console.log('🔄 Включаем прослушивание обновлений в реальном времени...');
+            
+            database.ref('prices').on('child_changed', (snapshot) => {
+                const key = snapshot.key;
+                const value = snapshot.val();
+                
+                console.log(`🔄 Обновление: ${key} = ${value}`);
+                
+                const mapping = priceMapping[key];
+                if (mapping) {
+                    const updated = updateCellValue(mapping.table, mapping.row, mapping.col, value);
+                    if (updated) {
+                        showNotification(`💰 Обновлена цена: ${key.replace(/_/g, ' ')} = ${value} руб.`);
+                        updateLastUpdateTime();
+                    }
+                }
+            });
+            
+            // Слушаем добавление новых цен
+            database.ref('prices').on('child_added', (snapshot) => {
+                const key = snapshot.key;
+                const value = snapshot.val();
+                
+                const mapping = priceMapping[key];
+                if (mapping) {
+                    updateCellValue(mapping.table, mapping.row, mapping.col, value);
+                    showNotification(`✨ Добавлена новая цена: ${key} = ${value} руб.`);
+                }
+            });
+        }
+        
+        // Проверка подключения
+        function checkConnection() {
+            const connectedRef = database.ref('.info/connected');
+            connectedRef.on('value', (snap) => {
+                if (snap.val() === true) {
+                    console.log('✅ Firebase подключен');
+                    document.getElementById('connectionDot').className = 'connection-dot';
+                    document.getElementById('connectionText').textContent = 'Подключено к Firebase';
+                } else {
+                    console.log('❌ Firebase отключен');
+                    document.getElementById('connectionDot').className = 'connection-dot disconnected';
+                    document.getElementById('connectionText').textContent = 'Ожидание подключения...';
+                }
+            });
+        }
+        
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🟢 Страница загружена, инициализация...');
+            
+            // Загружаем цены
+            loadAllPrices();
+            
+            // Включаем реальное время
+            listenForRealtimeUpdates();
+            
+            // Проверяем подключение
+            checkConnection();
+            
+            // Обновляем время каждую минуту
+            setInterval(updateLastUpdateTime, 60000);
         });
         
-        if (Object.keys(allChanges).length === 0) {
-            console.log('ℹ️ Нет сохраненных изменений');
-            return;
-        }
+        // Дополнительная загрузка после полной загрузки
+        window.addEventListener('load', function() {
+            console.log('🟢 Страница полностью загружена');
+            setTimeout(loadAllPrices, 1000);
+        });
         
-        console.log('📊 Все изменения:', allChanges);
+        // Переподключение при потере связи
+        window.addEventListener('online', function() {
+            console.log('🟢 Интернет появился');
+            loadAllPrices();
+        });
         
-        // Применяем изменения к таблицам
-        let updatedCount = 0;
-        
-        for (const [cellId, value] of Object.entries(allChanges)) {
-            // ID ячейки в формате "table-abs-main_0_1" (таблица_строка_колонка)
-            const parts = cellId.split('_');
-            if (parts.length >= 3) {
-                // ID таблицы - все части кроме последних двух (номер строки и колонки)
-                const tableId = parts.slice(0, -2).join('_');
-                // Номер строки - предпоследняя часть
-                const rowIndex = parseInt(parts[parts.length - 2]);
-                // Номер колонки - последняя часть
-                const colIndex = parseInt(parts[parts.length - 1]);
-                
-                console.log(`🔍 Ищем: таблица=${tableId}, строка=${rowIndex}, колонка=${colIndex}, значение=${value}`);
-                
-                const table = document.getElementById(tableId);
-                if (table) {
-                    const tbody = table.querySelector('tbody');
-                    if (tbody) {
-                        const rows = tbody.querySelectorAll('tr');
-                        if (rows[rowIndex]) {
-                            const cells = rows[rowIndex].querySelectorAll('td');
-                            if (cells[colIndex]) {
-                                // Ячейка найдена, обновляем значение
-                                const cell = cells[colIndex];
-                                const priceSpan = cell.querySelector('.badge-price');
-                                if (priceSpan) {
-                                    priceSpan.textContent = value;
-                                    console.log(`✅ Обновлена цена в ${tableId}: ${value}`);
-                                } else {
-                                    cell.textContent = value;
-                                    console.log(`✅ Обновлен текст в ${tableId}: ${value}`);
-                                }
-                                updatedCount++;
-                            } else {
-                                console.log(`❌ Нет колонки ${colIndex} в строке ${rowIndex}, есть только ${cells.length} колонок`);
-                            }
-                        } else {
-                            console.log(`❌ Нет строки ${rowIndex} в таблице ${tableId}, всего строк: ${rows.length}`);
-                        }
-                    } else {
-                        console.log(`❌ В таблице ${tableId} нет tbody`);
-                    }
-                } else {
-                    console.log(`❌ Таблица ${tableId} не найдена`);
-                }
-            } else {
-                console.log(`❌ Неверный формат cellId: ${cellId}`);
-            }
-        }
-        
-        console.log(`🎉 Всего обновлено ${updatedCount} ячеек`);
-    }
-    
-    // Загружаем при старте с задержкой для гарантии
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🟢 DOM загружен, начинаем обновление цен...');
-        setTimeout(loadPricesFromStorage, 300);
-    });
-    
-    window.addEventListener('load', function() {
-        console.log('🟢 Страница полностью загружена, обновляем цены...');
-        loadPricesFromStorage();
-    });
-    
-    // Следим за изменениями в других вкладках
-    window.addEventListener('storage', function(e) {
-        if (e.key && (e.key.startsWith('price_data_') || e.key === 'price_updates')) {
-            console.log('🔄 Обнаружены изменения в хранилище, обновляем...');
-            loadPricesFromStorage();
-        }
-    });
-</script>
+        console.log('✅ Скрипт прайс-листа загружен');
+    </script>
     
     <script src="js/layout-fixer.js"></script>
 </body>
