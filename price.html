@@ -707,7 +707,7 @@
         
         // Загрузка всех цен из Firebase
         async function loadAllPrices() {
-            console.log('🔄 Загружаем цены из Firebase...');
+            console.log('🔄 Загружаем цены...');
             
             try {
                 const snapshot = await database.ref('prices').once('value');
@@ -723,17 +723,17 @@
                     }
                 }
                 
-                console.log(`✅ Загружено ${Object.keys(prices).length} цен, обновлено ${updatedCount} ячеек`);
+             //   console.log(`✅ Загружено ${Object.keys(prices).length} цен, обновлено ${updatedCount} ячеек`);
                 
                 if (updatedCount > 0) {
-                    showNotification(`🔄 Обновлено ${updatedCount} позиций`);
+               //     showNotification(`🔄 Обновлено ${updatedCount} позиций`);
                 }
                 
                 updateLastUpdateTime();
                 
                 // Обновляем индикатор подключения
-                document.getElementById('connectionDot').className = 'connection-dot';
-                document.getElementById('connectionText').textContent = 'Подключено к Firebase';
+              //  document.getElementById('connectionDot').className = 'connection-dot';
+             //   document.getElementById('connectionText').textContent = 'Подключено к Firebase';
                 
             } catch (error) {
                 console.error('❌ Ошибка загрузки из Firebase:', error);
@@ -745,19 +745,19 @@
         
         // Слушаем изменения в реальном времени
         function listenForRealtimeUpdates() {
-            console.log('🔄 Включаем прослушивание обновлений в реальном времени...');
+        //    console.log('🔄 Включаем прослушивание обновлений в реальном времени...');
             
             database.ref('prices').on('child_changed', (snapshot) => {
                 const key = snapshot.key;
                 const value = snapshot.val();
                 
-                console.log(`🔄 Обновление: ${key} = ${value}`);
+          //      console.log(`🔄 Обновление: ${key} = ${value}`);
                 
                 const mapping = priceMapping[key];
                 if (mapping) {
                     const updated = updateCellValue(mapping.table, mapping.row, mapping.col, value);
                     if (updated) {
-                        showNotification(`💰 Обновлена цена: ${key.replace(/_/g, ' ')} = ${value} руб.`);
+                   //     showNotification(`💰 Обновлена цена: ${key.replace(/_/g, ' ')} = ${value} руб.`);
                         updateLastUpdateTime();
                     }
                 }
@@ -771,7 +771,7 @@
                 const mapping = priceMapping[key];
                 if (mapping) {
                     updateCellValue(mapping.table, mapping.row, mapping.col, value);
-                    showNotification(`✨ Добавлена новая цена: ${key} = ${value} руб.`);
+                  //  showNotification(`✨ Добавлена новая цена: ${key} = ${value} руб.`);
                 }
             });
         }
@@ -781,20 +781,20 @@
             const connectedRef = database.ref('.info/connected');
             connectedRef.on('value', (snap) => {
                 if (snap.val() === true) {
-                    console.log('✅ Firebase подключен');
+                   // console.log('✅ Firebase подключен');
                     document.getElementById('connectionDot').className = 'connection-dot';
-                    document.getElementById('connectionText').textContent = 'Подключено к Firebase';
+                  //  document.getElementById('connectionText').textContent = 'Подключено к Firebase';
                 } else {
                     console.log('❌ Firebase отключен');
                     document.getElementById('connectionDot').className = 'connection-dot disconnected';
-                    document.getElementById('connectionText').textContent = 'Ожидание подключения...';
+                  //  document.getElementById('connectionText').textContent = 'Ожидание подключения...';
                 }
             });
         }
         
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🟢 Страница загружена, инициализация...');
+         //   console.log('🟢 Страница загружена, инициализация...');
             
             // Загружаем цены
             loadAllPrices();
@@ -817,11 +817,11 @@
         
         // Переподключение при потере связи
         window.addEventListener('online', function() {
-            console.log('🟢 Интернет появился');
+           // console.log('🟢 Интернет появился');
             loadAllPrices();
         });
         
-        console.log('✅ Скрипт прайс-листа загружен');
+     //   console.log('✅ Скрипт прайс-листа загружен');
     </script>
     
     <script src="js/layout-fixer.js"></script>
