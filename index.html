@@ -101,69 +101,56 @@
         .hero-phones-large {
             margin-bottom: 1.5rem;
             padding: 0.5rem 0;
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
         }
         
         .hero-phones-large .phone-large-item {
             display: inline-block;
-            margin-right: 2rem;
-            margin-bottom: 0.5rem;
         }
         
         .hero-phones-large .phone-large-link {
             display: flex;
             align-items: center;
             text-decoration: none;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: #fff;
-            background: rgba(0, 0, 0, 0.25);
+            background: #007bff;
             padding: 0.75rem 1.5rem;
             border-radius: 50px;
             transition: all 0.3s ease;
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.3);
+            border: none;
         }
         
         .hero-phones-large .phone-large-link:hover {
-            background: rgba(0, 0, 0, 0.4);
+            background: #0056b3;
             transform: scale(1.02);
             color: #fff;
-            border-color: rgba(255,255,255,0.6);
         }
         
         .hero-phones-large .phone-icon {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             margin-right: 0.75rem;
         }
         
         @media (max-width: 768px) {
             .hero-phones-large .phone-large-link {
-                font-size: 1.1rem;
-                padding: 0.5rem 1rem;
+                font-size: 1.2rem;
+                padding: 0.6rem 1.2rem;
             }
             
             .hero-phones-large .phone-icon {
                 font-size: 1.3rem;
                 margin-right: 0.5rem;
             }
-            
-            .hero-phones-large .phone-large-item {
-                margin-right: 1rem;
-                margin-bottom: 0.5rem;
-            }
         }
         
         @media (max-width: 576px) {
             .hero-phones-large {
-                display: flex;
                 flex-direction: column;
-                align-items: center;
-            }
-            
-            .hero-phones-large .phone-large-item {
-                margin-right: 0;
-                margin-bottom: 0.75rem;
-                width: 100%;
+                gap: 1rem;
             }
             
             .hero-phones-large .phone-large-link {
@@ -172,41 +159,31 @@
             }
         }
         
-        /* Стили для герой-секции с флекс-расположением */
-        .hero-flex-wrapper {
+        /* Стили для герой-секции с сохранением центрирования */
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .hero-phones-wrapper {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: flex-start;
+            justify-content: center;
+            margin-top: 1.5rem;
         }
         
-        .hero-left-content {
-            flex: 1;
-            min-width: 250px;
+        .hero-phones-large {
+            justify-content: center;
         }
         
-        .hero-right-phones {
-            flex-shrink: 0;
-            margin-left: 2rem;
+        .hero-features {
+            text-align: left;
+            display: inline-block;
+            margin: 0 auto;
         }
         
-        @media (max-width: 992px) {
-            .hero-flex-wrapper {
-                flex-direction: column;
-            }
-            
-            .hero-right-phones {
-                margin-left: 0;
-                margin-top: 1.5rem;
-                width: 100%;
-            }
-            
-            .hero-right-phones .hero-phones-large {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: flex-start;
-                gap: 1rem;
-            }
+        .hero-buttons {
+            text-align: center;
         }
     </style>
     <!-- Google tag (gtag.js) -->
@@ -266,22 +243,16 @@
     <main role="main">
         <section class="hero-section" style="background-image: url('images/Узел 1.png');">
             <div class="container">
-                <div class="hero-flex-wrapper">
-                    <div class="hero-left-content">
-                        <h1 class="hero-title">Бетон с доставкой в Минске</h1>
-                        <div class="hero-features">
-                            <div class="feature-item">✓ Полное соответствие СТБ</div>
-                            <div class="feature-item">✓ Ежедневные проверки качества</div>
-                            <div class="feature-item">✓ Марки бетона от М-100 до М-600</div>
-                            <div class="feature-item">✓ Доставка собственным транспортом</div>
-                            <div class="feature-item">✓ Возможность подачи автобетоносмесителем с насосом</div>
-                        </div>
-                        <div class="hero-buttons">
-                            <a href="contact.html" class="btn btn-primary btn-lg me-3">Купить бетон</a>
-                            <a href="#services" class="btn btn-outline-light btn-lg">Раствор и услуги</a>
-                        </div>
+                <div class="hero-content">
+                    <h1 class="hero-title">Бетон с доставкой в Минске</h1>
+                    <div class="hero-features">
+                        <div class="feature-item">✓ Полное соответствие СТБ</div>
+                        <div class="feature-item">✓ Ежедневные проверки качества</div>
+                        <div class="feature-item">✓ Марки бетона от М-100 до М-600</div>
+                        <div class="feature-item">✓ Доставка собственным транспортом</div>
+                        <div class="feature-item">✓ Возможность подачи автобетоносмесителем с насосом</div>
                     </div>
-                    <div class="hero-right-phones">
+                    <div class="hero-phones-wrapper">
                         <div class="hero-phones-large">
                             <div class="phone-large-item">
                                 <a href="tel:+375291083083" class="phone-large-link">
@@ -296,6 +267,10 @@
                                 </a>
                             </div>
                         </div>
+                    </div>
+                    <div class="hero-buttons">
+                        <a href="contact.html" class="btn btn-primary btn-lg me-3">Купить бетон</a>
+                        <a href="#services" class="btn btn-outline-light btn-lg">Раствор и услуги</a>
                     </div>
                 </div>
             </div>
