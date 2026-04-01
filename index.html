@@ -104,6 +104,7 @@
             display: flex;
             gap: 1.5rem;
             flex-wrap: wrap;
+            justify-content: center;
         }
         
         .hero-phones-large .phone-large-item {
@@ -151,6 +152,7 @@
             .hero-phones-large {
                 flex-direction: column;
                 gap: 1rem;
+                align-items: center;
             }
             
             .hero-phones-large .phone-large-link {
@@ -166,16 +168,6 @@
             text-align: center;
         }
         
-        .hero-phones-wrapper {
-            display: flex;
-            justify-content: center;
-            margin-top: 1.5rem;
-        }
-        
-        .hero-phones-large {
-            justify-content: center;
-        }
-        
         .hero-features {
             text-align: left;
             display: inline-block;
@@ -184,6 +176,111 @@
         
         .hero-buttons {
             text-align: center;
+        }
+        
+        /* Стили для блока услуг с картинками в ряд */
+        .services-gallery {
+            background: #f8f9fa;
+            padding: 60px 0;
+        }
+        
+        .services-title {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .services-row {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        
+        .service-card {
+            flex: 1;
+            min-width: 0;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .service-image {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .service-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .service-card:hover .service-image img {
+            transform: scale(1.08);
+        }
+        
+        .service-content {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .service-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #007bff;
+            font-weight: 600;
+        }
+        
+        .service-content p {
+            color: #666;
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 992px) {
+            .services-row {
+                flex-wrap: wrap;
+            }
+            
+            .service-card {
+                flex: 1 1 calc(33.333% - 30px);
+                min-width: 250px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .services-row {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .service-card {
+                width: 100%;
+                max-width: 350px;
+            }
+            
+            .service-image {
+                height: 180px;
+            }
+            
+            .service-content h3 {
+                font-size: 1.1rem;
+            }
+            
+            .services-title {
+                font-size: 1.5rem;
+            }
         }
     </style>
     <!-- Google tag (gtag.js) -->
@@ -252,25 +349,59 @@
                         <div class="feature-item">✓ Доставка собственным транспортом</div>
                         <div class="feature-item">✓ Возможность подачи автобетоносмесителем с насосом</div>
                     </div>
-                    <div class="hero-phones-wrapper">
-                        <div class="hero-phones-large">
-                            <div class="phone-large-item">
-                                <a href="tel:+375291083083" class="phone-large-link">
-                                    <span class="phone-icon">📞</span>
-                                    <span>+375 29 108-30-83</span>
-                                </a>
-                            </div>
-                            <div class="phone-large-item">
-                                <a href="tel:+375291697227" class="phone-large-link">
-                                    <span class="phone-icon">📞</span>
-                                    <span>+375 29 169-72-27</span>
-                                </a>
-                            </div>
+                    <div class="hero-phones-large">
+                        <div class="phone-large-item">
+                            <a href="tel:+375291083083" class="phone-large-link">
+                                <span class="phone-icon">📞</span>
+                                <span>+375 29 108-30-83</span>
+                            </a>
+                        </div>
+                        <div class="phone-large-item">
+                            <a href="tel:+375291697227" class="phone-large-link">
+                                <span class="phone-icon">📞</span>
+                                <span>+375 29 169-72-27</span>
+                            </a>
                         </div>
                     </div>
                     <div class="hero-buttons">
                         <a href="contact.html" class="btn btn-primary btn-lg me-3">Купить бетон</a>
                         <a href="#services" class="btn btn-outline-light btn-lg">Раствор и услуги</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Новый блок: Наши услуги с картинками в ряд -->
+        <section class="services-gallery">
+            <div class="container">
+                <h2 class="services-title">НАШИ УСЛУГИ</h2>
+                <div class="services-row">
+                    <div class="service-card">
+                        <div class="service-image">
+                            <img src="https://beton-house.com/wp-content/uploads/2016/02/betononasos-730x410.jpg" alt="Автобетононасос" onerror="this.src='images/товарный бетон.webp'">
+                        </div>
+                        <div class="service-content">
+                            <h3>Автобетононасос</h3>
+                            <p>Подача бетона на высоту и в труднодоступные места</p>
+                        </div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-image">
+                            <img src="https://beton-market.by/wp-content/uploads/2019/05/category-beton.jpg" alt="Автобетоносмеситель с лентой" onerror="this.src='images/товарный бетон.webp'">
+                        </div>
+                        <div class="service-content">
+                            <h3>Автобетоносмеситель с лентой</h3>
+                            <p>Удобная подача смеси с ленточным конвейером</p>
+                        </div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-image">
+                            <img src="https://ktr16.ru/wp-content/uploads/2020/04/avtobetonosmesitel-s-betononasosom-1-1024x682.jpg" alt="Автобетоносмеситель с насосом" onerror="this.src='images/товарный бетон.webp'">
+                        </div>
+                        <div class="service-content">
+                            <h3>Автобетоносмеситель с насосом</h3>
+                            <p>Миксер и насос в одном — экономия времени и ресурсов</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -390,8 +521,6 @@
                 </div>
             </div>
         </div>
-
-       
 
         <section class="contacts">
             <div class="container">
