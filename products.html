@@ -35,8 +35,8 @@
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 300px; /* Увеличили ширину полоски */
-            height: 4px; /* Сделали немного толще */
+            width: 300px;
+            height: 4px;
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
             border-radius: 4px;
         }
@@ -88,6 +88,128 @@
             transform: scale(1.02);
         }
 
+        /* Стили для карточек условий доставки */
+        .delivery-terms-section {
+            padding: 40px 0;
+            background: #f8f9fa;
+        }
+
+        .delivery-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .delivery-card {
+            flex: 1;
+            min-width: 320px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .delivery-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .card-header h3 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .delivery-type {
+            margin-bottom: 25px;
+        }
+
+        .delivery-type h4 {
+            color: #1e3a8a;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #3b82f6;
+            display: inline-block;
+        }
+
+        .price-table {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e0e0e0;
+        }
+
+        .price-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .price-value {
+            font-weight: 700;
+            color: #1e3a8a;
+            font-size: 1.1rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 0.95rem;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .info-value {
+            color: #666;
+            text-align: right;
+        }
+
+        .badge {
+            background: #e6f0ff;
+            color: #1e3a8a;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin: 5px 5px 0 0;
+        }
+
+        .specs {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .specs p {
+            margin: 8px 0;
+            font-size: 0.9rem;
+        }
+
         /* Стили для нижнего блока с описанием (на всю ширину) */
         .transport-description-full {
             margin-top: 3rem;
@@ -130,7 +252,7 @@
             }
             
             .transport-title:after {
-                width: 200px; /* На мобильных тоже увеличили */
+                width: 200px;
             }
             
             .transport-list li {
@@ -143,6 +265,14 @@
             
             .transport-description-full {
                 padding: 1.5rem;
+            }
+            
+            .delivery-card {
+                min-width: 280px;
+            }
+            
+            .card-header h3 {
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -234,6 +364,113 @@
                     <!-- Правая колонка с картинкой -->
                     <div class="col-lg-6">
                         <img src="images/imgdelivery.png" alt="Автопарк компании" class="transport-image img-fluid">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Новый блок: Условия и цены доставки (две карточки) -->
+        <section class="delivery-terms-section">
+            <div class="container">
+                <div class="delivery-cards">
+                    <!-- Карточка 1: Миксеры с лотками 1,5-2м -->
+                    <div class="delivery-card">
+                        <div class="card-header">
+                            <h3>🚚 Миксеры с лотками 1,5–2м</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="delivery-type">
+                                <h4>📍 Доставка по городу</h4>
+                                <div class="price-table">
+                                    <div class="price-row">
+                                        <span class="price-label">Минимальный объем доставки</span>
+                                        <span class="price-value">1 м³</span>
+                                    </div>
+                                    <div class="price-row">
+                                        <span class="price-label">Минимальная стоимость доставки</span>
+                                        <span class="price-value">2000 руб.</span>
+                                    </div>
+                                    <div class="price-row">
+                                        <span class="price-label">Стоимость доставки свыше 5 м³</span>
+                                        <span class="price-value">400 руб./м³</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="delivery-type">
+                                <h4>🌍 Доставка за город</h4>
+                                <div class="info-item">
+                                    <span class="info-label">Заказы &lt; 5 м³:</span>
+                                    <span class="info-value">2000 руб./миксер + 500 руб./миксер за каждые 10 км за МКАД</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Заказы &gt; 5 м³:</span>
+                                    <span class="info-value">400 руб./м³ + 100 руб./м³ за каждые 10 км за МКАД</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Проезд поста:</span>
+                                    <span class="info-value">+1000 руб./шт.</span>
+                                </div>
+                            </div>
+                            
+                            <div class="specs">
+                                <span class="badge">Бесплатная выгрузка: 1 час</span>
+                                <span class="badge">В автопарке: 8 миксеров</span>
+                                <span class="badge">Объемы: 5м³, 7м³, 9м³, 10м³</span>
+                                <span class="badge">Длина лотка: 1,5-2 м</span>
+                                <span class="badge">Высота подачи: 0,5 м</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Карточка 2: Миксеры с лентой подачи 10м -->
+                    <div class="delivery-card">
+                        <div class="card-header">
+                            <h3>🏗️ Миксеры с лентой подачи 10м</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="delivery-type">
+                                <h4>📍 Доставка по городу</h4>
+                                <div class="price-table">
+                                    <div class="price-row">
+                                        <span class="price-label">Минимальный объем доставки</span>
+                                        <span class="price-value">1 м³</span>
+                                    </div>
+                                    <div class="price-row">
+                                        <span class="price-label">Минимальная стоимость доставки</span>
+                                        <span class="price-value">6000 руб.</span>
+                                    </div>
+                                    <div class="price-row">
+                                        <span class="price-label">Стоимость доставки свыше 6 м³</span>
+                                        <span class="price-value">1000 руб./м³</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="delivery-type">
+                                <h4>🌍 Доставка за город</h4>
+                                <div class="info-item">
+                                    <span class="info-label">Заказы &lt; 6 м³:</span>
+                                    <span class="info-value">6000 руб./миксер + 3000 руб./миксер за каждые 10 км за МКАД</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Заказы &gt; 6 м³:</span>
+                                    <span class="info-value">1000 руб./м³ + 500 руб./м³ за каждые 10 км за МКАД</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Проезд поста:</span>
+                                    <span class="info-value">+1000 руб./шт.</span>
+                                </div>
+                            </div>
+                            
+                            <div class="specs">
+                                <span class="badge">Бесплатная выгрузка: 1 час</span>
+                                <span class="badge">В автопарке: 2 миксера</span>
+                                <span class="badge">Объемы: 6м³, 8м³</span>
+                                <span class="badge">Длина лотка: 10 м</span>
+                                <span class="badge">Высота подачи: до 3 м</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
