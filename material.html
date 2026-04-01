@@ -511,5 +511,41 @@
     </script>
     <!-- Скрипт для автоматической подгонки ширины страницы -->
     <script src="js/layout-fixer.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Отслеживание кликов по телефонам
+    const phones = document.querySelectorAll('a[href^="tel:"]');
+    phones.forEach(function(phone) {
+        phone.addEventListener('click', function() {
+            gtag('event', 'phone_click', {
+                'event_category': 'contacts',
+                'event_label': this.getAttribute('href')
+            });
+        });
+    });
+
+    // 2. Отслеживание кликов по email
+    const emails = document.querySelectorAll('a[href^="mailto:"]');
+    emails.forEach(function(email) {
+        email.addEventListener('click', function() {
+            gtag('event', 'email_click', {
+                'event_category': 'contacts',
+                'event_label': this.getAttribute('href')
+            });
+        });
+    });
+
+    // 3. Отслеживание кликов по кнопкам
+    const buttons = document.querySelectorAll('.btn, .btn-primary, .btn-danger');
+    buttons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            gtag('event', 'button_click', {
+                'event_category': 'buttons',
+                'event_label': this.innerText.trim() || 'button'
+            });
+        });
+    });
+});
+</script>
 </body>
 </html>
