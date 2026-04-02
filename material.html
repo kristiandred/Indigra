@@ -668,7 +668,7 @@
                 
                 const relatedMaterialsList = getRelatedMaterials(material.title);
                 if (relatedMaterialsList.length > 0) {
-                    let relatedHtml = '<div class="related-materials"><h3>📌 Связанные материалы</h3><p>';
+                    let relatedHtml = '<div class="related-materials"><h3>📌 Похожие материалы</h3><p>';
                     relatedMaterialsList.forEach((item, index) => {
                         const encodedItem = encodeURIComponent(item);
                         relatedHtml += `<a href="material.html?material=${encodedItem}">${item}</a>`;
