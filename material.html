@@ -327,17 +327,6 @@
                                 </p>
                                 <a href="contact.html" class="btn btn-primary">📝 Отправить заявку</a>
                             </div>
-                            <div class="related-materials">
-                                <h3>📌 Связанные материалы</h3>
-                                <p>
-                                    <a href="material.html?material=Щебень">Щебень</a> | 
-                                    <a href="material.html?material=Песок">Песок</a> | 
-                                    <a href="material.html?material=Гравий">Гравий</a> | 
-                                    <a href="material.html?material=Бетон%20М300">Бетон М300</a> | 
-                                    <a href="material.html?material=Бетон%20М350">Бетон М350</a> | 
-                                    <a href="material.html?material=Растворная%20смесь">Растворная смесь</a>
-                                </p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -641,6 +630,56 @@
                 } else {
                     $('.material-specifications').empty();
                 }
+                
+                // ========== ДИНАМИЧЕСКИЕ СВЯЗАННЫЕ МАТЕРИАЛЫ ==========
+                function getRelatedMaterials(currentTitle) {
+                    const allMaterialsMap = {
+                        'Бетон': ['Бетон М300', 'Бетон М350', 'Бетон М400', 'Бетон М500'],
+                        'Раствор': ['РСГП М100', 'РСГП М150', 'РСГП М200'],
+                        'Щебень': ['Песок', 'Гравий', 'Бетон М300'],
+                        'Песок': ['Щебень', 'Гравий', 'Растворная смесь'],
+                        'Гравий': ['Щебень', 'Песок', 'Бетон М300']
+                    };
+                    
+                    let related = [];
+                    
+                    if (currentTitle.includes('Бетон')) {
+                        related = [...allMaterialsMap['Бетон']];
+                        related.push('Щебень', 'Песок');
+                    } else if (currentTitle.includes('Раствор') || currentTitle.includes('РСГП')) {
+                        related = [...allMaterialsMap['Раствор']];
+                        related.push('Песок');
+                    } else if (currentTitle.includes('Щебень')) {
+                        related = [...allMaterialsMap['Щебень']];
+                    } else if (currentTitle.includes('Песок')) {
+                        related = [...allMaterialsMap['Песок']];
+                    } else if (currentTitle.includes('Гравий')) {
+                        related = [...allMaterialsMap['Гравий']];
+                    } else {
+                        related = ['Бетон М300', 'Щебень', 'Песок', 'Растворная смесь'];
+                    }
+                    
+                    // Убираем дубликаты и текущий материал
+                    related = [...new Set(related)];
+                    related = related.filter(item => item !== currentTitle);
+                    
+                    return related.slice(0, 6);
+                }
+                
+                const relatedMaterialsList = getRelatedMaterials(material.title);
+                if (relatedMaterialsList.length > 0) {
+                    let relatedHtml = '<div class="related-materials"><h3>📌 Связанные материалы</h3><p>';
+                    relatedMaterialsList.forEach((item, index) => {
+                        const encodedItem = encodeURIComponent(item);
+                        relatedHtml += `<a href="material.html?material=${encodedItem}">${item}</a>`;
+                        if (index < relatedMaterialsList.length - 1) {
+                            relatedHtml += ' | ';
+                        }
+                    });
+                    relatedHtml += '</p></div>';
+                    $('.material-info').append(relatedHtml);
+                }
+                
             } else {
                 document.title = 'Материал не найден - ИНДИГРА';
                 $('#materialTitle').text('Материал не найден');
