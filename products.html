@@ -717,7 +717,7 @@
                 // Создаем новую карточку
                 const newCard = createCard(cardData, cardId);
                 if (newCard && container) {
-                    container.appendChild(newCard);
+                //    container.appendChild(newCard);
                    // showNotification(`✅ Загружена карточка: ${cardData.title}`);
                 }
             }
@@ -794,7 +794,7 @@
                     
                     // Показываем уведомление об изменении, если данные отличаются
                     if (oldData && JSON.stringify(oldData) !== JSON.stringify(newData)) {
-                        showNotification(`📋 Обновлены условия доставки: ${newData.title}`);
+                   //     showNotification(`📋 Обновлены условия доставки: ${newData.title}`);
                     }
                 }
             });
@@ -808,7 +808,7 @@
                     updateCard(newData, 'mixerBelt', 'mixerBelt');
                     
                     if (oldData && JSON.stringify(oldData) !== JSON.stringify(newData)) {
-                        showNotification(`📋 Обновлены условия доставки: ${newData.title}`);
+                       // showNotification(`📋 Обновлены условия доставки: ${newData.title}`);
                     }
                 }
             });
