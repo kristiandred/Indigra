@@ -226,47 +226,6 @@
             border-top: 1px solid #e0e0e0;
         }
 
-        .specs p {
-            margin: 8px 0;
-            font-size: 0.9rem;
-        }
-
-        /* Стили для нижнего блока с описанием (на всю ширину) */
-        .transport-description-full {
-            margin-top: 3rem;
-            padding: 2rem;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            border-left: 5px solid #3b82f6;
-            width: 100%;
-        }
-
-        .transport-description-full p {
-            font-size: 1.05rem;
-            line-height: 1.8;
-            color: #2d3748;
-            margin-bottom: 1.2rem;
-        }
-
-        .transport-description-full p:last-child {
-            margin-bottom: 0;
-        }
-
-        .highlight {
-            font-weight: 600;
-            color: #1e3a8a;
-            background: linear-gradient(135deg, #e6f0ff 0%, #d4e5ff 100%);
-            padding: 0.2rem 0.5rem;
-            border-radius: 5px;
-        }
-
-        .phone-highlight {
-            font-weight: 700;
-            color: #3b82f6;
-            font-size: 1.1rem;
-        }
-
         /* Анимация для обновления данных */
         @keyframes cardUpdate {
             0% { background-color: #fff9c4; transform: scale(1); }
@@ -276,31 +235,6 @@
         
         .card-updated {
             animation: cardUpdate 0.5s ease;
-        }
-        
-        /* Уведомление */
-        .live-notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            z-index: 9999;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            animation: slideInRight 0.3s ease;
-        }
-        
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes slideOutRight {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
         }
         
         /* Индикатор загрузки */
@@ -418,12 +352,9 @@
         <!-- Секция с автопарком -->
         <section class="transport-section">
             <div class="container">
-                <!-- Заголовок секции -->
                 <h2 class="transport-title">Наш автопарк</h2>
                 
-                <!-- Верхний ряд: текст слева + картинка справа (параллельно) -->
                 <div class="row align-items-start">
-                    <!-- Левая колонка с текстом -->
                     <div class="col-lg-6">
                         <p class="transport-subtitle">
                             Компания располагает собственным автопарком, состоящим из следующих транспортных средств:
@@ -445,7 +376,6 @@
                         </ul>
                     </div>
                     
-                    <!-- Правая колонка с картинкой -->
                     <div class="col-lg-6">
                         <img src="images/imgdelivery.png" alt="Автопарк компании" class="transport-image img-fluid">
                     </div>
@@ -453,18 +383,16 @@
             </div>
         </section>
 
-        <!-- Новый блок: Условия и цены доставки (две карточки, данные из Firebase) -->
+        <!-- Блок с карточками доставки -->
         <section class="delivery-terms-section">
             <div class="container">
                 <div id="deliveryCardsContainer" class="delivery-cards">
-                    <!-- Индикатор загрузки -->
                     <div class="loading-indicator">
                         <div class="spinner"></div>
                         <p>Загрузка актуальных условий доставки...</p>
                     </div>
                 </div>
                 
-                <!-- Нижний блок с описанием (на всю ширину) -->
                 <div class="row">
                     <div class="col-12">
                         <div class="transport-description-full">
@@ -544,19 +472,6 @@
             mixerTray: null,
             mixerBelt: null
         };
-        
-        // Функция отображения уведомления
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'live-notification';
-            notification.innerHTML = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOutRight 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
         
         // Функция создания HTML карточки на основе данных
         function createCard(cardData, cardId) {
@@ -639,14 +554,11 @@
         }
         
         // Функция обновления или создания карточки
-        function updateCard(cardData, cardId, cardKey) {
+        function updateCard(cardData, cardId) {
             let existingCard = document.querySelector(`.delivery-card[data-card-id="${cardId}"]`);
             
             if (existingCard) {
                 // Обновляем существующую карточку
-                const oldTitle = existingCard.querySelector('.card-header h3')?.innerText || '';
-                const newTitle = `${cardData.icon || '🚚'} ${cardData.title || 'Миксер'}`;
-                
                 existingCard.querySelector('.card-header h3').innerHTML = `${cardData.icon || '🚚'} ${cardData.title || 'Миксер'}`;
                 
                 // Обновляем изображение
@@ -709,16 +621,11 @@
                 // Анимация обновления
                 existingCard.classList.add('card-updated');
                 setTimeout(() => existingCard.classList.remove('card-updated'), 500);
-                
-                if (oldTitle !== newTitle) {
-                    showNotification(`🔄 Обновлена карточка: ${cardData.title}`);
-                }
             } else {
                 // Создаем новую карточку
                 const newCard = createCard(cardData, cardId);
                 if (newCard && container) {
                     container.appendChild(newCard);
-                    showNotification(`✅ Загружена карточка: ${cardData.title}`);
                 }
             }
         }
@@ -726,7 +633,6 @@
         // Функция загрузки всех данных из Firebase
         async function loadDeliveryData() {
             try {
-                // Показываем индикатор загрузки, если контейнер пуст
                 if (container && container.children.length === 0) {
                     container.innerHTML = `
                         <div class="loading-indicator">
@@ -739,28 +645,24 @@
                 const snapshot = await database.ref('deliveryCards').once('value');
                 const data = snapshot.val() || {};
                 
-                // Очищаем контейнер от индикатора загрузки
                 if (container) {
                     container.innerHTML = '';
                 }
                 
                 let cardsLoaded = 0;
                 
-                // Загружаем карточку миксеров с лотками
                 if (data.mixerTray) {
                     currentCardsData.mixerTray = data.mixerTray;
-                    updateCard(data.mixerTray, 'mixerTray', 'mixerTray');
+                    updateCard(data.mixerTray, 'mixerTray');
                     cardsLoaded++;
                 }
                 
-                // Загружаем карточку миксеров с лентой
                 if (data.mixerBelt) {
                     currentCardsData.mixerBelt = data.mixerBelt;
-                    updateCard(data.mixerBelt, 'mixerBelt', 'mixerBelt');
+                    updateCard(data.mixerBelt, 'mixerBelt');
                     cardsLoaded++;
                 }
                 
-                // Если данных нет, показываем заглушку
                 if (cardsLoaded === 0 && container) {
                     container.innerHTML = `
                         <div style="text-align: center; padding: 40px; color: #666;">
@@ -778,38 +680,24 @@
                         </div>
                     `;
                 }
-                showNotification('⚠️ Ошибка подключения к серверу');
             }
         }
         
         // Слушаем изменения в реальном времени
         function listenForRealtimeUpdates() {
-            // Слушаем изменения в карточке миксеров с лотками
             database.ref('deliveryCards/mixerTray').on('value', (snapshot) => {
                 const newData = snapshot.val();
                 if (newData) {
-                    const oldData = currentCardsData.mixerTray;
                     currentCardsData.mixerTray = newData;
-                    updateCard(newData, 'mixerTray', 'mixerTray');
-                    
-                    // Показываем уведомление об изменении, если данные отличаются
-                    if (oldData && JSON.stringify(oldData) !== JSON.stringify(newData)) {
-                        showNotification(`📋 Обновлены условия доставки: ${newData.title}`);
-                    }
+                    updateCard(newData, 'mixerTray');
                 }
             });
             
-            // Слушаем изменения в карточке миксеров с лентой
             database.ref('deliveryCards/mixerBelt').on('value', (snapshot) => {
                 const newData = snapshot.val();
                 if (newData) {
-                    const oldData = currentCardsData.mixerBelt;
                     currentCardsData.mixerBelt = newData;
-                    updateCard(newData, 'mixerBelt', 'mixerBelt');
-                    
-                    if (oldData && JSON.stringify(oldData) !== JSON.stringify(newData)) {
-                        showNotification(`📋 Обновлены условия доставки: ${newData.title}`);
-                    }
+                    updateCard(newData, 'mixerBelt');
                 }
             });
         }
@@ -820,7 +708,6 @@
             listenForRealtimeUpdates();
         });
         
-        // Дополнительная загрузка после полной загрузки страницы
         window.addEventListener('load', function() {
             setTimeout(loadDeliveryData, 1000);
         });
