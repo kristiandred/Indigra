@@ -256,6 +256,14 @@
         gtag('js', new Date());
         gtag('config', 'G-T6VNYJLXBN');
     </script>
+    <script type="application/ld+json" id="product-schema">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Бетон",
+  "description": "Купить бетон с доставкой в Минске"
+}
+</script>
 </head>
 <body>
     <header>
@@ -726,5 +734,26 @@
             });
         });
     </script>
+    <script>
+// Обновление микроразметки Schema.org для каждого материала
+if (typeof material !== 'undefined' && material) {
+    const schemaScript = document.getElementById('product-schema');
+    if (schemaScript) {
+        const newSchema = {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": material.title,
+            "description": `Купить ${material.title.toLowerCase()} с доставкой в Минске. Производство бетона, высокое качество, выгодные цены.`,
+            "offers": {
+                "@type": "Offer",
+                "priceCurrency": "BYN",
+                "price": "145",
+                "availability": "https://schema.org/InStock"
+            }
+        };
+        schemaScript.textContent = JSON.stringify(newSchema);
+    }
+}
+</script>
 </body>
 </html>
