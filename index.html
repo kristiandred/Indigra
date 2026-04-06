@@ -267,41 +267,139 @@
             font-size: 0.9rem;
         }
         
-        /* Стили для блока "О компании" на главной */
-        .about-company-main {
+        /* Стили для блока "Почему выбирают бетон от ИНДИГРА" */
+        .why-choose-us {
             padding: 60px 0;
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         }
         
-        .about-company-main h2 {
-            color: #007bff;
-            margin-bottom: 30px;
-            font-size: 2rem;
+        .why-choose-us .section-title {
             text-align: center;
-        }
-        
-        .about-company-main h3 {
             color: #007bff;
-            margin: 30px 0 15px 0;
-            font-size: 1.5rem;
+            margin-bottom: 40px;
+            font-size: 2rem;
+            font-weight: 700;
         }
         
-        .about-company-main ul {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .about-company-main ul li {
-            padding: 8px 0 8px 25px;
+        .why-choose-us .brand-name {
+            color: #0056b3;
             position: relative;
         }
         
-        .about-company-main ul li:before {
+        .why-choose-us .intro-text {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .features-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .feature-block {
+            flex: 1;
+            min-width: 280px;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        
+        .feature-block:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-block h3 {
+            color: #007bff;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        .feature-block p {
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        
+        .advantages-block {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        
+        .advantages-block h3 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .advantages-list {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+        }
+        
+        .advantages-list li {
+            padding: 10px 0 10px 30px;
+            position: relative;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 5px 0;
+        }
+        
+        .advantages-list li:before {
             content: "✓";
             color: #28a745;
             position: absolute;
-            left: 0;
+            left: 10px;
             font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .order-block {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            padding: 35px;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+        }
+        
+        .order-block h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+        }
+        
+        .order-block p {
+            font-size: 1.05rem;
+            margin-bottom: 12px;
+            color: rgba(255,255,255,0.95);
+        }
+        
+        .order-block a {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .order-block a:hover {
+            color: #ffdd99;
+        }
+        
+        .phone-link-order {
+            font-size: 1.2rem;
+            text-decoration: none;
         }
         
         @media (max-width: 992px) {
@@ -338,12 +436,24 @@
                 font-size: 1.5rem;
             }
             
-            .about-company-main h2 {
+            .why-choose-us {
+                padding: 40px 0;
+            }
+            
+            .why-choose-us .section-title {
                 font-size: 1.5rem;
             }
             
-            .about-company-main h3 {
+            .feature-block h3 {
                 font-size: 1.2rem;
+            }
+            
+            .order-block h3 {
+                font-size: 1.3rem;
+            }
+            
+            .advantages-list {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -435,7 +545,7 @@
             </div>
         </section>
 
-        <!-- Новый блок: Наши услуги с картинками в ряд -->
+        <!-- Блок: Наши услуги с картинками в ряд -->
         <section class="services-gallery">
             <div class="container">
                 <h2 class="section-title">НАШИ УСЛУГИ</h2>
@@ -535,35 +645,45 @@
             </div>
         </section>
 
-        <!-- Блок: О компании (уникальный текст для главной) -->
-        <section class="about-company-main">
+        <!-- Блок: Почему выбирают бетон от ИНДИГРА -->
+        <section class="why-choose-us">
             <div class="container">
-                <h2>Почему выбирают бетон от «ИНДИГРА»</h2>
+                <h2 class="section-title">Почему выбирают бетон от <span class="brand-name">«ИНДИГРА»</span></h2>
                 
-                <p><strong>«ИНДИГРА»</strong> — это производство товарного бетона и строительных растворов в Минске. Мы предлагаем продукцию для объектов любого масштаба: от фундамента частного дома до промышленных зданий.</p>
+                <div class="intro-text">
+                    <p><strong>«ИНДИГРА»</strong> — это производство товарного бетона и строительных растворов в Минске. Мы предлагаем продукцию для объектов любого масштаба: от фундамента частного дома до промышленных зданий.</p>
+                </div>
                 
-                <h3>Марки бетона в наличии</h3>
-                <p>На заводе можно заказать бетон марок <strong>М150, М200, М250, М300, М350, М400, М450, М500</strong>. Каждая партия проходит лабораторный контроль по ГОСТ 7473-2010. Используем качественные компоненты: цемент высоких марок, гранитный щебень, мытый песок.</p>
+                <div class="features-grid">
+                    <div class="feature-block">
+                        <h3>🏗️ Марки бетона в наличии</h3>
+                        <p>На заводе можно заказать бетон марок <strong>М150, М200, М250, М300, М350, М400, М450, М500</strong>. Каждая партия проходит лабораторный контроль по ГОСТ 7473-2010. Используем качественные компоненты: цемент высоких марок, гранитный щебень, мытый песок.</p>
+                        <p>Также производим <strong>кладочные растворы М50, М100, М150, М200</strong>, поставляем <strong>щебень гранитный</strong> (фракции 5-20, 20-40, 40-70 мм), <strong>строительный песок</strong> и <strong>природный гравий</strong>.</p>
+                    </div>
+                    
+                    <div class="feature-block">
+                        <h3>🚚 Доставка бетона</h3>
+                        <p>Собственный автопарк — <strong>миксеры объёмом 5–9 м³</strong>. Доставка по Минску и области <strong>за 1–2 часа</strong> после заказа. Минимальный заказ — <strong>от 1 кубометра</strong>. Оплата наличными или безналичным расчётом.</p>
+                    </div>
+                </div>
                 
-                <p>Также производим <strong>кладочные растворы М50, М100, М150, М200</strong>, поставляем <strong>щебень гранитный</strong> (фракции 5-20, 20-40, 40-70 мм), <strong>строительный песок</strong> и <strong>природный гравий</strong>.</p>
+                <div class="advantages-block">
+                    <h3>⭐ Преимущества работы с нами</h3>
+                    <ul class="advantages-list">
+                        <li><strong>Собственное производство</strong> — без наценок посредников</li>
+                        <li><strong>Лабораторный контроль</strong> — паспорт качества на каждую партию</li>
+                        <li><strong>Скидки до 10%</strong> — постоянным клиентам и крупным заказчикам</li>
+                        <li><strong>Работаем с юрлицами и физлицами</strong> — договоры, закрывающие документы</li>
+                        <li><strong>Бесплатная консультация</strong> — поможем рассчитать объём и подобрать марку</li>
+                        <li><strong>Доставка 7 дней в неделю</strong> — принимаем заявки на субботу и воскресенье</li>
+                    </ul>
+                </div>
                 
-                <h3>Доставка бетона</h3>
-                <p>Собственный автопарк — <strong>миксеры объёмом 5–9 м³</strong>. Доставка по Минску и области <strong>за 1–2 часа</strong> после заказа. Минимальный заказ — <strong>от 1 кубометра</strong>. Оплата наличными или безналичным расчётом.</p>
-                
-                <h3>Преимущества работы с нами</h3>
-                <ul>
-                    <li><strong>Собственное производство</strong> — без наценок посредников</li>
-                    <li><strong>Лабораторный контроль</strong> — паспорт качества на каждую партию</li>
-                    <li><strong>Скидки до 10%</strong> — постоянным клиентам и крупным заказчикам</li>
-                    <li><strong>Работаем с юрлицами и физлицами</strong> — договоры, закрывающие документы</li>
-                    <li><strong>Бесплатная консультация</strong> — поможем рассчитать объём и подобрать марку</li>
-                    <li><strong>Доставка 7 дней в неделю</strong> — принимаем заявки на субботу и воскресенье</li>
-                </ul>
-                
-                <h3>Как заказать бетон в Минске</h3>
-                <p>Позвоните по телефону <strong>+375 29 108 30 83</strong> или <strong>+375 29 169 72 27</strong>. Менеджеры рассчитают количество, подберут марку и согласуют время доставки.</p>
-                
-                <p>Заявку можно оставить на сайте или написать на почту <a href="mailto:indigra.beton@gmail.com">indigra.beton@gmail.com</a>. Мы перезвоним в течение 15 минут.</p>
+                <div class="order-block">
+                    <h3>📞 Как заказать бетон в Минске</h3>
+                    <p>Позвоните по телефону <a href="tel:+375291083083" class="phone-link-order"><strong>+375 29 108 30 83</strong></a> или <a href="tel:+375291697227" class="phone-link-order"><strong>+375 29 169 72 27</strong></a>. Менеджеры рассчитают количество, подберут марку и согласуют время доставки.</p>
+                    <p>Заявку можно оставить на сайте или написать на почту <a href="mailto:indigra.beton@gmail.com">indigra.beton@gmail.com</a>. <strong>Мы перезвоним в течение 15 минут.</strong></p>
+                </div>
             </div>
         </section>
 
