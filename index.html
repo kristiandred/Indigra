@@ -402,6 +402,113 @@
             text-decoration: none;
         }
         
+        /* Стили для статей блога */
+        .blog-section {
+            background: #f0f4f8;
+            padding: 60px 0;
+        }
+        
+        .blog-section .section-title {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 40px;
+            font-size: 2rem;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .blog-section .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: #007bff;
+        }
+        
+        .blog-article {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .blog-article:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+        }
+        
+        .blog-article:last-child {
+            margin-bottom: 0;
+        }
+        
+        .blog-title {
+            color: #007bff;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            border-left: 5px solid #007bff;
+            padding-left: 20px;
+        }
+        
+        .blog-article h3 {
+            color: #0056b3;
+            margin: 25px 0 15px 0;
+            font-size: 1.3rem;
+        }
+        
+        .blog-article p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .blog-article ul, .blog-article ol {
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+        
+        .blog-article li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .article-footer {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+            font-size: 0.95rem;
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 12px;
+        }
+        
+        .article-footer a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .article-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .article-tag {
+            display: inline-block;
+            background: #e6f0ff;
+            color: #007bff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
         @media (max-width: 992px) {
             .services-row {
                 flex-wrap: wrap;
@@ -454,6 +561,27 @@
             
             .advantages-list {
                 grid-template-columns: 1fr;
+            }
+            
+            .blog-section {
+                padding: 40px 0;
+            }
+            
+            .blog-section .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .blog-title {
+                font-size: 1.4rem;
+                padding-left: 15px;
+            }
+            
+            .blog-article {
+                padding: 20px;
+            }
+            
+            .blog-article h3 {
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -684,6 +812,118 @@
                     <p>Позвоните по телефону <a href="tel:+375291083083" class="phone-link-order"><strong>+375 29 108 30 83</strong></a> или <a href="tel:+375291697227" class="phone-link-order"><strong>+375 29 169 72 27</strong></a>. Менеджеры рассчитают количество, подберут марку и согласуют время доставки.</p>
                     <p>Заявку можно оставить на сайте или написать на почту <a href="mailto:indigra.beton@gmail.com">indigra.beton@gmail.com</a>. <strong>Мы перезвоним в течение 15 минут.</strong></p>
                 </div>
+            </div>
+        </section>
+
+        <!-- БЛОГ: СТАТЬИ -->
+        <section class="blog-section">
+            <div class="container">
+                <h2 class="section-title">📚 ПОЛЕЗНЫЕ СТАТЬИ</h2>
+                
+                <!-- Статья 1: Как выбрать марку бетона для фундамента -->
+                <article class="blog-article">
+                    <div class="article-tag">🎯 СОВЕТЫ</div>
+                    <h2 class="blog-title">Как выбрать марку бетона для фундамента</h2>
+                    
+                    <p>Фундамент — основа любого дома. От правильного выбора марки бетона зависит прочность и долговечность всей конструкции. В этой статье расскажем, какие марки бетона подходят для разных типов фундаментов.</p>
+                    
+                    <h3>Какие бывают марки бетона</h3>
+                    <p>Марка бетона обозначается буквой «М» и цифрой (М100, М150, М200 и т.д.). Цифра показывает прочность на сжатие в кг/см². Чем выше цифра — тем прочнее бетон.</p>
+                    
+                    <h3>Какую марку выбрать для фундамента</h3>
+                    <ul>
+                        <li><strong>М150</strong> — подходит для небольших построек: гаражей, сараев, беседок, заборов. Не рекомендуется для жилых домов.</li>
+                        <li><strong>М200</strong> — оптимальный вариант для ленточного фундамента одноэтажных домов из газобетона, пеноблоков или дерева.</li>
+                        <li><strong>М250</strong> — используется для фундаментов двухэтажных домов из кирпича или блоков. Выдерживает средние нагрузки.</li>
+                        <li><strong>М300</strong> — самый популярный выбор для монолитных и плитных фундаментов. Подходит для тяжёлых домов до 3 этажей.</li>
+                        <li><strong>М350 и выше</strong> — для сложных грунтов, высоких нагрузок и промышленного строительства.</li>
+                    </ul>
+                    
+                    <h3>Дополнительные факторы</h3>
+                    <p>При выборе марки учитывайте тип грунта, глубину промерзания и уровень грунтовых вод. Для пучинистых и влажных грунтов лучше использовать бетон не ниже М300 с добавками для водонепроницаемости.</p>
+                    
+                    <div class="article-footer">
+                        <strong>💡 Совет специалиста:</strong> Если сомневаетесь в выборе — позвоните нам. Мы поможем рассчитать нагрузку и подберём оптимальную марку бетона для вашего фундамента.<br><br>
+                        <strong>🔗 Читайте также:</strong> 
+                        <a href="material.html?material=Бетон%20М300">Бетон М300</a> | 
+                        <a href="material.html?material=Бетон%20М350">Бетон М350</a>
+                    </div>
+                </article>
+
+                <!-- Статья 2: Сравнение бетона М300 и М350 -->
+                <article class="blog-article">
+                    <div class="article-tag">⚖️ СРАВНЕНИЕ</div>
+                    <h2 class="blog-title">Сравнение бетона М300 и М350: что лучше?</h2>
+                    
+                    <p>Бетон марок М300 и М350 — одни из самых востребованных в строительстве. Но в чём разница и какой выбрать? Давайте разберёмся.</p>
+                    
+                    <h3>Характеристики бетона М300</h3>
+                    <ul>
+                        <li><strong>Прочность:</strong> 300 кг/см² (класс В22,5)</li>
+                        <li><strong>Морозостойкость:</strong> F200 (200 циклов заморозки/оттайки)</li>
+                        <li><strong>Водонепроницаемость:</strong> W6</li>
+                        <li><strong>Применение:</strong> фундаменты, стяжки, перекрытия, монолитные стены</li>
+                    </ul>
+                    
+                    <h3>Характеристики бетона М350</h3>
+                    <ul>
+                        <li><strong>Прочность:</strong> 350 кг/см² (класс В25)</li>
+                        <li><strong>Морозостойкость:</strong> F200</li>
+                        <li><strong>Водонепроницаемость:</strong> W8</li>
+                        <li><strong>Применение:</strong> мосты, гидротехнические сооружения, высотное строительство, ответственные конструкции</li>
+                    </ul>
+                    
+                    <h3>Что лучше?</h3>
+                    <p>Однозначного ответа нет. Выбор зависит от вашей задачи:</p>
+                    <ul>
+                        <li><strong>Для частного дома (фундамент, стены, перекрытия)</strong> — М300 оптимален. Он дешевле и справляется со всеми нагрузками.</li>
+                        <li><strong>Для зон с высокими нагрузками (цокольные этажи, подпорные стены, бассейны)</strong> — лучше взять М350 из-за большей водонепроницаемости.</li>
+                        <li><strong>Для промышленных объектов и мостов</strong> — только М350 и выше.</li>
+                    </ul>
+                    
+                    <div class="article-footer">
+                        <strong>🏆 Наш вердикт:</strong> Если бюджет ограничен — берите М300. Если нужен запас прочности и защита от влаги — доплатите за М350. В любом случае, обе марки надёжны и проверены временем.<br><br>
+                        <strong>🔗 Заказать бетон:</strong> 
+                        <a href="material.html?material=Бетон%20М300">М300</a> | 
+                        <a href="material.html?material=Бетон%20М350">М350</a>
+                    </div>
+                </article>
+
+                <!-- Статья 3: Почему бетон трескается и как этого избежать -->
+                <article class="blog-article">
+                    <div class="article-tag">⚠️ ПОЛЕЗНО ЗНАТЬ</div>
+                    <h2 class="blog-title">Почему бетон трескается и как этого избежать</h2>
+                    
+                    <p>Трещины на бетоне — распространённая проблема. Но в большинстве случаев её можно предотвратить. Разберём основные причины и способы защиты.</p>
+                    
+                    <h3>Основные причины трещин</h3>
+                    <ul>
+                        <li><strong>Неправильный состав бетона</strong> — слишком много воды, низкое качество цемента или неподходящие заполнители.</li>
+                        <li><strong>Неправильный уход после заливки</strong> — бетон сохнет слишком быстро, что приводит к усадочным трещинам.</li>
+                        <li><strong>Отсутствие компенсационных швов</strong> — в больших конструкциях (стяжки, дорожки) швы обязательны.</li>
+                        <li><strong>Неподготовленное основание</strong> — просадка грунта вызывает трещины в фундаменте.</li>
+                        <li><strong>Перепады температур</strong> — заливка в жару или в мороз без добавок.</li>
+                    </ul>
+                    
+                    <h3>Как избежать трещин</h3>
+                    <ul>
+                        <li><strong>Используйте качественный бетон</strong> — заказывайте у проверенных производителей с лабораторным контролем.</li>
+                        <li><strong>Увлажняйте бетон после заливки</strong> — первые 7 дней поливайте поверхность водой или накрывайте плёнкой.</li>
+                        <li><strong>Добавляйте пластификаторы</strong> — они улучшают подвижность и снижают риск трещин.</li>
+                        <li><strong>Нарезайте компенсационные швы</strong> — на каждые 3-5 метра стяжки или дорожки.</li>
+                        <li><strong>Армируйте конструкцию</strong> — сетка или прутья берут на себя растягивающие нагрузки.</li>
+                        <li><strong>Заказывайте доставку с соблюдением сроков</strong> — не допускайте начала схватывания бетона в миксере.</li>
+                    </ul>
+                    
+                    <h3>Что делать, если трещины уже появились</h3>
+                    <p>Мелкие волосяные трещины обычно не опасны и не влияют на прочность. Их можно затереть цементным молочком или специальной ремонтной смесью. Глубокие трещины (более 1-2 мм) лучше заделать эпоксидной смолой или полиуретановым герметиком. Если трещина сквозная и идёт по всей конструкции — обратитесь к специалисту.</p>
+                    
+                    <div class="article-footer">
+                        <strong>✨ Главное правило:</strong> качественный бетон + правильный уход = долговечная конструкция без трещин.<br><br>
+                        <strong>📞 Нужна консультация?</strong> 
+                        <a href="contact.html">Свяжитесь с нами</a> — поможем подобрать бетон и расскажем об уходе.
+                    </div>
+                </article>
             </div>
         </section>
 
