@@ -226,6 +226,70 @@
             overflow-wrap: break-word;
         }
 
+        /* Стили для важного предупреждения */
+        .important-warning {
+            background: linear-gradient(135deg, #fff5e6 0%, #ffe8d9 100%);
+            border-left: 6px solid #ff6b35;
+            border-radius: 16px;
+            padding: 24px 30px;
+            margin: 30px 0 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .important-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+        }
+        
+        .warning-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #cc3300;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .warning-title::before {
+            content: "⚠️";
+            font-size: 1.8rem;
+        }
+        
+        .warning-text {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            line-height: 1.5;
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .warning-text strong {
+            color: #cc3300;
+            text-transform: uppercase;
+            background: rgba(255,107,53,0.15);
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-weight: 800;
+        }
+        
+        @media (max-width: 768px) {
+            .important-warning {
+                padding: 18px 20px;
+                margin: 20px 0 15px;
+            }
+            .warning-title {
+                font-size: 1.2rem;
+            }
+            .warning-title::before {
+                font-size: 1.4rem;
+            }
+            .warning-text {
+                font-size: 1rem;
+            }
+        }
+
         /* Анимация для обновления данных */
         @keyframes cardUpdate {
             0% { background-color: #fff9c4; transform: scale(1); }
@@ -407,6 +471,14 @@
                         <div class="spinner"></div>
                         <p>Загрузка актуальных условий доставки...</p>
                     </div>
+                </div>
+                
+                <!-- НОВЫЙ БЛОК: Важное предупреждение под карточками -->
+                <div class="important-warning">
+                    <div class="warning-title">Важное предупреждение!</div>
+                    <p class="warning-text">
+                        <strong>Предоставление места для мойки лотков на объекте ОБЯЗАТЕЛЬНО!</strong>
+                    </p>
                 </div>
                 
                 <div class="row">
