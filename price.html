@@ -214,41 +214,6 @@
             }
         }
         
-        /* Индикатор подключения */
-        .connection-indicator {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .connection-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #28a745;
-            animation: pulse 2s infinite;
-        }
-        
-        .connection-dot.disconnected {
-            background: #dc3545;
-            animation: none;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        
         /* Обновление времени */
         .last-update {
             font-size: 12px;
@@ -268,16 +233,17 @@
             border-radius: 20px;
             font-size: 11px;
             z-index: 999;
+            transition: opacity 0.3s ease;
         }
     </style>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-T6VNYJLXBN"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-T6VNYJLXBN');
-</script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-T6VNYJLXBN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-T6VNYJLXBN');
+    </script>
 </head>
 <body>
     <header>
@@ -355,22 +321,26 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td>С8/10 М100 гр</td>
+                                    <tr>
+                                        <td>С8/10 М100 гр</td>
                                         <td class="price-cell" data-key="beton_gravel_100" data-default="115">
                                             <span class="badge-price">115</span>
                                         </td>
                                     </tr>
-                                    <tr><td>С12/15 М200 гр</td>
+                                    <tr>
+                                        <td>С12/15 М200 гр</td>
                                         <td class="price-cell" data-key="beton_gravel_200" data-default="125">
                                             <span class="badge-price">125</span>
                                         </td>
                                     </tr>
-                                    <tr><td>С16/20 М250 гр</td>
+                                    <tr>
+                                        <td>С16/20 М250 гр</td>
                                         <td class="price-cell" data-key="beton_gravel_250" data-default="135">
                                             <span class="badge-price">135</span>
                                         </td>
                                     </tr>
-                                    <tr><td>С18/22,5 М300 гр</td>
+                                    <tr>
+                                        <td>С18/22,5 М300 гр</td>
                                         <td class="price-cell" data-key="beton_gravel_300" data-default="145">
                                             <span class="badge-price">145</span>
                                         </td>
@@ -392,44 +362,52 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td>С8/10 М150 щ</td>
-                                        <td class="price-cell" data-key="beton_granite_150" data-default="166.5">
-                                            <span class="badge-price">166.5</span>
+                                    <tr>
+                                        <td>С8/10 М150 щ</td>
+                                        <td class="price-cell" data-key="beton_granite_150" data-default="140">
+                                            <span class="badge-price">140</span>
                                         </td>
                                     </tr>
-                                    <tr><td>С12/15 М200 щ</td>
-                                        <td class="price-cell" data-key="beton_granite_200" data-default="175">
-                                            <span class="badge-price">175</span>
+                                    <tr>
+                                        <td>С12/15 М200 щ</td>
+                                        <td class="price-cell" data-key="beton_granite_200" data-default="148">
+                                            <span class="badge-price">148</span>
                                         </td>
                                     </tr>
-                                    <tr><td>С16/20 М250 щ</td>
-                                        <td class="price-cell" data-key="beton_granite_250" data-default="180">
-                                            <span class="badge-price">180</span>
+                                    <tr>
+                                        <td>С16/20 М250 щ</td>
+                                        <td class="price-cell" data-key="beton_granite_250" data-default="155">
+                                            <span class="badge-price">155</span>
                                         </td>
                                     </tr>
-                                    <tr><td>С18/22,5 М300 щ</td>
-                                        <td class="price-cell" data-key="beton_granite_300" data-default="187.5">
-                                            <span class="badge-price">187.5</span>
+                                    <tr>
+                                        <td>С18/22,5 М300 щ</td>
+                                        <td class="price-cell" data-key="beton_granite_300" data-default="162">
+                                            <span class="badge-price">162</span>
                                         </td>
                                     </tr>
-                                    <tr><td>С20/25 М350 щ</td>
-                                        <td class="price-cell" data-key="beton_granite_350" data-default="196">
+                                    <tr>
+                                        <td>С20/25 М350 щ</td>
+                                        <td class="price-cell" data-key="beton_granite_350" data-default="169">
+                                            <span class="badge-price">169</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>С25/30 М400 щ</td>
+                                        <td class="price-cell" data-key="beton_granite_400" data-default="179">
+                                            <span class="badge-price">179</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>С28/35 М450 щ</td>
+                                        <td class="price-cell" data-key="beton_granite_450" data-default="189">
+                                            <span class="badge-price">189</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>С30/37 М500 щ</td>
+                                        <td class="price-cell" data-key="beton_granite_500" data-default="196">
                                             <span class="badge-price">196</span>
-                                        </td>
-                                    </tr>
-                                    <tr><td>С25/30 М400 щ</td>
-                                        <td class="price-cell" data-key="beton_granite_400" data-default="215">
-                                            <span class="badge-price">215</span>
-                                        </td>
-                                    </tr>
-                                    <tr> whetherС28/35 М450 щ</td>
-                                        <td class="price-cell" data-key="beton_granite_450" data-default="225">
-                                            <span class="badge-price">225</span>
-                                        </td>
-                                    </tr>
-                                    <tr><td>С30/37 М500 щ</td>
-                                        <td class="price-cell" data-key="beton_granite_500" data-default="250">
-                                            <span class="badge-price">250</span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -505,49 +483,49 @@
                                 <td>рейс</td>
                                 <td class="price-cell" data-key="abs_7" data-default="200">
                                     <span class="badge-price">200</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>Услуги АБС 8 м³</td>
                                 <td>рейс</td>
                                 <td class="price-cell" data-key="abs_8" data-default="210">
                                     <span class="badge-price">210</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>Услуги АБС 9 м³</td>
                                 <td>рейс</td>
                                 <td class="price-cell" data-key="abs_9" data-default="220">
                                     <span class="badge-price">220</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>Услуги АБС 10 м³</td>
                                 <td>рейс</td>
                                 <td class="price-cell" data-key="abs_10" data-default="240">
                                     <span class="badge-price">240</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>Услуги АБС 11 м³</td>
                                 <td>рейс</td>
                                 <td class="price-cell" data-key="abs_11" data-default="300">
                                     <span class="badge-price">300</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>Услуги АБС 12 м³</td>
                                 <td>рейс</td>
                                 <td class="price-cell" data-key="abs_12" data-default="320">
                                     <span class="badge-price">320</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>Услуги АБС 14 м³</td>
                                 <td>рейс</td>
                                 <td class="price-cell" data-key="abs_14" data-default="350">
                                     <span class="badge-price">350</span>
-                                </td>
+                                 </td>
                             </tr>
                         </tbody>
                     </table>
@@ -569,14 +547,14 @@
                                 <td>час</td>
                                 <td class="price-cell" data-key="abs_extra_time" data-default="100">
                                     <span class="badge-price">100</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>Использование дополнительного оборудования (доп. лоток)</td>
                                 <td>ед.</td>
                                 <td class="price-cell" data-key="abs_extra_equip" data-default="50">
                                     <span class="badge-price">50</span>
-                                </td>
+                                 </td>
                             </tr>
                         </tbody>
                     </table>
@@ -601,10 +579,22 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>0-49 км</td><td>Договорной тариф</td></tr>
-                            <tr><td>50-99 км</td><td>Договорной тариф</td></tr>
-                            <tr><td>100-149 км</td><td>Договорной тариф</td></tr>
-                            <tr><td>свыше 150 км</td><td>Договорной тариф</td></tr>
+                            <tr>
+                                <td>0-49 км</td>
+                                <td>Договорной тариф</td>
+                            </tr>
+                            <tr>
+                                <td>50-99 км</td>
+                                <td>Договорной тариф</td>
+                            </tr>
+                            <tr>
+                                <td>100-149 км</td>
+                                <td>Договорной тариф</td>
+                            </tr>
+                            <tr>
+                                <td>свыше 150 км</td>
+                                <td>Договорной тариф</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -632,28 +622,28 @@
                                 <td>рейс</td>
                                 <td class="price-cell" data-key="nasos_7" data-default="600">
                                     <span class="badge-price">600</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>Услуги АБС с насосом 8 м³</td>
                                 <td>рейс</td>
                                 <td class="price-cell" data-key="nasos_8" data-default="650">
                                     <span class="badge-price">650</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>Услуги АБС с насосом 7 м³ (стрела 28 м)</td>
                                 <td>рейс</td>
                                 <td class="price-cell" data-key="nasos_7_28" data-default="650">
                                     <span class="badge-price">650</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>Услуги АБС с насосом 8 м³ (стрела 28 м)</td>
                                 <td>рейс</td>
                                 <td class="price-cell" data-key="nasos_8_28" data-default="700">
                                     <span class="badge-price">700</span>
-                                </td>
+                                 </td>
                             </tr>
                         </tbody>
                     </table>
@@ -675,28 +665,28 @@
                                 <td>час</td>
                                 <td class="price-cell" data-key="nasos_extra_time" data-default="200">
                                     <span class="badge-price">200</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>Прокачка бетона свыше 15 м³</td>
                                 <td>м³</td>
                                 <td class="price-cell" data-key="nasos_pump" data-default="25">
                                     <span class="badge-price">25</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>Использование дополнительного оборудования (доп. шланг 4 м)</td>
                                 <td>ед.</td>
                                 <td class="price-cell" data-key="nasos_hose" data-default="50">
                                     <span class="badge-price">50</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>Отсутствие места мойки смесительного барабана</td>
                                 <td>ед.</td>
                                 <td class="price-cell" data-key="nasos_nowash" data-default="200">
                                     <span class="badge-price">200</span>
-                                </td>
+                                 </td>
                             </tr>
                         </tbody>
                     </table>
@@ -730,25 +720,25 @@
                                 <td>0-49 км</td>
                                 <td class="price-cell" data-key="nasos_delivery_49" data-default="5">
                                     <span class="badge-price">5</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>50-99 км</td>
                                 <td class="price-cell" data-key="nasos_delivery_99" data-default="6">
                                     <span class="badge-price">6</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>100-149 км</td>
                                 <td class="price-cell" data-key="nasos_delivery_149" data-default="7">
                                     <span class="badge-price">7</span>
-                                </td>
+                                 </td>
                             </tr>
                             <tr>
                                 <td>свыше 150 км</td>
                                 <td class="price-cell" data-key="nasos_delivery_150" data-default="8">
                                     <span class="badge-price">8</span>
-                                </td>
+                                 </td>
                             </tr>
                         </tbody>
                     </table>
@@ -796,8 +786,6 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         
-        let updateCount = 0;
-        
         // Функция обновления цены в ячейке
         function updatePriceCell(cell, newValue, showAnimation = true) {
             const priceSpan = cell.querySelector('.badge-price');
@@ -820,6 +808,7 @@
             const statusDiv = document.getElementById('loadingStatus');
             statusDiv.textContent = '🔄 Загрузка актуальных цен...';
             statusDiv.style.background = 'rgba(0,0,0,0.7)';
+            statusDiv.style.opacity = '1';
             
             try {
                 const snapshot = await database.ref('prices').once('value');
@@ -832,28 +821,20 @@
                 
                 for (const cell of priceCells) {
                     const key = cell.getAttribute('data-key');
-                    const defaultValue = cell.getAttribute('data-default');
                     
                     // Если в Firebase есть значение для этого ключа - обновляем
-                    if (prices[key] !== undefined) {
+                    if (prices[key] !== undefined && prices[key] !== null) {
                         const updated = updatePriceCell(cell, prices[key], false);
                         if (updated) updatedItems++;
-                    } 
-                    // Если нет - оставляем базовое значение (уже отображается)
+                    }
                 }
                 
                 if (updatedItems > 0) {
                     statusDiv.textContent = `✅ Обновлено ${updatedItems} позиций`;
                     statusDiv.style.background = 'rgba(40, 167, 69, 0.9)';
-                    setTimeout(() => {
-                        statusDiv.style.opacity = '0.5';
-                    }, 3000);
                 } else {
                     statusDiv.textContent = '✓ Цены актуальны';
                     statusDiv.style.background = 'rgba(40, 167, 69, 0.9)';
-                    setTimeout(() => {
-                        statusDiv.style.opacity = '0.5';
-                    }, 2000);
                 }
                 
                 updateLastUpdateTime();
@@ -952,40 +933,40 @@
     
     <script src="js/layout-fixer.js"></script>
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. Отслеживание кликов по телефонам
-    const phones = document.querySelectorAll('a[href^="tel:"]');
-    phones.forEach(function(phone) {
-        phone.addEventListener('click', function() {
-            gtag('event', 'phone_click', {
-                'event_category': 'contacts',
-                'event_label': this.getAttribute('href')
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Отслеживание кликов по телефонам
+            const phones = document.querySelectorAll('a[href^="tel:"]');
+            phones.forEach(function(phone) {
+                phone.addEventListener('click', function() {
+                    gtag('event', 'phone_click', {
+                        'event_category': 'contacts',
+                        'event_label': this.getAttribute('href')
+                    });
+                });
             });
-        });
-    });
 
-    // 2. Отслеживание кликов по email
-    const emails = document.querySelectorAll('a[href^="mailto:"]');
-    emails.forEach(function(email) {
-        email.addEventListener('click', function() {
-            gtag('event', 'email_click', {
-                'event_category': 'contacts',
-                'event_label': this.getAttribute('href')
+            // 2. Отслеживание кликов по email
+            const emails = document.querySelectorAll('a[href^="mailto:"]');
+            emails.forEach(function(email) {
+                email.addEventListener('click', function() {
+                    gtag('event', 'email_click', {
+                        'event_category': 'contacts',
+                        'event_label': this.getAttribute('href')
+                    });
+                });
             });
-        });
-    });
 
-    // 3. Отслеживание кликов по кнопкам
-    const buttons = document.querySelectorAll('.btn, .btn-primary, .btn-danger');
-    buttons.forEach(function(button) {
-        button.addEventListener('click', function() {
-            gtag('event', 'button_click', {
-                'event_category': 'buttons',
-                'event_label': this.innerText.trim() || 'button'
+            // 3. Отслеживание кликов по кнопкам
+            const buttons = document.querySelectorAll('.btn, .btn-primary, .btn-danger');
+            buttons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    gtag('event', 'button_click', {
+                        'event_category': 'buttons',
+                        'event_label': this.innerText.trim() || 'button'
+                    });
+                });
             });
         });
-    });
-});
-</script>
+    </script>
 </body>
 </html>
