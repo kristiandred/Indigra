@@ -157,7 +157,7 @@
             text-align: center;
         }
         
-        /* Анимация для обновления цен */
+        /* Анимация для обновления цен (только для реальных изменений) */
         @keyframes priceUpdate {
             0% {
                 background-color: #fff9c4;
@@ -256,6 +256,44 @@
             margin-top: 10px;
             text-align: right;
         }
+        
+        /* Прелоадер - скрывает все секции до загрузки */
+        .price-content-wrapper {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .price-content-wrapper.loaded {
+            opacity: 1;
+        }
+        
+        .loader-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--ice-blue);
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loader-text {
+            color: var(--primary-blue);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
     </style>
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-T6VNYJLXBN"></script>
@@ -322,258 +360,261 @@
             </div>
         </section>
 
-        <div class="container py-5">
-            
-            <!-- Индикатор подключения -->
-         <!--   <div class="connection-indicator" id="connectionIndicator">
-                <span class="connection-dot" id="connectionDot"></span>
-                <span id="connectionText">Подключение...</span>
-            </div> -->
-            
-            <!-- ==================== ТОВАРНЫЙ БЕТОН ==================== -->
-            
-            <div class="price-section">
-                <h2>🏗️ Товарный бетон</h2>
+        <!-- Контейнер с прелоадером -->
+        <div id="priceLoader" class="loader-container" style="display: flex;">
+            <div class="spinner"></div>
+            <div class="loader-text">Загрузка актуальных цен...</div>
+        </div>
+        
+        <!-- Обертка для всего контента (скрыта до загрузки) -->
+        <div id="priceContent" class="price-content-wrapper" style="opacity: 0;">
+            <div class="container py-5">
                 
-                <div class="two-columns">
-                    <!-- Бетон на гравийном заполнителе -->
-                    <div>
-                        <h3>На гравийном заполнителе фр. 3-20 мм</h3>
-                        <div class="table-responsive">
-                            <table class="price-table" id="table-beton-gravel">
-                                <thead>
-                                    <tr>
-                                        <th>Марка бетона</th>
-                                        <th>Цена без НДС, руб. коп</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>С8/10 М100 гр</td><td class="price-cell" data-key="beton_gravel_100"><span class="badge-price">115</span></td></tr>
-                                    <tr><td>С12/15 М200 гр</td><td class="price-cell" data-key="beton_gravel_200"><span class="badge-price">125</span></td></tr>
-                                    <tr><td>С16/20 М250 гр</td><td class="price-cell" data-key="beton_gravel_250"><span class="badge-price">135</span></td></tr>
-                                    <tr><td>С18/22,5 М300 гр</td><td class="price-cell" data-key="beton_gravel_300"><span class="badge-price">145</span></td></tr>
-                                </tbody>
-                            </table>
+                <!-- ==================== ТОВАРНЫЙ БЕТОН ==================== -->
+                
+                <div class="price-section">
+                    <h2>🏗️ Товарный бетон</h2>
+                    
+                    <div class="two-columns">
+                        <!-- Бетон на гравийном заполнителе -->
+                        <div>
+                            <h3>На гравийном заполнителе фр. 3-20 мм</h3>
+                            <div class="table-responsive">
+                                <table class="price-table" id="table-beton-gravel">
+                                    <thead>
+                                        <tr>
+                                            <th>Марка бетона</th>
+                                            <th>Цена без НДС, руб. коп</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>С8/10 М100 гр</td><td class="price-cell" data-key="beton_gravel_100"><span class="badge-price">—</span></td></tr>
+                                        <tr><td>С12/15 М200 гр</td><td class="price-cell" data-key="beton_gravel_200"><span class="badge-price">—</span></td></tr>
+                                        <tr><td>С16/20 М250 гр</td><td class="price-cell" data-key="beton_gravel_250"><span class="badge-price">—</span></td></tr>
+                                        <tr><td>С18/22,5 М300 гр</td><td class="price-cell" data-key="beton_gravel_300"><span class="badge-price">—</span></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
+                        
+                        <!-- Бетон на гранитном щебне -->
+                        <div>
+                            <h3>На гранитном щебне фр. 5-20 мм</h3>
+                            <div class="table-responsive">
+                                <table class="price-table" id="table-beton-granite">
+                                    <thead>
+                                        <tr>
+                                            <th>Марка бетона</th>
+                                            <th>Цена без НДС, руб. коп.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>С8/10 М150 щ</td><td class="price-cell" data-key="beton_granite_150"><span class="badge-price">—</span></td></tr>
+                                        <tr><td>С12/15 М200 щ</td><td class="price-cell" data-key="beton_granite_200"><span class="badge-price">—</span></td></tr>
+                                        <tr><td>С16/20 М250 щ</td><td class="price-cell" data-key="beton_granite_250"><span class="badge-price">—</span></td></tr>
+                                        <tr><td>С18/22,5 М300 щ</td><td class="price-cell" data-key="beton_granite_300"><span class="badge-price">—</span></td></tr>
+                                        <tr><td>С20/25 М350 щ</td><td class="price-cell" data-key="beton_granite_350"><span class="badge-price">—</span></td></tr>
+                                        <tr><td>С25/30 М400 щ</td><td class="price-cell" data-key="beton_granite_400"><span class="badge-price">—</span></td></tr>
+                                        <tr><td>С28/35 М450 щ</td><td class="price-cell" data-key="beton_granite_450"><span class="badge-price">—</span></td></tr>
+                                        <tr><td>С30/37 М500 щ</td><td class="price-cell" data-key="beton_granite_500"><span class="badge-price">—</span></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ==================== РАСТВОРЫ ==================== -->
+                
+                <div class="price-section">
+                    <h2>🧱 Растворы</h2>
+                    
+                    <div class="table-responsive">
+                        <table class="price-table" id="table-mortars">
+                            <thead>
+                                <tr>
+                                    <th>Марка</th>
+                                    <th>Цена без НДС, руб. коп</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>РСГП М50</td><td class="price-cell" data-key="rastvor_50"><span class="badge-price">—</span></td></tr>
+                                <tr><td>РСГП М100</td><td class="price-cell" data-key="rastvor_100"><span class="badge-price">—</span></td></tr>
+                                <tr><td>РСГП М150</td><td class="price-cell" data-key="rastvor_150"><span class="badge-price">—</span></td></tr>
+                                <tr><td>РСГП М200</td><td class="price-cell" data-key="rastvor_200"><span class="badge-price">—</span></td></tr>
+                            </tbody>
+                        </table>
                     </div>
                     
-                    <!-- Бетон на гранитном щебне -->
-                    <div>
-                        <h3>На гранитном щебне фр. 5-20 мм</h3>
-                        <div class="table-responsive">
-                            <table class="price-table" id="table-beton-granite">
-                                <thead>
-                                    <tr>
-                                        <th>Марка бетона</th>
-                                        <th>Цена без НДС, руб. коп.</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>С8/10 М150 щ</td><td class="price-cell" data-key="beton_granite_150"><span class="badge-price">166.5</span></td></tr>
-                                    <tr><td>С12/15 М200 щ</td><td class="price-cell" data-key="beton_granite_200"><span class="badge-price">175</span></td></tr>
-                                    <tr><td>С16/20 М250 щ</td><td class="price-cell" data-key="beton_granite_250"><span class="badge-price">180</span></td></tr>
-                                    <tr><td>С18/22,5 М300 щ</td><td class="price-cell" data-key="beton_granite_300"><span class="badge-price">187.5</span></td></tr>
-                                    <tr><td>С20/25 М350 щ</td><td class="price-cell" data-key="beton_granite_350"><span class="badge-price">196</span></td></tr>
-                                    <tr><td>С25/30 М400 щ</td><td class="price-cell" data-key="beton_granite_400"><span class="badge-price">215</span></td></tr>
-                                    <tr><td>С28/35 М450 щ</td><td class="price-cell" data-key="beton_granite_450"><span class="badge-price">225</span></td></tr>
-                                    <tr><td>С30/37 М500 щ</td><td class="price-cell" data-key="beton_granite_500"><span class="badge-price">250</span></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    <p class="note-text">* Растворы готовые кладочные и штукатурные</p>
+                </div>
+                
+                <!-- ==================== ТАРИФЫ НА АВТОБЕТОНОСМЕСИТЕЛИ ==================== -->
+                
+                <div class="price-section">
+                    <h2>🚚 Тарифы на транспортные услуги автобетоносмесителей (в пределах МКАД)</h2>
+                    
+                    <h3>📋 Основные услуги</h3>
+                    <div class="table-responsive">
+                        <table class="price-table" id="table-abs-main">
+                            <thead>
+                                <tr>
+                                    <th>Наименование услуги</th>
+                                    <th>Ед. изм.</th>
+                                    <th>Тариф без НДС, руб.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Услуги АБС 7 м³</td><td>рейс</td><td class="price-cell" data-key="abs_7"><span class="badge-price">—</span></td></tr>
+                                <tr><td>Услуги АБС 8 м³</td><td>рейс</td><td class="price-cell" data-key="abs_8"><span class="badge-price">—</span></td></tr>
+                                <tr><td>Услуги АБС 9 м³</td><td>рейс</td><td class="price-cell" data-key="abs_9"><span class="badge-price">—</span></td></tr>
+                                <tr><td>Услуги АБС 10 м³</td><td>рейс</td><td class="price-cell" data-key="abs_10"><span class="badge-price">—</span></td></tr>
+                                <tr><td>Услуги АБС 11 м³</td><td>рейс</td><td class="price-cell" data-key="abs_11"><span class="badge-price">—</span></td></tr>
+                                <tr><td>Услуги АБС 12 м³</td><td>рейс</td><td class="price-cell" data-key="abs_12"><span class="badge-price">—</span></td></tr>
+                                <tr><td>Услуги АБС 14 м³</td><td>рейс</td><td class="price-cell" data-key="abs_14"><span class="badge-price">—</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>⏱️ Дополнительные услуги</h3>
+                    <div class="table-responsive">
+                        <table class="price-table" id="table-abs-extra">
+                            <thead>
+                                <tr>
+                                    <th>Наименование услуги</th>
+                                    <th>Ед. изм.</th>
+                                    <th>Тариф без НДС, руб.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Дополнительное время работы на объекте (свыше 1 машино-часа)</td><td>час</td><td class="price-cell" data-key="abs_extra_time"><span class="badge-price">—</span></td></tr>
+                                <tr><td>Использование дополнительного оборудования (доп. лоток)</td><td>ед.</td><td class="price-cell" data-key="abs_extra_equip"><span class="badge-price">—</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>ℹ️ В стоимость рейса АБС входит:</h4>
+                        <ul class="mb-0">
+                            <li>Доставка продукции от узла до объекта строительства</li>
+                            <li>Работа на объекте 1 машино-час (включая технологическую мойку)</li>
+                            <li>Возврат транспорта на узел</li>
+                        </ul>
+                    </div>
+
+                    <h3>🛣️ Доставка продукции за пределы МКАД</h3>
+                    <div class="table-responsive">
+                        <table class="price-table" id="table-abs-delivery">
+                            <thead>
+                                <tr>
+                                    <th>Расстояние от МКАД</th>
+                                    <th>Примечание</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>0-49 км</td><td>Договорной тариф</td></tr>
+                                <tr><td>50-99 км</td><td>Договорной тариф</td></tr>
+                                <tr><td>100-149 км</td><td>Договорной тариф</td></tr>
+                                <tr><td>свыше 150 км</td><td>Договорной тариф</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="note-text">* Точная стоимость доставки за МКАД рассчитывается индивидуально. Обращайтесь к менеджерам!</p>
+                </div>
+
+                <!-- ==================== ТАРИФЫ НА АБС С НАСОСОМ ==================== -->
+                
+                <div class="price-section">
+                    <h2>🚛 Тарифы на транспортные услуги автобетоносмесителей с насосом (в пределах МКАД)</h2>
+                    
+                    <h3>📋 Основные услуги</h3>
+                    <div class="table-responsive">
+                        <table class="price-table" id="table-nasos-main">
+                            <thead>
+                                <tr>
+                                    <th>Наименование услуги</th>
+                                    <th>Ед. изм.</th>
+                                    <th>Тариф без НДС, руб.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Услуги АБС с насосом 7 м³</td><td>рейс</td><td class="price-cell" data-key="nasos_7"><span class="badge-price">—</span></td></tr>
+                                <tr><td>Услуги АБС с насосом 8 м³</td><td>рейс</td><td class="price-cell" data-key="nasos_8"><span class="badge-price">—</span></td></tr>
+                                <tr><td>Услуги АБС с насосом 7 м³ (стрела 28 м)</td><td>рейс</td><td class="price-cell" data-key="nasos_7_28"><span class="badge-price">—</span></td></tr>
+                                <tr><td>Услуги АБС с насосом 8 м³ (стрела 28 м)</td><td>рейс</td><td class="price-cell" data-key="nasos_8_28"><span class="badge-price">—</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>⏱️ Дополнительные услуги</h3>
+                    <div class="table-responsive">
+                        <table class="price-table" id="table-nasos-extra">
+                            <thead>
+                                <tr>
+                                    <th>Наименование услуги</th>
+                                    <th>Ед. изм.</th>
+                                    <th>Тариф без НДС, руб.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Дополнительное время работы на объекте (свыше 2 машино-часов)</td><td>час</td><td class="price-cell" data-key="nasos_extra_time"><span class="badge-price">—</span></td></tr>
+                                <tr><td>Прокачка бетона свыше 15 м³</td><td>м³</td><td class="price-cell" data-key="nasos_pump"><span class="badge-price">—</span></td></tr>
+                                <tr><td>Использование дополнительного оборудования (доп. шланг 4 м)</td><td>ед.</td><td class="price-cell" data-key="nasos_hose"><span class="badge-price">—</span></td></tr>
+                                <tr><td>Отсутствие места мойки смесительного барабана</td><td>ед.</td><td class="price-cell" data-key="nasos_nowash"><span class="badge-price">—</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>⚠️ Важное предупреждение!</h4>
+                        <p class="mb-0"><strong>Отсутствие мойки приемника автобетононасоса - ЗАКАЗЫ НЕ ПРИНИМАЮТСЯ!</strong></p>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>ℹ️ В стоимость рейса АБС с насосом входит:</h4>
+                        <ul class="mb-0">
+                            <li>Доставка продукции от узла до объекта строительства</li>
+                            <li>Работа на объекте 2 машино-часа (включая заезд на объект, раскладывание стрелы и технологическую мойку)</li>
+                            <li>Возврат транспорта на узел</li>
+                        </ul>
+                    </div>
+
+                    <h3>🗺️ Доставка продукции за пределы МКАД (АБС с насосом)</h3>
+                    <div class="table-responsive">
+                        <table class="price-table" id="table-nasos-delivery">
+                            <thead>
+                                <tr>
+                                    <th>Расстояние от МКАД</th>
+                                    <th>Тариф за 1 км, руб.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>0-49 км</td><td class="price-cell" data-key="nasos_delivery_49"><span class="badge-price">—</span></td></tr>
+                                <tr><td>50-99 км</td><td class="price-cell" data-key="nasos_delivery_99"><span class="badge-price">—</span></td></tr>
+                                <tr><td>100-149 км</td><td class="price-cell" data-key="nasos_delivery_149"><span class="badge-price">—</span></td></tr>
+                                <tr><td>свыше 150 км</td><td class="price-cell" data-key="nasos_delivery_150"><span class="badge-price">—</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="note-text">* Тариф применяется за каждый километр от МКАД до объекта и суммируется со стоимостью подачи автобетоносмесителя с насосом в пределах МКАД.</p>
+                </div>
+
+                <!-- Контактная информация -->
+                <div class="text-center mt-4">
+                    <div class="info-box" style="background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);">
+                        <h3>📞 Для заказа и консультации</h3>
+                        <p style="font-size: 1.2rem; margin-bottom: 10px;">
+                            <strong>+375 29 108-30-83</strong> | <strong>+375 29 169-72-27</strong>
+                        </p>
+                        <p style="font-size: 1rem; margin-bottom: 0;">
+                            <a href="mailto:indigra.beton@gmail.com" style="color: var(--primary-blue);">indigra.beton@gmail.com</a>
+                        </p>
                     </div>
                 </div>
-            </div>
-            
-            <!-- ==================== РАСТВОРЫ ==================== -->
-            
-            <div class="price-section">
-                <h2>🧱 Растворы</h2>
                 
-                <div class="table-responsive">
-                    <table class="price-table" id="table-mortars">
-                        <thead>
-                            <tr>
-                                <th>Марка</th>
-                                <th>Цена без НДС, руб. коп</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>РСГП М50</td><td class="price-cell" data-key="rastvor_50"><span class="badge-price">105</span></td></tr>
-                            <tr><td>РСГП М100</td><td class="price-cell" data-key="rastvor_100"><span class="badge-price">126</span></td></tr>
-                            <tr><td>РСГП М150</td><td class="price-cell" data-key="rastvor_150"><span class="badge-price">138</span></td></tr>
-                            <tr><td>РСГП М200</td><td class="price-cell" data-key="rastvor_200"><span class="badge-price">147</span></td></tr>
-                        </tbody>
-                    </table>
+                <div class="last-update" id="lastUpdateTime">
+                    Последнее обновление: загрузка...
                 </div>
-                
-                <p class="note-text">* Растворы готовые кладочные и штукатурные</p>
-            </div>
-            
-            <!-- ==================== ТАРИФЫ НА АВТОБЕТОНОСМЕСИТЕЛИ ==================== -->
-            
-            <div class="price-section">
-                <h2>🚚 Тарифы на транспортные услуги автобетоносмесителей (в пределах МКАД)</h2>
-                
-                <h3>📋 Основные услуги</h3>
-                <div class="table-responsive">
-                    <table class="price-table" id="table-abs-main">
-                        <thead>
-                            <tr>
-                                <th>Наименование услуги</th>
-                                <th>Ед. изм.</th>
-                                <th>Тариф без НДС, руб.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Услуги АБС 7 м³</td><td>рейс</td><td class="price-cell" data-key="abs_7"><span class="badge-price">200</span></td></tr>
-                            <tr><td>Услуги АБС 8 м³</td><td>рейс</td><td class="price-cell" data-key="abs_8"><span class="badge-price">210</span></td></tr>
-                            <tr><td>Услуги АБС 9 м³</td><td>рейс</td><td class="price-cell" data-key="abs_9"><span class="badge-price">220</span></td></tr>
-                            <tr><td>Услуги АБС 10 м³</td><td>рейс</td><td class="price-cell" data-key="abs_10"><span class="badge-price">240</span></td></tr>
-                            <tr><td>Услуги АБС 11 м³</td><td>рейс</td><td class="price-cell" data-key="abs_11"><span class="badge-price">300</span></td></tr>
-                            <tr><td>Услуги АБС 12 м³</td><td>рейс</td><td class="price-cell" data-key="abs_12"><span class="badge-price">320</span></td></tr>
-                            <tr><td>Услуги АБС 14 м³</td><td>рейс</td><td class="price-cell" data-key="abs_14"><span class="badge-price">350</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h3>⏱️ Дополнительные услуги</h3>
-                <div class="table-responsive">
-                    <table class="price-table" id="table-abs-extra">
-                        <thead>
-                            <tr>
-                                <th>Наименование услуги</th>
-                                <th>Ед. изм.</th>
-                                <th>Тариф без НДС, руб.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Дополнительное время работы на объекте (свыше 1 машино-часа)</td><td>час</td><td class="price-cell" data-key="abs_extra_time"><span class="badge-price">100</span></td></tr>
-                            <tr><td>Использование дополнительного оборудования (доп. лоток)</td><td>ед.</td><td class="price-cell" data-key="abs_extra_equip"><span class="badge-price">50</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="info-box">
-                    <h4>ℹ️ В стоимость рейса АБС входит:</h4>
-                    <ul class="mb-0">
-                        <li>Доставка продукции от узла до объекта строительства</li>
-                        <li>Работа на объекте 1 машино-час (включая технологическую мойку)</li>
-                        <li>Возврат транспорта на узел</li>
-                    </ul>
-                </div>
-
-                <h3>🛣️ Доставка продукции за пределы МКАД</h3>
-                <div class="table-responsive">
-                    <table class="price-table" id="table-abs-delivery">
-                        <thead>
-                            <tr>
-                                <th>Расстояние от МКАД</th>
-                                <th>Примечание</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>0-49 км</td><td>Договорной тариф</td></tr>
-                            <tr><td>50-99 км</td><td>Договорной тариф</td></tr>
-                            <tr><td>100-149 км</td><td>Договорной тариф</td></tr>
-                            <tr><td>свыше 150 км</td><td>Договорной тариф</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <p class="note-text">* Точная стоимость доставки за МКАД рассчитывается индивидуально. Обращайтесь к менеджерам!</p>
-            </div>
-
-            <!-- ==================== ТАРИФЫ НА АБС С НАСОСОМ ==================== -->
-            
-            <div class="price-section">
-                <h2>🚛 Тарифы на транспортные услуги автобетоносмесителей с насосом (в пределах МКАД)</h2>
-                
-                <h3>📋 Основные услуги</h3>
-                <div class="table-responsive">
-                    <table class="price-table" id="table-nasos-main">
-                        <thead>
-                            <tr>
-                                <th>Наименование услуги</th>
-                                <th>Ед. изм.</th>
-                                <th>Тариф без НДС, руб.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Услуги АБС с насосом 7 м³</td><td>рейс</td><td class="price-cell" data-key="nasos_7"><span class="badge-price">600</span></td></tr>
-                            <tr><td>Услуги АБС с насосом 8 м³</td><td>рейс</td><td class="price-cell" data-key="nasos_8"><span class="badge-price">650</span></td></tr>
-                            <tr><td>Услуги АБС с насосом 7 м³ (стрела 28 м)</td><td>рейс</td><td class="price-cell" data-key="nasos_7_28"><span class="badge-price">650</span></td></tr>
-                            <tr><td>Услуги АБС с насосом 8 м³ (стрела 28 м)</td><td>рейс</td><td class="price-cell" data-key="nasos_8_28"><span class="badge-price">700</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h3>⏱️ Дополнительные услуги</h3>
-                <div class="table-responsive">
-                    <table class="price-table" id="table-nasos-extra">
-                        <thead>
-                            <tr>
-                                <th>Наименование услуги</th>
-                                <th>Ед. изм.</th>
-                                <th>Тариф без НДС, руб.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Дополнительное время работы на объекте (свыше 2 машино-часов)</td><td>час</td><td class="price-cell" data-key="nasos_extra_time"><span class="badge-price">200</span></td></tr>
-                            <tr><td>Прокачка бетона свыше 15 м³</td><td>м³</td><td class="price-cell" data-key="nasos_pump"><span class="badge-price">25</span></td></tr>
-                            <tr><td>Использование дополнительного оборудования (доп. шланг 4 м)</td><td>ед.</td><td class="price-cell" data-key="nasos_hose"><span class="badge-price">50</span></td></tr>
-                            <tr><td>Отсутствие места мойки смесительного барабана</td><td>ед.</td><td class="price-cell" data-key="nasos_nowash"><span class="badge-price">200</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="warning-box">
-                    <h4>⚠️ Важное предупреждение!</h4>
-                    <p class="mb-0"><strong>Отсутствие мойки приемника автобетононасоса - ЗАКАЗЫ НЕ ПРИНИМАЮТСЯ!</strong></p>
-                </div>
-
-                <div class="info-box">
-                    <h4>ℹ️ В стоимость рейса АБС с насосом входит:</h4>
-                    <ul class="mb-0">
-                        <li>Доставка продукции от узла до объекта строительства</li>
-                        <li>Работа на объекте 2 машино-часа (включая заезд на объект, раскладывание стрелы и технологическую мойку)</li>
-                        <li>Возврат транспорта на узел</li>
-                    </ul>
-                </div>
-
-                <h3>🗺️ Доставка продукции за пределы МКАД (АБС с насосом)</h3>
-                <div class="table-responsive">
-                    <table class="price-table" id="table-nasos-delivery">
-                        <thead>
-                            <tr>
-                                <th>Расстояние от МКАД</th>
-                                <th>Тариф за 1 км, руб.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>0-49 км</td><td class="price-cell" data-key="nasos_delivery_49"><span class="badge-price">5</span></td></tr>
-                            <tr><td>50-99 км</td><td class="price-cell" data-key="nasos_delivery_99"><span class="badge-price">6</span></td></tr>
-                            <tr><td>100-149 км</td><td class="price-cell" data-key="nasos_delivery_149"><span class="badge-price">7</span></td></tr>
-                            <tr><td>свыше 150 км</td><td class="price-cell" data-key="nasos_delivery_150"><span class="badge-price">8</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <p class="note-text">* Тариф применяется за каждый километр от МКАД до объекта и суммируется со стоимостью подачи автобетоносмесителя с насосом в пределах МКАД.</p>
-            </div>
-
-            <!-- Контактная информация -->
-            <div class="text-center mt-4">
-                <div class="info-box" style="background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);">
-                    <h3>📞 Для заказа и консультации</h3>
-                    <p style="font-size: 1.2rem; margin-bottom: 10px;">
-                        <strong>+375 29 108-30-83</strong> | <strong>+375 29 169-72-27</strong>
-                    </p>
-                    <p style="font-size: 1rem; margin-bottom: 0;">
-                        <a href="mailto:indigra.beton@gmail.com" style="color: var(--primary-blue);">indigra.beton@gmail.com</a>
-                    </p>
-                </div>
-            </div>
-            
-            <div class="last-update" id="lastUpdateTime">
-                Последнее обновление: загрузка...
             </div>
         </div>
     </main>
@@ -597,8 +638,8 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         
-        // Переменные
         let lastUpdateTime = null;
+        let isFirstLoad = true;
         
         // Маппинг ключей Firebase к ячейкам
         const priceMapping = {
@@ -656,8 +697,8 @@
             'nasos_delivery_150': { table: 'table-nasos-delivery', row: 3, col: 1 }
         };
         
-        // Функция обновления ячейки
-        function updateCellValue(tableId, rowIndex, colIndex, value) {
+        // Функция обновления ячейки (без анимации при первом рендере)
+        function updateCellValue(tableId, rowIndex, colIndex, value, animate = true) {
             const table = document.getElementById(tableId);
             if (!table) return false;
             
@@ -675,11 +716,16 @@
             
             if (priceSpan) {
                 const oldValue = priceSpan.textContent;
-                if (oldValue !== String(value)) {
+                if (oldValue !== String(value) && oldValue !== '—') {
                     priceSpan.textContent = value;
-                    // Анимация обновления
-                    cell.classList.add('price-updated');
-                    setTimeout(() => cell.classList.remove('price-updated'), 500);
+                    // Анимация только для реальных обновлений после загрузки
+                    if (animate && !isFirstLoad) {
+                        cell.classList.add('price-updated');
+                        setTimeout(() => cell.classList.remove('price-updated'), 500);
+                    }
+                    return true;
+                } else if (oldValue === '—') {
+                    priceSpan.textContent = value;
                     return true;
                 }
             }
@@ -710,126 +756,77 @@
                 minute: '2-digit',
                 second: '2-digit'
             });
-           // document.getElementById('lastUpdateTime').innerHTML = `📅 Последнее обновление: ${timeStr}`;
+            const updateElem = document.getElementById('lastUpdateTime');
+            if (updateElem) {
+                updateElem.innerHTML = `📅 Последнее обновление: ${timeStr}`;
+            }
         }
         
         // Загрузка всех цен из Firebase
         async function loadAllPrices() {
-          //  console.log('🔄 Загружаем цены...');
-            
             try {
                 const snapshot = await database.ref('prices').once('value');
                 const prices = snapshot.val() || {};
                 
-                let updatedCount = 0;
-                
                 for (const [key, value] of Object.entries(prices)) {
                     const mapping = priceMapping[key];
                     if (mapping) {
-                        const updated = updateCellValue(mapping.table, mapping.row, mapping.col, value);
-                        if (updated) updatedCount++;
+                        updateCellValue(mapping.table, mapping.row, mapping.col, value, false);
                     }
-                }
-                
-             //   console.log(`✅ Загружено ${Object.keys(prices).length} цен, обновлено ${updatedCount} ячеек`);
-                
-                if (updatedCount > 0) {
-               //     showNotification(`🔄 Обновлено ${updatedCount} позиций`);
                 }
                 
                 updateLastUpdateTime();
                 
-                // Обновляем индикатор подключения
-              //  document.getElementById('connectionDot').className = 'connection-dot';
-             //   document.getElementById('connectionText').textContent = 'Подключено к Firebase';
-                
             } catch (error) {
                 console.error('❌ Ошибка загрузки из Firebase:', error);
-                document.getElementById('connectionDot').className = 'connection-dot disconnected';
-                document.getElementById('connectionText').textContent = 'Ошибка подключения';
                 showNotification('⚠️ Ошибка подключения к серверу цен');
             }
         }
         
-        // Слушаем изменения в реальном времени
+        // Слушаем изменения в реальном времени (только после первой загрузки)
         function listenForRealtimeUpdates() {
-        //    console.log('🔄 Включаем прослушивание обновлений в реальном времени...');
-            
             database.ref('prices').on('child_changed', (snapshot) => {
                 const key = snapshot.key;
                 const value = snapshot.val();
                 
-          //      console.log(`🔄 Обновление: ${key} = ${value}`);
-                
                 const mapping = priceMapping[key];
                 if (mapping) {
-                    const updated = updateCellValue(mapping.table, mapping.row, mapping.col, value);
+                    const updated = updateCellValue(mapping.table, mapping.row, mapping.col, value, true);
                     if (updated) {
-                   //     showNotification(`💰 Обновлена цена: ${key.replace(/_/g, ' ')} = ${value} руб.`);
+                        showNotification(`💰 Обновлена цена: ${key.replace(/_/g, ' ')} = ${value} руб.`);
                         updateLastUpdateTime();
                     }
                 }
             });
-            
-            // Слушаем добавление новых цен
-            database.ref('prices').on('child_added', (snapshot) => {
-                const key = snapshot.key;
-                const value = snapshot.val();
-                
-                const mapping = priceMapping[key];
-                if (mapping) {
-                    updateCellValue(mapping.table, mapping.row, mapping.col, value);
-                  //  showNotification(`✨ Добавлена новая цена: ${key} = ${value} руб.`);
-                }
-            });
         }
         
-        // Проверка подключения
-        function checkConnection() {
-            const connectedRef = database.ref('.info/connected');
-            connectedRef.on('value', (snap) => {
-                if (snap.val() === true) {
-                   // console.log('✅ Firebase подключен');
-                 //   document.getElementById('connectionDot').className = 'connection-dot';
-                  //  document.getElementById('connectionText').textContent = 'Подключено к Firebase';
-                } else {
-                  //  console.log('❌ Firebase отключен');
-                 //   document.getElementById('connectionDot').className = 'connection-dot disconnected';
-                  //  document.getElementById('connectionText').textContent = 'Ожидание подключения...';
-                }
-            });
+        // Показать контент после загрузки
+        function showContent() {
+            const loader = document.getElementById('priceLoader');
+            const content = document.getElementById('priceContent');
+            
+            if (loader && content) {
+                loader.style.display = 'none';
+                content.style.opacity = '1';
+                content.classList.add('loaded');
+            }
         }
         
-        // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-         //   console.log('🟢 Страница загружена, инициализация...');
-            
-            // Загружаем цены
-            loadAllPrices();
-            
-            // Включаем реальное время
+        // Основная инициализация
+        async function init() {
+            await loadAllPrices();
             listenForRealtimeUpdates();
-            
-            // Проверяем подключение
-            checkConnection();
-            
-            // Обновляем время каждую минуту
-            setInterval(updateLastUpdateTime, 60000);
-        });
+            isFirstLoad = false;
+            showContent();
+        }
         
-        // Дополнительная загрузка после полной загрузки
-        window.addEventListener('load', function() {
-         //   console.log('🟢 Страница полностью загружена');
-            setTimeout(loadAllPrices, 1000);
-        });
+        // Запуск
+        init();
         
         // Переподключение при потере связи
         window.addEventListener('online', function() {
-           // console.log('🟢 Интернет появился');
             loadAllPrices();
         });
-        
-     //   console.log('✅ Скрипт прайс-листа загружен');
     </script>
     
     <script src="js/layout-fixer.js"></script>
