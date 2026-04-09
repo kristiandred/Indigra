@@ -369,7 +369,7 @@
                     </div>
                 </div>
 
-                <!-- РЕДАКТОР КАРТОЧЕК ДОСТАВКИ -->
+                <!-- РЕДАКТОР КАРТОЧЕК ДОСТАВКИ (только доставка по городу) -->
                 <div class="price-section cards-editor">
                     <h2>📦 Редактор карточек доставки</h2>
                     <p style="margin-bottom: 20px; color: #666;">Эти данные отображаются в карточках на странице <strong>products.html</strong>.</p>
@@ -388,17 +388,7 @@
                             <div class="form-group"><label>Мин. объем</label><input type="text" id="tray_cityMinVolume" class="form-control" value="1 м³"></div>
                             <div class="form-group"><label>Мин. стоимость</label><input type="text" id="tray_cityMinPrice" class="form-control" value="2000"></div>
                             <div class="form-group"><label>Порог объема</label><input type="text" id="tray_cityVolumeThreshold" class="form-control" value="5"></div>
-                            <div class="form-group"><label>Цена за м³ свыше</label><input type="text" id="tray_cityPricePerCube" class="form-control" value="400"></div>
-                        </div>
-                        
-                        <h4>🌍 Доставка за город</h4>
-                        <div class="form-row">
-                            <div class="form-group"><label>Порог объема</label><input type="text" id="tray_countryVolumeThreshold" class="form-control" value="5"></div>
-                            <div class="form-group"><label>Цена (малые)</label><input type="text" id="tray_countryPriceSmall" class="form-control" value="2000"></div>
-                            <div class="form-group"><label>Цена за км</label><input type="text" id="tray_countryKmPriceSmall" class="form-control" value="500"></div>
-                            <div class="form-group"><label>Цена (крупные)</label><input type="text" id="tray_countryPriceLarge" class="form-control" value="400"></div>
-                            <div class="form-group"><label>Цена за км (крупные)</label><input type="text" id="tray_countryKmPriceLarge" class="form-control" value="100"></div>
-                            <div class="form-group"><label>Проезд поста</label><input type="text" id="tray_postPassPrice" class="form-control" value="1000"></div>
+                            <div class="form-group"><label>Цена за м³ свыше порога</label><input type="text" id="tray_cityPricePerCube" class="form-control" value="400"></div>
                         </div>
                         
                         <h4>🏷️ Характеристики (теги)</h4>
@@ -421,17 +411,7 @@
                             <div class="form-group"><label>Мин. объем</label><input type="text" id="belt_cityMinVolume" class="form-control" value="1 м³"></div>
                             <div class="form-group"><label>Мин. стоимость</label><input type="text" id="belt_cityMinPrice" class="form-control" value="6000"></div>
                             <div class="form-group"><label>Порог объема</label><input type="text" id="belt_cityVolumeThreshold" class="form-control" value="6"></div>
-                            <div class="form-group"><label>Цена за м³ свыше</label><input type="text" id="belt_cityPricePerCube" class="form-control" value="1000"></div>
-                        </div>
-                        
-                        <h4>🌍 Доставка за город</h4>
-                        <div class="form-row">
-                            <div class="form-group"><label>Порог объема</label><input type="text" id="belt_countryVolumeThreshold" class="form-control" value="6"></div>
-                            <div class="form-group"><label>Цена (малые)</label><input type="text" id="belt_countryPriceSmall" class="form-control" value="6000"></div>
-                            <div class="form-group"><label>Цена за км</label><input type="text" id="belt_countryKmPriceSmall" class="form-control" value="3000"></div>
-                            <div class="form-group"><label>Цена (крупные)</label><input type="text" id="belt_countryPriceLarge" class="form-control" value="1000"></div>
-                            <div class="form-group"><label>Цена за км (крупные)</label><input type="text" id="belt_countryKmPriceLarge" class="form-control" value="500"></div>
-                            <div class="form-group"><label>Проезд поста</label><input type="text" id="belt_postPassPrice" class="form-control" value="1000"></div>
+                            <div class="form-group"><label>Цена за м³ свыше порога</label><input type="text" id="belt_cityPricePerCube" class="form-control" value="1000"></div>
                         </div>
                         
                         <h4>🏷️ Характеристики (теги)</h4>
@@ -512,7 +492,6 @@
             } catch (error) { console.error('Ошибка загрузки цен:', error); }
         }
 
-        // Функция для обновления списка характеристик в интерфейсе
         function updateSpecsList(containerId, specsArray) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
@@ -526,7 +505,6 @@
                     }
                 });
             }
-            // Добавляем обработчики для кнопок удаления
             document.querySelectorAll(`#${containerId} .remove-spec`).forEach(btn => {
                 btn.onclick = () => btn.parentElement.remove();
             });
@@ -546,16 +524,9 @@
                     document.getElementById('tray_cityMinPrice').value = t.cityMinPrice || '2000';
                     document.getElementById('tray_cityVolumeThreshold').value = t.cityVolumeThreshold || '5';
                     document.getElementById('tray_cityPricePerCube').value = t.cityPricePerCube || '400';
-                    document.getElementById('tray_countryVolumeThreshold').value = t.countryVolumeThreshold || '5';
-                    document.getElementById('tray_countryPriceSmall').value = t.countryPriceSmall || '2000';
-                    document.getElementById('tray_countryKmPriceSmall').value = t.countryKmPriceSmall || '500';
-                    document.getElementById('tray_countryPriceLarge').value = t.countryPriceLarge || '400';
-                    document.getElementById('tray_countryKmPriceLarge').value = t.countryKmPriceLarge || '100';
-                    document.getElementById('tray_postPassPrice').value = t.postPassPrice || '1000';
                     
                     updateSpecsList('tray_specs_list', t.specs || []);
                 } else {
-                    // Дефолтные значения для tray
                     updateSpecsList('tray_specs_list', [
                         'Бесплатная выгрузка: 1 час',
                         'В автопарке: 8 миксеров',
@@ -574,12 +545,6 @@
                     document.getElementById('belt_cityMinPrice').value = b.cityMinPrice || '6000';
                     document.getElementById('belt_cityVolumeThreshold').value = b.cityVolumeThreshold || '6';
                     document.getElementById('belt_cityPricePerCube').value = b.cityPricePerCube || '1000';
-                    document.getElementById('belt_countryVolumeThreshold').value = b.countryVolumeThreshold || '6';
-                    document.getElementById('belt_countryPriceSmall').value = b.countryPriceSmall || '6000';
-                    document.getElementById('belt_countryKmPriceSmall').value = b.countryKmPriceSmall || '3000';
-                    document.getElementById('belt_countryPriceLarge').value = b.countryPriceLarge || '1000';
-                    document.getElementById('belt_countryKmPriceLarge').value = b.countryKmPriceLarge || '500';
-                    document.getElementById('belt_postPassPrice').value = b.postPassPrice || '1000';
                     
                     updateSpecsList('belt_specs_list', b.specs || []);
                 } else {
@@ -599,7 +564,6 @@
             }
         }
 
-        // Функция получения текущих характеристик из интерфейса
         function getSpecsFromUI(containerId) {
             const specs = [];
             const container = document.getElementById(containerId);
@@ -626,12 +590,6 @@
                         cityMinPrice: document.getElementById('tray_cityMinPrice').value,
                         cityVolumeThreshold: document.getElementById('tray_cityVolumeThreshold').value,
                         cityPricePerCube: document.getElementById('tray_cityPricePerCube').value,
-                        countryVolumeThreshold: document.getElementById('tray_countryVolumeThreshold').value,
-                        countryPriceSmall: document.getElementById('tray_countryPriceSmall').value,
-                        countryKmPriceSmall: document.getElementById('tray_countryKmPriceSmall').value,
-                        countryPriceLarge: document.getElementById('tray_countryPriceLarge').value,
-                        countryKmPriceLarge: document.getElementById('tray_countryKmPriceLarge').value,
-                        postPassPrice: document.getElementById('tray_postPassPrice').value,
                         specs: specs
                     };
                     await database.ref('deliveryCards/mixerTray').set(cardData);
@@ -646,12 +604,6 @@
                         cityMinPrice: document.getElementById('belt_cityMinPrice').value,
                         cityVolumeThreshold: document.getElementById('belt_cityVolumeThreshold').value,
                         cityPricePerCube: document.getElementById('belt_cityPricePerCube').value,
-                        countryVolumeThreshold: document.getElementById('belt_countryVolumeThreshold').value,
-                        countryPriceSmall: document.getElementById('belt_countryPriceSmall').value,
-                        countryKmPriceSmall: document.getElementById('belt_countryKmPriceSmall').value,
-                        countryPriceLarge: document.getElementById('belt_countryPriceLarge').value,
-                        countryKmPriceLarge: document.getElementById('belt_countryKmPriceLarge').value,
-                        postPassPrice: document.getElementById('belt_postPassPrice').value,
                         specs: specs
                     };
                     await database.ref('deliveryCards/mixerBelt').set(cardData);
