@@ -369,7 +369,7 @@
                     </div>
                 </div>
 
-                <!-- РЕДАКТОР КАРТОЧЕК ДОСТАВКИ (только доставка по городу) -->
+                <!-- РЕДАКТОР КАРТОЧЕК ДОСТАВКИ (только мин. объем и мин. стоимость) -->
                 <div class="price-section cards-editor">
                     <h2>📦 Редактор карточек доставки</h2>
                     <p style="margin-bottom: 20px; color: #666;">Эти данные отображаются в карточках на странице <strong>products.html</strong>.</p>
@@ -387,8 +387,6 @@
                         <div class="form-row">
                             <div class="form-group"><label>Мин. объем</label><input type="text" id="tray_cityMinVolume" class="form-control" value="1 м³"></div>
                             <div class="form-group"><label>Мин. стоимость</label><input type="text" id="tray_cityMinPrice" class="form-control" value="2000"></div>
-                            <div class="form-group"><label>Порог объема</label><input type="text" id="tray_cityVolumeThreshold" class="form-control" value="5"></div>
-                            <div class="form-group"><label>Цена за м³ свыше порога</label><input type="text" id="tray_cityPricePerCube" class="form-control" value="400"></div>
                         </div>
                         
                         <h4>🏷️ Характеристики (теги)</h4>
@@ -410,8 +408,6 @@
                         <div class="form-row">
                             <div class="form-group"><label>Мин. объем</label><input type="text" id="belt_cityMinVolume" class="form-control" value="1 м³"></div>
                             <div class="form-group"><label>Мин. стоимость</label><input type="text" id="belt_cityMinPrice" class="form-control" value="6000"></div>
-                            <div class="form-group"><label>Порог объема</label><input type="text" id="belt_cityVolumeThreshold" class="form-control" value="6"></div>
-                            <div class="form-group"><label>Цена за м³ свыше порога</label><input type="text" id="belt_cityPricePerCube" class="form-control" value="1000"></div>
                         </div>
                         
                         <h4>🏷️ Характеристики (теги)</h4>
@@ -522,8 +518,6 @@
                     document.getElementById('tray_image').value = t.imageUrl || 'images/гибрид4.jpg';
                     document.getElementById('tray_cityMinVolume').value = t.cityMinVolume || '1 м³';
                     document.getElementById('tray_cityMinPrice').value = t.cityMinPrice || '2000';
-                    document.getElementById('tray_cityVolumeThreshold').value = t.cityVolumeThreshold || '5';
-                    document.getElementById('tray_cityPricePerCube').value = t.cityPricePerCube || '400';
                     
                     updateSpecsList('tray_specs_list', t.specs || []);
                 } else {
@@ -543,8 +537,6 @@
                     document.getElementById('belt_image').value = b.imageUrl || 'images/гибрид5.jpg';
                     document.getElementById('belt_cityMinVolume').value = b.cityMinVolume || '1 м³';
                     document.getElementById('belt_cityMinPrice').value = b.cityMinPrice || '6000';
-                    document.getElementById('belt_cityVolumeThreshold').value = b.cityVolumeThreshold || '6';
-                    document.getElementById('belt_cityPricePerCube').value = b.cityPricePerCube || '1000';
                     
                     updateSpecsList('belt_specs_list', b.specs || []);
                 } else {
@@ -588,8 +580,6 @@
                         imageUrl: document.getElementById('tray_image').value,
                         cityMinVolume: document.getElementById('tray_cityMinVolume').value,
                         cityMinPrice: document.getElementById('tray_cityMinPrice').value,
-                        cityVolumeThreshold: document.getElementById('tray_cityVolumeThreshold').value,
-                        cityPricePerCube: document.getElementById('tray_cityPricePerCube').value,
                         specs: specs
                     };
                     await database.ref('deliveryCards/mixerTray').set(cardData);
@@ -602,8 +592,6 @@
                         imageUrl: document.getElementById('belt_image').value,
                         cityMinVolume: document.getElementById('belt_cityMinVolume').value,
                         cityMinPrice: document.getElementById('belt_cityMinPrice').value,
-                        cityVolumeThreshold: document.getElementById('belt_cityVolumeThreshold').value,
-                        cityPricePerCube: document.getElementById('belt_cityPricePerCube').value,
                         specs: specs
                     };
                     await database.ref('deliveryCards/mixerBelt').set(cardData);
