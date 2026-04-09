@@ -192,23 +192,6 @@
             font-size: 1.1rem;
         }
 
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            font-size: 0.95rem;
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .info-value {
-            color: #666;
-            text-align: right;
-        }
-
         .badge {
             background: #e6f0ff;
             color: #1e3a8a;
@@ -473,7 +456,7 @@
             mixerBelt: null
         };
         
-        // Функция создания HTML карточки на основе данных
+        // Функция создания HTML карточки на основе данных (только доставка по городу)
         function createCard(cardData, cardId) {
             if (!cardData) return null;
             
@@ -495,7 +478,7 @@
             const content = document.createElement('div');
             content.className = 'card-content';
             
-            // Доставка по городу
+            // Только доставка по городу
             const cityDelivery = `
                 <div class="delivery-type">
                     <h4>📍 Доставка по городу</h4>
@@ -516,25 +499,6 @@
                 </div>
             `;
             
-            // Доставка за город
-            let countryDelivery = `
-                <div class="delivery-type">
-                    <h4>🌍 Доставка за город</h4>
-                    <div class="info-item">
-                        <span class="info-label">Заказы &lt; ${cardData.countryVolumeThreshold || '—'} м³:</span>
-                        <span class="info-value">${cardData.countryPriceSmall || '—'} руб./миксер + ${cardData.countryKmPriceSmall || '—'} руб./миксер за каждые 10 км за МКАД</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Заказы &gt; ${cardData.countryVolumeThreshold || '—'} м³:</span>
-                        <span class="info-value">${cardData.countryPriceLarge || '—'} руб./м³ + ${cardData.countryKmPriceLarge || '—'} руб./м³ за каждые 10 км за МКАД</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Проезд поста:</span>
-                        <span class="info-value">+${cardData.postPassPrice || '—'} руб./шт.</span>
-                    </div>
-                </div>
-            `;
-            
             // Характеристики
             let specsHtml = '<div class="specs">';
             if (cardData.specs && cardData.specs.length) {
@@ -544,7 +508,7 @@
             }
             specsHtml += '</div>';
             
-            content.innerHTML = cityDelivery + countryDelivery + specsHtml;
+            content.innerHTML = cityDelivery + specsHtml;
             
             card.appendChild(header);
             card.appendChild(imageDiv);
@@ -553,7 +517,7 @@
             return card;
         }
         
-        // Функция обновления или создания карточки
+        // Функция обновления или создания карточки (только доставка по городу)
         function updateCard(cardData, cardId) {
             let existingCard = document.querySelector(`.delivery-card[data-card-id="${cardId}"]`);
             
@@ -567,7 +531,7 @@
                     img.src = cardData.imageUrl || 'images/товарный бетон.webp';
                 }
                 
-                // Обновляем контент
+                // Обновляем контент (только доставка по городу)
                 const content = existingCard.querySelector('.card-content');
                 
                 const cityDelivery = `
@@ -590,24 +554,6 @@
                     </div>
                 `;
                 
-                const countryDelivery = `
-                    <div class="delivery-type">
-                        <h4>🌍 Доставка за город</h4>
-                        <div class="info-item">
-                            <span class="info-label">Заказы &lt; ${cardData.countryVolumeThreshold || '—'} м³:</span>
-                            <span class="info-value">${cardData.countryPriceSmall || '—'} руб./миксер + ${cardData.countryKmPriceSmall || '—'} руб./миксер за каждые 10 км за МКАД</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Заказы &gt; ${cardData.countryVolumeThreshold || '—'} м³:</span>
-                            <span class="info-value">${cardData.countryPriceLarge || '—'} руб./м³ + ${cardData.countryKmPriceLarge || '—'} руб./м³ за каждые 10 км за МКАД</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Проезд поста:</span>
-                            <span class="info-value">+${cardData.postPassPrice || '—'} руб./шт.</span>
-                        </div>
-                    </div>
-                `;
-                
                 let specsHtml = '<div class="specs">';
                 if (cardData.specs && cardData.specs.length) {
                     cardData.specs.forEach(spec => {
@@ -616,7 +562,7 @@
                 }
                 specsHtml += '</div>';
                 
-                content.innerHTML = cityDelivery + countryDelivery + specsHtml;
+                content.innerHTML = cityDelivery + specsHtml;
                 
                 // Анимация обновления
                 existingCard.classList.add('card-updated');
