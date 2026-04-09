@@ -28,7 +28,6 @@
             --shadow-medium: 0 5px 20px rgba(0,0,0,0.08);
         }
         
-        /* Стили для авторизации */
         .auth-container {
             position: fixed;
             top: 0;
@@ -63,7 +62,6 @@
         .logout-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 15px; border-radius: 20px; cursor: pointer; margin-left: 10px; }
         .logout-btn:hover { background: rgba(255,255,255,0.3); }
         
-        /* Стили для таблиц */
         .price-section {
             margin-bottom: 40px;
             padding: 25px;
@@ -137,7 +135,6 @@
         .admin-panel .btn-export { background: #17a2b8; color: white; }
         .admin-panel .btn-reset { background: #6c757d; color: white; }
         
-        /* Стили для карточек доставки (форма редактирования) */
         .cards-editor {
             background: linear-gradient(135deg, #f0f7ff 0%, #e8f0fe 100%);
             border: 2px solid var(--primary-blue);
@@ -180,11 +177,15 @@
             border-radius: 8px;
             padding: 15px;
             margin-top: 10px;
+            max-height: 400px;
+            overflow-y: auto;
         }
         .spec-item { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
         .spec-item input { flex: 1; }
         .spec-item button { background: #dc3545; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer; }
+        .spec-item button:hover { background: #c82333; }
         .add-spec-btn { background: #28a745; color: white; border: none; border-radius: 5px; padding: 8px 15px; margin-top: 10px; cursor: pointer; }
+        .add-spec-btn:hover { background: #218838; }
         
         .save-card-btn {
             background: var(--gradient-primary);
@@ -242,17 +243,6 @@
         
         .info-box { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-left: 4px solid var(--primary-blue); padding: 20px; border-radius: 10px; margin: 20px 0; }
         .warning-box { background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); border-left: 4px solid #c62828; padding: 20px; border-radius: 10px; margin: 20px 0; }
-        
-        .preview-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-top: 20px;
-        }
-        .preview-card-header { background: var(--gradient-primary); color: white; padding: 15px; text-align: center; font-weight: 700; }
-        .preview-card-content { padding: 15px; }
-        .preview-price-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #e0e0e0; }
     </style>
 </head>
 <body>
@@ -281,11 +271,10 @@
                     <i>✏️</i> Режим редактирования цен активен. Нажмите на любую ячейку с ценой, чтобы изменить её.
                 </div>
 
-                <!-- ==================== РАЗДЕЛ 1: ПРАЙС-ЛИСТ ==================== -->
+                <!-- ПРАЙС-ЛИСТ -->
                 <div class="price-section">
                     <h2>💰 Прайс-лист на продукцию</h2>
                     
-                    <!-- БЕТОН -->
                     <div id="section-beton">
                         <h3>🏗️ Товарный бетон</h3>
                         <div class="two-columns">
@@ -324,7 +313,6 @@
                         </div>
                     </div>
 
-                    <!-- РАСТВОРЫ -->
                     <div id="section-rastvory">
                         <h3>🧱 Растворы</h3>
                         <div class="table-responsive">
@@ -341,7 +329,6 @@
                         <p class="note-text">* Растворы готовые кладочные и штукатурные</p>
                     </div>
 
-                    <!-- АБС -->
                     <div id="section-abs">
                         <h3>🚚 Тарифы на автобетоносмесители (в пределах МКАД)</h3>
                         <div class="table-responsive">
@@ -361,7 +348,6 @@
                         <div class="info-box"><h4>ℹ️ В стоимость рейса АБС входит:</h4><ul><li>Доставка продукции от узла до объекта</li><li>Работа на объекте 1 машино-час</li><li>Возврат транспорта на узел</li></ul></div>
                     </div>
 
-                    <!-- АБС С НАСОСОМ -->
                     <div id="section-nasos">
                         <h3>🚛 Тарифы на АБС с насосом (в пределах МКАД)</h3>
                         <div class="table-responsive">
@@ -383,65 +369,49 @@
                     </div>
                 </div>
 
-                <!-- ==================== РАЗДЕЛ 2: РЕДАКТОР КАРТОЧЕК ДОСТАВКИ ==================== -->
+                <!-- РЕДАКТОР КАРТОЧЕК ДОСТАВКИ -->
                 <div class="price-section cards-editor">
-                    <h2>📦 Редактор карточек доставки (отображаются на странице "Услуги")</h2>
-                    <p style="margin-bottom: 20px; color: #666;">Эти данные будут отображаться в карточках на странице <strong>products.html</strong> (миксеры с лотками и миксеры с лентой подачи).</p>
+                    <h2>📦 Редактор карточек доставки</h2>
+                    <p style="margin-bottom: 20px; color: #666;">Эти данные отображаются в карточках на странице <strong>products.html</strong>.</p>
                     
-                    <!-- Форма редактирования карточки 1: Миксеры с лотками -->
+                    <!-- Карточка 1: Миксеры с лотками -->
                     <div class="card-edit-form" id="cardTrayForm">
                         <h3>🚚 Миксеры с лотками 1,5-2м</h3>
                         <div class="form-row">
-                            <div class="form-group">
-                                <label>Иконка (эмодзи)</label>
-                                <input type="text" id="tray_icon" class="form-control" value="🚚">
-                            </div>
-                            <div class="form-group">
-                                <label>Заголовок</label>
-                                <input type="text" id="tray_title" class="form-control" value="Миксеры с лотками 1,5–2м">
-                            </div>
-                            <div class="form-group">
-                                <label>URL изображения</label>
-                                <input type="text" id="tray_image" class="form-control" value="images/гибрид4.jpg">
-                            </div>
+                            <div class="form-group"><label>Иконка</label><input type="text" id="tray_icon" class="form-control" value="🚚"></div>
+                            <div class="form-group"><label>Заголовок</label><input type="text" id="tray_title" class="form-control" value="Миксеры с лотками 1,5–2м"></div>
+                            <div class="form-group"><label>URL изображения</label><input type="text" id="tray_image" class="form-control" value="images/гибрид4.jpg"></div>
                         </div>
                         
                         <h4>📍 Доставка по городу</h4>
                         <div class="form-row">
                             <div class="form-group"><label>Мин. объем</label><input type="text" id="tray_cityMinVolume" class="form-control" value="1 м³"></div>
                             <div class="form-group"><label>Мин. стоимость</label><input type="text" id="tray_cityMinPrice" class="form-control" value="2000"></div>
-                            <div class="form-group"><label>Порог объема (м³)</label><input type="text" id="tray_cityVolumeThreshold" class="form-control" value="5"></div>
-                            <div class="form-group"><label>Цена за м³ свыше порога</label><input type="text" id="tray_cityPricePerCube" class="form-control" value="400"></div>
+                            <div class="form-group"><label>Порог объема</label><input type="text" id="tray_cityVolumeThreshold" class="form-control" value="5"></div>
+                            <div class="form-group"><label>Цена за м³ свыше</label><input type="text" id="tray_cityPricePerCube" class="form-control" value="400"></div>
                         </div>
                         
                         <h4>🌍 Доставка за город</h4>
                         <div class="form-row">
-                            <div class="form-group"><label>Порог объема (м³)</label><input type="text" id="tray_countryVolumeThreshold" class="form-control" value="5"></div>
-                            <div class="form-group"><label>Цена (малые заказы)</label><input type="text" id="tray_countryPriceSmall" class="form-control" value="2000"></div>
-                            <div class="form-group"><label>Цена за км (малые)</label><input type="text" id="tray_countryKmPriceSmall" class="form-control" value="500"></div>
-                            <div class="form-group"><label>Цена (крупные заказы)</label><input type="text" id="tray_countryPriceLarge" class="form-control" value="400"></div>
+                            <div class="form-group"><label>Порог объема</label><input type="text" id="tray_countryVolumeThreshold" class="form-control" value="5"></div>
+                            <div class="form-group"><label>Цена (малые)</label><input type="text" id="tray_countryPriceSmall" class="form-control" value="2000"></div>
+                            <div class="form-group"><label>Цена за км</label><input type="text" id="tray_countryKmPriceSmall" class="form-control" value="500"></div>
+                            <div class="form-group"><label>Цена (крупные)</label><input type="text" id="tray_countryPriceLarge" class="form-control" value="400"></div>
                             <div class="form-group"><label>Цена за км (крупные)</label><input type="text" id="tray_countryKmPriceLarge" class="form-control" value="100"></div>
                             <div class="form-group"><label>Проезд поста</label><input type="text" id="tray_postPassPrice" class="form-control" value="1000"></div>
                         </div>
                         
                         <h4>🏷️ Характеристики (теги)</h4>
-                        <div class="specs-list" id="tray_specs_list">
-                            <div class="spec-item"><input type="text" placeholder="Характеристика" value="Бесплатная выгрузка: 1 час"><button class="remove-spec">✖</button></div>
-                            <div class="spec-item"><input type="text" placeholder="Характеристика" value="В автопарке: 8 миксеров"><button class="remove-spec">✖</button></div>
-                            <div class="spec-item"><input type="text" placeholder="Характеристика" value="Объемы: 5м³, 7м³, 9м³, 10м³"><button class="remove-spec">✖</button></div>
-                            <div class="spec-item"><input type="text" placeholder="Характеристика" value="Длина лотка: 1,5-2 м"><button class="remove-spec">✖</button></div>
-                            <div class="spec-item"><input type="text" placeholder="Характеристика" value="Высота подачи: 0,5 м"><button class="remove-spec">✖</button></div>
-                        </div>
+                        <div class="specs-list" id="tray_specs_list"></div>
                         <button class="add-spec-btn" data-target="tray_specs_list">+ Добавить характеристику</button>
-                        
-                        <button class="save-card-btn" data-card="tray">💾 Сохранить карточку "Миксеры с лотками"</button>
+                        <button class="save-card-btn" data-card="tray">💾 Сохранить карточку</button>
                     </div>
                     
-                    <!-- Форма редактирования карточки 2: Миксеры с лентой -->
+                    <!-- Карточка 2: Миксеры с лентой -->
                     <div class="card-edit-form" id="cardBeltForm">
                         <h3>🏗️ Миксеры с лентой подачи 10м</h3>
                         <div class="form-row">
-                            <div class="form-group"><label>Иконка (эмодзи)</label><input type="text" id="belt_icon" class="form-control" value="🏗️"></div>
+                            <div class="form-group"><label>Иконка</label><input type="text" id="belt_icon" class="form-control" value="🏗️"></div>
                             <div class="form-group"><label>Заголовок</label><input type="text" id="belt_title" class="form-control" value="Миксеры с лентой подачи 10м"></div>
                             <div class="form-group"><label>URL изображения</label><input type="text" id="belt_image" class="form-control" value="images/гибрид5.jpg"></div>
                         </div>
@@ -450,31 +420,24 @@
                         <div class="form-row">
                             <div class="form-group"><label>Мин. объем</label><input type="text" id="belt_cityMinVolume" class="form-control" value="1 м³"></div>
                             <div class="form-group"><label>Мин. стоимость</label><input type="text" id="belt_cityMinPrice" class="form-control" value="6000"></div>
-                            <div class="form-group"><label>Порог объема (м³)</label><input type="text" id="belt_cityVolumeThreshold" class="form-control" value="6"></div>
-                            <div class="form-group"><label>Цена за м³ свыше порога</label><input type="text" id="belt_cityPricePerCube" class="form-control" value="1000"></div>
+                            <div class="form-group"><label>Порог объема</label><input type="text" id="belt_cityVolumeThreshold" class="form-control" value="6"></div>
+                            <div class="form-group"><label>Цена за м³ свыше</label><input type="text" id="belt_cityPricePerCube" class="form-control" value="1000"></div>
                         </div>
                         
                         <h4>🌍 Доставка за город</h4>
                         <div class="form-row">
-                            <div class="form-group"><label>Порог объема (м³)</label><input type="text" id="belt_countryVolumeThreshold" class="form-control" value="6"></div>
-                            <div class="form-group"><label>Цена (малые заказы)</label><input type="text" id="belt_countryPriceSmall" class="form-control" value="6000"></div>
-                            <div class="form-group"><label>Цена за км (малые)</label><input type="text" id="belt_countryKmPriceSmall" class="form-control" value="3000"></div>
-                            <div class="form-group"><label>Цена (крупные заказы)</label><input type="text" id="belt_countryPriceLarge" class="form-control" value="1000"></div>
+                            <div class="form-group"><label>Порог объема</label><input type="text" id="belt_countryVolumeThreshold" class="form-control" value="6"></div>
+                            <div class="form-group"><label>Цена (малые)</label><input type="text" id="belt_countryPriceSmall" class="form-control" value="6000"></div>
+                            <div class="form-group"><label>Цена за км</label><input type="text" id="belt_countryKmPriceSmall" class="form-control" value="3000"></div>
+                            <div class="form-group"><label>Цена (крупные)</label><input type="text" id="belt_countryPriceLarge" class="form-control" value="1000"></div>
                             <div class="form-group"><label>Цена за км (крупные)</label><input type="text" id="belt_countryKmPriceLarge" class="form-control" value="500"></div>
                             <div class="form-group"><label>Проезд поста</label><input type="text" id="belt_postPassPrice" class="form-control" value="1000"></div>
                         </div>
                         
                         <h4>🏷️ Характеристики (теги)</h4>
-                        <div class="specs-list" id="belt_specs_list">
-                            <div class="spec-item"><input type="text" placeholder="Характеристика" value="Бесплатная выгрузка: 1 час"><button class="remove-spec">✖</button></div>
-                            <div class="spec-item"><input type="text" placeholder="Характеристика" value="В автопарке: 2 миксера"><button class="remove-spec">✖</button></div>
-                            <div class="spec-item"><input type="text" placeholder="Характеристика" value="Объемы: 6м³, 8м³"><button class="remove-spec">✖</button></div>
-                            <div class="spec-item"><input type="text" placeholder="Характеристика" value="Длина лотка: 10 м"><button class="remove-spec">✖</button></div>
-                            <div class="spec-item"><input type="text" placeholder="Характеристика" value="Высота подачи: до 3 м"><button class="remove-spec">✖</button></div>
-                        </div>
+                        <div class="specs-list" id="belt_specs_list"></div>
                         <button class="add-spec-btn" data-target="belt_specs_list">+ Добавить характеристику</button>
-                        
-                        <button class="save-card-btn" data-card="belt">💾 Сохранить карточку "Миксеры с лентой"</button>
+                        <button class="save-card-btn" data-card="belt">💾 Сохранить карточку</button>
                     </div>
                 </div>
             </div>
@@ -541,12 +504,32 @@
                 const data = snapshot.val() || {};
                 document.querySelectorAll('.price-cell').forEach(cell => {
                     const key = cell.getAttribute('data-key');
-                    if (key && data[key] !== undefined) {
+                    if (key && data[key] !== undefined && data[key] !== null) {
                         cell.textContent = data[key];
                         cell.setAttribute('data-original', data[key]);
                     } else cell.setAttribute('data-original', cell.textContent);
                 });
             } catch (error) { console.error('Ошибка загрузки цен:', error); }
+        }
+
+        // Функция для обновления списка характеристик в интерфейсе
+        function updateSpecsList(containerId, specsArray) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            if (specsArray && specsArray.length > 0) {
+                specsArray.forEach(spec => {
+                    if (spec && spec.trim()) {
+                        const div = document.createElement('div');
+                        div.className = 'spec-item';
+                        div.innerHTML = `<input type="text" value="${spec.replace(/"/g, '&quot;')}"><button class="remove-spec">✖</button>`;
+                        container.appendChild(div);
+                    }
+                });
+            }
+            // Добавляем обработчики для кнопок удаления
+            document.querySelectorAll(`#${containerId} .remove-spec`).forEach(btn => {
+                btn.onclick = () => btn.parentElement.remove();
+            });
         }
 
         async function loadDeliveryCardsFromFirebase() {
@@ -570,16 +553,16 @@
                     document.getElementById('tray_countryKmPriceLarge').value = t.countryKmPriceLarge || '100';
                     document.getElementById('tray_postPassPrice').value = t.postPassPrice || '1000';
                     
-                    if (t.specs && t.specs.length) {
-                        const container = document.getElementById('tray_specs_list');
-                        container.innerHTML = '';
-                        t.specs.forEach(spec => {
-                            const div = document.createElement('div');
-                            div.className = 'spec-item';
-                            div.innerHTML = `<input type="text" value="${spec.replace(/"/g, '&quot;')}"><button class="remove-spec">✖</button>`;
-                            container.appendChild(div);
-                        });
-                    }
+                    updateSpecsList('tray_specs_list', t.specs || []);
+                } else {
+                    // Дефолтные значения для tray
+                    updateSpecsList('tray_specs_list', [
+                        'Бесплатная выгрузка: 1 час',
+                        'В автопарке: 8 миксеров',
+                        'Объемы: 5м³, 7м³, 9м³, 10м³',
+                        'Длина лотка: 1,5-2 м',
+                        'Высота подачи: 0,5 м'
+                    ]);
                 }
                 
                 if (data.mixerBelt) {
@@ -598,19 +581,35 @@
                     document.getElementById('belt_countryKmPriceLarge').value = b.countryKmPriceLarge || '500';
                     document.getElementById('belt_postPassPrice').value = b.postPassPrice || '1000';
                     
-                    if (b.specs && b.specs.length) {
-                        const container = document.getElementById('belt_specs_list');
-                        container.innerHTML = '';
-                        b.specs.forEach(spec => {
-                            const div = document.createElement('div');
-                            div.className = 'spec-item';
-                            div.innerHTML = `<input type="text" value="${spec.replace(/"/g, '&quot;')}"><button class="remove-spec">✖</button>`;
-                            container.appendChild(div);
-                        });
-                    }
+                    updateSpecsList('belt_specs_list', b.specs || []);
+                } else {
+                    updateSpecsList('belt_specs_list', [
+                        'Бесплатная выгрузка: 1 час',
+                        'В автопарке: 2 миксера',
+                        'Объемы: 6м³, 8м³',
+                        'Длина лотка: 10 м',
+                        'Высота подачи: до 3 м'
+                    ]);
                 }
+                
                 showNotification('✅ Карточки доставки загружены', 'success');
-            } catch (error) { console.error('Ошибка загрузки карточек:', error); }
+            } catch (error) { 
+                console.error('Ошибка загрузки карточек:', error);
+                showNotification('❌ Ошибка загрузки карточек', 'error');
+            }
+        }
+
+        // Функция получения текущих характеристик из интерфейса
+        function getSpecsFromUI(containerId) {
+            const specs = [];
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.querySelectorAll('.spec-item input').forEach(inp => {
+                    const value = inp.value.trim();
+                    if (value) specs.push(value);
+                });
+            }
+            return specs;
         }
 
         async function saveDeliveryCard(cardType) {
@@ -618,10 +617,7 @@
             try {
                 let cardData = {};
                 if (cardType === 'tray') {
-                    const specs = [];
-                    document.querySelectorAll('#tray_specs_list .spec-item input').forEach(inp => {
-                        if (inp.value.trim()) specs.push(inp.value.trim());
-                    });
+                    const specs = getSpecsFromUI('tray_specs_list');
                     cardData = {
                         icon: document.getElementById('tray_icon').value,
                         title: document.getElementById('tray_title').value,
@@ -639,11 +635,9 @@
                         specs: specs
                     };
                     await database.ref('deliveryCards/mixerTray').set(cardData);
+                    showNotification(`✅ Карточка "Миксеры с лотками" сохранена! (${specs.length} характеристик)`, 'success');
                 } else {
-                    const specs = [];
-                    document.querySelectorAll('#belt_specs_list .spec-item input').forEach(inp => {
-                        if (inp.value.trim()) specs.push(inp.value.trim());
-                    });
+                    const specs = getSpecsFromUI('belt_specs_list');
                     cardData = {
                         icon: document.getElementById('belt_icon').value,
                         title: document.getElementById('belt_title').value,
@@ -661,10 +655,11 @@
                         specs: specs
                     };
                     await database.ref('deliveryCards/mixerBelt').set(cardData);
+                    showNotification(`✅ Карточка "Миксеры с лентой" сохранена! (${specs.length} характеристик)`, 'success');
                 }
-                showNotification(`✅ Карточка "${cardType === 'tray' ? 'Миксеры с лотками' : 'Миксеры с лентой'}" сохранена!`, 'success');
             } catch (error) {
-                showNotification('❌ Ошибка сохранения карточки', 'error');
+                console.error('Ошибка сохранения:', error);
+                showNotification('❌ Ошибка сохранения карточки: ' + error.message, 'error');
             } finally {
                 showLoading(false);
             }
@@ -734,6 +729,7 @@
                     cell.addEventListener('input', handleCellInput);
                 });
             } else {
+                if (changedCells.size > 0 && !confirm('Есть несохранённые изменения. Выйти без сохранения?')) return;
                 editBtn.textContent = '✏️ Редактировать цены';
                 editHint.style.display = 'none';
                 editStatus.textContent = 'Режим просмотра';
@@ -742,6 +738,7 @@
                     cell.removeAttribute('contenteditable');
                     cell.removeEventListener('input', handleCellInput);
                 });
+                if (changedCells.size > 0) cancelChanges();
             }
         }
 
@@ -816,9 +813,6 @@
                     div.querySelector('.remove-spec').onclick = () => div.remove();
                 };
             });
-            document.querySelectorAll('.remove-spec').forEach(btn => {
-                btn.onclick = () => btn.parentElement.remove();
-            });
         }
 
         function initializeApp() {
@@ -835,10 +829,6 @@
             
             document.querySelectorAll('.save-card-btn').forEach(btn => {
                 btn.onclick = () => saveDeliveryCard(btn.getAttribute('data-card'));
-            });
-            
-            document.querySelectorAll('.remove-spec').forEach(btn => {
-                btn.onclick = () => btn.parentElement.remove();
             });
         }
 
