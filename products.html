@@ -109,6 +109,7 @@
         .delivery-card {
             flex: 1;
             min-width: 320px;
+            max-width: 100%;
             background: white;
             border-radius: 20px;
             overflow: hidden;
@@ -179,6 +180,8 @@
             justify-content: space-between;
             padding: 10px 0;
             border-bottom: 1px dashed #e0e0e0;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .price-label {
@@ -192,21 +195,35 @@
             font-size: 1.1rem;
         }
 
+        /* ===== ИСПРАВЛЕНИЕ: Стили для тегов (характеристик) с переносом слов ===== */
         .badge {
             background: #e6f0ff;
             color: #1e3a8a;
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 600;
             display: inline-block;
             margin: 5px 5px 0 0;
+            /* Ключевые свойства для переноса длинных слов */
+            word-wrap: break-word;      /* Перенос длинных слов */
+            word-break: break-word;     /* Альтернативный перенос */
+            white-space: normal;        /* Разрешаем перенос строки */
+            max-width: 100%;            /* Не выходим за границы родителя */
+            line-height: 1.3;           /* Комфортная высота строки */
         }
 
+        /* Контейнер для всех тегов (характеристик) — тоже добавляем переносы */
         .specs {
             margin-top: 20px;
             padding-top: 15px;
             border-top: 1px solid #e0e0e0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            /* Гарантируем, что контейнер не вылезает за края */
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         /* Анимация для обновления данных */
@@ -243,6 +260,16 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Дополнительная защита для текста внутри карточек */
+        .delivery-card,
+        .card-content,
+        .delivery-type,
+        .price-table {
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
         @media (max-width: 768px) {
             .transport-title {
                 font-size: 2rem;
@@ -274,6 +301,12 @@
             
             .card-image {
                 height: 180px;
+            }
+            
+            /* На мобильных устройствах теги будут ещё более гибкими */
+            .badge {
+                font-size: 0.75rem;
+                padding: 3px 10px;
             }
         }
     </style>
@@ -499,11 +532,18 @@
                 </div>
             `;
             
-            // Характеристики
+            // Характеристики (теги) - используем обновленные стили, которые переносятся автоматически
             let specsHtml = '<div class="specs">';
             if (cardData.specs && cardData.specs.length) {
                 cardData.specs.forEach(spec => {
-                    specsHtml += `<span class="badge">${spec}</span>`;
+                    // Экранируем спецсимволы для безопасности
+                    const safeSpec = String(spec).replace(/[&<>]/g, function(m) {
+                        if (m === '&') return '&amp;';
+                        if (m === '<') return '&lt;';
+                        if (m === '>') return '&gt;';
+                        return m;
+                    });
+                    specsHtml += `<span class="badge">${safeSpec}</span>`;
                 });
             }
             specsHtml += '</div>';
@@ -557,7 +597,13 @@
                 let specsHtml = '<div class="specs">';
                 if (cardData.specs && cardData.specs.length) {
                     cardData.specs.forEach(spec => {
-                        specsHtml += `<span class="badge">${spec}</span>`;
+                        const safeSpec = String(spec).replace(/[&<>]/g, function(m) {
+                            if (m === '&') return '&amp;';
+                            if (m === '<') return '&lt;';
+                            if (m === '>') return '&gt;';
+                            return m;
+                        });
+                        specsHtml += `<span class="badge">${safeSpec}</span>`;
                     });
                 }
                 specsHtml += '</div>';
@@ -663,20 +709,24 @@
             const phones = document.querySelectorAll('a[href^="tel:"]');
             phones.forEach(function(phone) {
                 phone.addEventListener('click', function() {
-                    gtag('event', 'phone_click', {
-                        'event_category': 'contacts',
-                        'event_label': this.getAttribute('href')
-                    });
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'phone_click', {
+                            'event_category': 'contacts',
+                            'event_label': this.getAttribute('href')
+                        });
+                    }
                 });
             });
             
             const emails = document.querySelectorAll('a[href^="mailto:"]');
             emails.forEach(function(email) {
                 email.addEventListener('click', function() {
-                    gtag('event', 'email_click', {
-                        'event_category': 'contacts',
-                        'event_label': this.getAttribute('href')
-                    });
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'email_click', {
+                            'event_category': 'contacts',
+                            'event_label': this.getAttribute('href')
+                        });
+                    }
                 });
             });
         });
