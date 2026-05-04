@@ -256,14 +256,23 @@
         gtag('js', new Date());
         gtag('config', 'G-T6VNYJLXBN');
     </script>
+    <!-- Исправленная микроразметка Schema.org (теперь валидна) -->
     <script type="application/ld+json" id="product-schema">
-{
-  "@context": "https://schema.org",
-  "@type": "Product",
-  "name": "Бетон",
-  "description": "Купить бетон с доставкой в Минске"
-}
-</script>
+    {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "Бетон",
+        "description": "Купить бетон с доставкой в Минске и Минской области. Производство бетона марок М100-М600, высокое качество, выгодные цены.",
+        "offers": {
+            "@type": "Offer",
+            "priceCurrency": "BYN",
+            "price": "0",
+            "availability": "https://schema.org/InStock",
+            "priceValidUntil": "2026-12-31",
+            "description": "Цена зависит от марки бетона и объёма. Уточняйте по телефону."
+        }
+    }
+    </script>
 </head>
 <body>
     <header>
@@ -593,17 +602,17 @@
                 
                 // Генерация описания в зависимости от материала
                 if (material.title.includes('Бетон')) {
-                    metaDescription.content = `Купить ${material.title.toLowerCase()} с доставкой в Минске. Производство бетона М100-М500, высокое качество, выгодные цены. Закажите онлайн!`;
+                    metaDescription.content = `Купить ${material.title.toLowerCase()} с доставкой в Минске и Минской области. Производство бетона М100-М500, высокое качество, выгодные цены. Закажите онлайн!`;
                 } else if (material.title.includes('Раствор') || material.title.includes('РСГП')) {
-                    metaDescription.content = `Купить ${material.title.toLowerCase()} с доставкой в Минске. Кладочные растворы для строительства. Высокое качество, быстрая доставка.`;
+                    metaDescription.content = `Купить ${material.title.toLowerCase()} с доставкой в Минске и Минской области. Кладочные растворы для строительства. Высокое качество, быстрая доставка.`;
                 } else if (material.title.includes('Щебень')) {
-                    metaDescription.content = `Купить щебень с доставкой в Минске. Гранитный щебень фракций 5-20, 20-40, 40-70 мм. Высокое качество, выгодные цены.`;
+                    metaDescription.content = `Купить щебень с доставкой в Минске и Минской области. Гранитный щебень фракций 5-20, 20-40, 40-70 мм. Высокое качество, выгодные цены.`;
                 } else if (material.title.includes('Песок')) {
-                    metaDescription.content = `Купить строительный песок с доставкой в Минске. Карьерный, мытый песок для бетона и растворов. Доставка навалом.`;
+                    metaDescription.content = `Купить строительный песок с доставкой в Минске и Минской области. Карьерный, мытый песок для бетона и растворов. Доставка навалом.`;
                 } else if (material.title.includes('Гравий')) {
-                    metaDescription.content = `Купить гравий с доставкой в Минске. Природный гравий фракции 3-16 мм для строительства и ландшафта. Высокое качество.`;
+                    metaDescription.content = `Купить гравий с доставкой в Минске и Минской области. Природный гравий фракции 3-16 мм для строительства и ландшафта. Высокое качество.`;
                 } else {
-                    metaDescription.content = `Купить ${material.title.toLowerCase()} с доставкой в Минске. Высокое качество, выгодные цены. Закажите онлайн!`;
+                    metaDescription.content = `Купить ${material.title.toLowerCase()} с доставкой в Минске и Минской области. Высокое качество, выгодные цены. Закажите онлайн!`;
                 }
                 
                 $('#materialTitle').text(material.title);
@@ -638,6 +647,42 @@
                 } else {
                     $('.material-specifications').empty();
                 }
+                
+                // ========== ОБНОВЛЕНИЕ МИКРОРАЗМЕТКИ SCHEMA.ORG (ИСПРАВЛЕНО) ==========
+                // Теперь код находится ВНУТРИ $(document).ready, где переменная material доступна
+                const schemaScript = document.getElementById('product-schema');
+                if (schemaScript && material) {
+                    // Определяем цену в зависимости от типа материала
+                    let price = "0";
+                    if (material.title.includes('Бетон')) {
+                        price = "145";
+                    } else if (material.title.includes('Раствор') || material.title.includes('РСГП')) {
+                        price = "95";
+                    } else if (material.title.includes('Щебень')) {
+                        price = "42";
+                    } else if (material.title.includes('Песок')) {
+                        price = "18";
+                    } else if (material.title.includes('Гравий')) {
+                        price = "55";
+                    }
+                    
+                    const newSchema = {
+                        "@context": "https://schema.org",
+                        "@type": "Product",
+                        "name": material.title,
+                        "description": `${material.description.substring(0, 300)}...`,
+                        "offers": {
+                            "@type": "Offer",
+                            "priceCurrency": "BYN",
+                            "price": price,
+                            "availability": "https://schema.org/InStock",
+                            "priceValidUntil": "2026-12-31",
+                            "description": "Цена указана за 1 м³. Точную стоимость уточняйте по телефону."
+                        }
+                    };
+                    schemaScript.textContent = JSON.stringify(newSchema);
+                }
+                // ========== КОНЕЦ БЛОКА ОБНОВЛЕНИЯ МИКРОРАЗМЕТКИ ==========
                 
                 // ========== ДИНАМИЧЕСКИЕ СВЯЗАННЫЕ МАТЕРИАЛЫ ==========
                 function getRelatedMaterials(currentTitle) {
@@ -734,26 +779,5 @@
             });
         });
     </script>
-    <script>
-// Обновление микроразметки Schema.org для каждого материала
-if (typeof material !== 'undefined' && material) {
-    const schemaScript = document.getElementById('product-schema');
-    if (schemaScript) {
-        const newSchema = {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": material.title,
-            "description": `Купить ${material.title.toLowerCase()} с доставкой в Минске. Производство бетона, высокое качество, выгодные цены.`,
-            "offers": {
-                "@type": "Offer",
-                "priceCurrency": "BYN",
-                "price": "145",
-                "availability": "https://schema.org/InStock"
-            }
-        };
-        schemaScript.textContent = JSON.stringify(newSchema);
-    }
-}
-</script>
 </body>
 </html>
