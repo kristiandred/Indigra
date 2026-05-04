@@ -256,20 +256,25 @@
         gtag('js', new Date());
         gtag('config', 'G-T6VNYJLXBN');
     </script>
-    <!-- Исправленная микроразметка Schema.org (теперь валидна) -->
+    <!-- ИСПРАВЛЕННАЯ микроразметка Schema.org (добавлено поле image) -->
     <script type="application/ld+json" id="product-schema">
     {
         "@context": "https://schema.org",
         "@type": "Product",
         "name": "Бетон",
         "description": "Купить бетон с доставкой в Минске и Минской области. Производство бетона марок М100-М600, высокое качество, выгодные цены.",
+        "image": "images/товарный бетон.webp",
         "offers": {
             "@type": "Offer",
             "priceCurrency": "BYN",
-            "price": "0",
+            "price": "145",
             "availability": "https://schema.org/InStock",
             "priceValidUntil": "2026-12-31",
             "description": "Цена зависит от марки бетона и объёма. Уточняйте по телефону."
+        },
+        "brand": {
+            "@type": "Brand",
+            "name": "ИНДИГРА"
         }
     }
     </script>
@@ -648,36 +653,32 @@
                     $('.material-specifications').empty();
                 }
                 
-                // ========== ОБНОВЛЕНИЕ МИКРОРАЗМЕТКИ SCHEMA.ORG (ИСПРАВЛЕНО) ==========
-                // Теперь код находится ВНУТРИ $(document).ready, где переменная material доступна
+                // ========== ОБНОВЛЕНИЕ МИКРОРАЗМЕТКИ SCHEMA.ORG (С image) ==========
                 const schemaScript = document.getElementById('product-schema');
                 if (schemaScript && material) {
-                    // Определяем цену в зависимости от типа материала
                     let price = "0";
-                    if (material.title.includes('Бетон')) {
-                        price = "145";
-                    } else if (material.title.includes('Раствор') || material.title.includes('РСГП')) {
-                        price = "95";
-                    } else if (material.title.includes('Щебень')) {
-                        price = "42";
-                    } else if (material.title.includes('Песок')) {
-                        price = "18";
-                    } else if (material.title.includes('Гравий')) {
-                        price = "55";
-                    }
+                    if (material.title.includes('Бетон')) price = "145";
+                    else if (material.title.includes('Раствор')) price = "95";
+                    else if (material.title.includes('Щебень')) price = "42";
+                    else if (material.title.includes('Песок')) price = "18";
+                    else if (material.title.includes('Гравий')) price = "55";
                     
                     const newSchema = {
                         "@context": "https://schema.org",
                         "@type": "Product",
                         "name": material.title,
-                        "description": `${material.description.substring(0, 300)}...`,
+                        "description": material.description.substring(0, 300),
+                        "image": material.image,  // ← ДОБАВЛЕНО поле image
                         "offers": {
                             "@type": "Offer",
                             "priceCurrency": "BYN",
                             "price": price,
                             "availability": "https://schema.org/InStock",
-                            "priceValidUntil": "2026-12-31",
-                            "description": "Цена указана за 1 м³. Точную стоимость уточняйте по телефону."
+                            "priceValidUntil": "2026-12-31"
+                        },
+                        "brand": {
+                            "@type": "Brand",
+                            "name": "ИНДИГРА"
                         }
                     };
                     schemaScript.textContent = JSON.stringify(newSchema);
