@@ -4,151 +4,151 @@
   <!-- ========== ОСНОВНЫЕ СТРАНИЦЫ ========== -->
   <url>
     <loc>https://indigrastroy.by/index.html</loc>
-    <lastmod>2026-03-17</lastmod>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://indigrastroy.by/about.html</loc>
-    <lastmod>2026-03-17</lastmod>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://indigrastroy.by/contact.html</loc>
-    <lastmod>2026-03-17</lastmod>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://indigrastroy.by/delivery.html</loc>
-    <lastmod>2026-03-17</lastmod>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://indigrastroy.by/price.html</loc>
-    <lastmod>2026-03-17</lastmod>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://indigrastroy.by/products.html</loc>
-    <lastmod>2026-03-17</lastmod>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
-  <!-- ========== СТРАНИЦЫ МАТЕРИАЛОВ ========== -->
-  <!-- Общие страницы материалов -->
+  <!-- ========== СТРАНИЦЫ МАТЕРИАЛОВ (ПОЛНЫЙ СПИСОК) ========== -->
+  
+  <!-- Общие категории -->
   <url>
-    <loc>https://indigrastroy.by/material.html?material=Товарный%20бетон</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%A2%D0%BE%D0%B2%D0%B0%D1%80%D0%BD%D1%8B%D0%B9%20%D0%B1%D0%B5%D1%82%D0%BE%D0%BD</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://indigrastroy.by/material.html?material=Растворная%20смесь</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%A0%D0%B0%D1%81%D1%82%D0%B2%D0%BE%D1%80%D0%BD%D0%B0%D1%8F%20%D1%81%D0%BC%D0%B5%D1%81%D1%8C</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
-  <!-- Бетон марки М100-М500 -->
+  <!-- Бетон все марки (М150-М500) -->
   <url>
-    <loc>https://indigrastroy.by/material.html?material=Бетон%20М150</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%91%D0%B5%D1%82%D0%BE%D0%BD%20%D0%9C150</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://indigrastroy.by/material.html?material=Бетон%20М200</loc>
-    <lastmod>2026-03-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://indigrastroy.by/material.html?material=Бетон%20М250</loc>
-    <lastmod>2026-03-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://indigrastroy.by/material.html?material=Бетон%20М300</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%91%D0%B5%D1%82%D0%BE%D0%BD%20%D0%9C200</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://indigrastroy.by/material.html?material=Бетон%20М350</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%91%D0%B5%D1%82%D0%BE%D0%BD%20%D0%9C250</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://indigrastroy.by/material.html?material=%D0%91%D0%B5%D1%82%D0%BE%D0%BD%20%D0%9C300</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://indigrastroy.by/material.html?material=Бетон%20М400</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%91%D0%B5%D1%82%D0%BE%D0%BD%20%D0%9C350</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://indigrastroy.by/material.html?material=Бетон%20М450</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%91%D0%B5%D1%82%D0%BE%D0%BD%20%D0%9C400</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://indigrastroy.by/material.html?material=%D0%91%D0%B5%D1%82%D0%BE%D0%BD%20%D0%9C450</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://indigrastroy.by/material.html?material=Бетон%20М500</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%91%D0%B5%D1%82%D0%BE%D0%BD%20%D0%9C500</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
-  <!-- Растворы кладочные -->
+  <!-- Растворы РСГП (все марки) -->
   <url>
-    <loc>https://indigrastroy.by/material.html?material=РСГП%20М50</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%A0%D0%A1%D0%93%D0%9F%20%D0%9C50</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://indigrastroy.by/material.html?material=РСГП%20М100</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%A0%D0%A1%D0%93%D0%9F%20%D0%9C100</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://indigrastroy.by/material.html?material=РСГП%20М150</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%A0%D0%A1%D0%93%D0%9F%20%D0%9C150</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://indigrastroy.by/material.html?material=РСГП%20М200</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%A0%D0%A1%D0%93%D0%9F%20%D0%9C200</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <!-- Заполнители -->
   <url>
-    <loc>https://indigrastroy.by/material.html?material=Щебень</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%A9%D0%B5%D0%B1%D0%B5%D0%BD%D1%8C</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://indigrastroy.by/material.html?material=Песок</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%9F%D0%B5%D1%81%D0%BE%D0%BA</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://indigrastroy.by/material.html?material=Гравий</loc>
-    <lastmod>2026-03-17</lastmod>
+    <loc>https://indigrastroy.by/material.html?material=%D0%93%D1%80%D0%B0%D0%B2%D0%B8%D0%B9</loc>
+    <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-  
   
 </urlset>
