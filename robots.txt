@@ -1,7 +1,9 @@
 User-agent: *
+Allow: /
 Disallow: /admin-panel.html
 Disallow: /AutorithAdmin.html
 Disallow: /owner.html
+Disallow: /navigation-template.html
 Disallow: /delete_file.php
 Disallow: /save_excel.php
 Disallow: /sync_github.php
@@ -11,11 +13,13 @@ Disallow: /*.py$
 Disallow: /cgi-bin/
 Disallow: /tmp/
 
-# Отдельно для Яндекса
+# Яндекс
 User-agent: Yandex
+Allow: /
 Disallow: /admin-panel.html
 Disallow: /AutorithAdmin.html
 Disallow: /owner.html
+Disallow: /navigation-template.html
 Disallow: /delete_file.php
 Disallow: /save_excel.php
 Disallow: /sync_github.php
@@ -24,13 +28,15 @@ Disallow: /*.php$
 Disallow: /*.py$
 Disallow: /cgi-bin/
 Disallow: /tmp/
-Host: https://indigrastroy.by
+Host: https://www.indigrastroy.by
 
-# Для Google (он Host не понимает, но и не мешает)
+# Google
 User-agent: Googlebot
+Allow: /
 Disallow: /admin-panel.html
 Disallow: /AutorithAdmin.html
 Disallow: /owner.html
+Disallow: /navigation-template.html
 Disallow: /delete_file.php
 Disallow: /save_excel.php
 Disallow: /sync_github.php
@@ -40,4 +46,4 @@ Disallow: /*.py$
 Disallow: /cgi-bin/
 Disallow: /tmp/
 
-Sitemap: https://indigrastroy.by/sitemap.xml
+Sitemap: https://www.indigrastroy.by/sitemap.xml

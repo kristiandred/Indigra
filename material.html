@@ -4,6 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Материал - ИНДИГРА</title>
+    <meta name="description" content="Купить бетон с доставкой в Минске и Минской области. Производство бетона марок М100–М600, растворы, щебень, песок. Выгодные цены от ИНДИГРА." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://www.indigrastroy.by/material.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_BY" />
+    <meta property="og:title" content="Строительные материалы - ИНДИГРА" />
+    <meta property="og:description" content="Бетон, растворы и заполнители с доставкой по Минску и области." />
+    <meta property="og:url" content="https://www.indigrastroy.by/material.html" />
+    <meta property="og:image" content="https://www.indigrastroy.by/images/gravii.jpg" />
     <link rel="icon" href="/images/favicon.svg?v=3" type="image/svg+xml" />
     <link rel="icon" href="/images/favicon-32.png?v=3" type="image/png" sizes="32x32" />
     <link rel="icon" href="/favicon.ico?v=3" sizes="any" />
@@ -625,6 +634,22 @@
                 } else {
                     metaDescription.content = `Купить ${material.title.toLowerCase()} с доставкой в Минске и Минской области. Высокое качество, выгодные цены. Закажите онлайн!`;
                 }
+
+                const pageUrl = `https://www.indigrastroy.by/material.html?material=${encodeURIComponent(materialName)}`;
+                let canonical = document.querySelector('link[rel="canonical"]');
+                if (!canonical) {
+                    canonical = document.createElement('link');
+                    canonical.rel = 'canonical';
+                    document.head.appendChild(canonical);
+                }
+                canonical.href = pageUrl;
+
+                const ogTitle = document.querySelector('meta[property="og:title"]');
+                if (ogTitle) ogTitle.content = document.title;
+                const ogDescription = document.querySelector('meta[property="og:description"]');
+                if (ogDescription) ogDescription.content = metaDescription.content;
+                const ogUrl = document.querySelector('meta[property="og:url"]');
+                if (ogUrl) ogUrl.content = pageUrl;
                 
                 $('#materialTitle').text(material.title);
                 $('#materialImage').attr('src', material.image);
@@ -674,13 +699,15 @@
                         "@type": "Product",
                         "name": material.title,
                         "description": material.description.substring(0, 300),
-                        "image": material.image,  // ← ДОБАВЛЕНО поле image
+                        "image": material.image.startsWith('http') ? material.image : `https://www.indigrastroy.by/${material.image}`,
+                        "url": pageUrl,
                         "offers": {
                             "@type": "Offer",
                             "priceCurrency": "BYN",
                             "price": price,
                             "availability": "https://schema.org/InStock",
-                            "priceValidUntil": "2026-12-31"
+                            "priceValidUntil": "2026-12-31",
+                            "url": pageUrl
                         },
                         "brand": {
                             "@type": "Brand",
