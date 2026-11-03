@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Калькулятор объёма бетона - ИНДИГРА</title>
-    <meta name="description" content="Онлайн-калькулятор объёма бетона: плита, ленточный фундамент, столбы и сваи. Рассчитайте нужный объём в см³ с запасом." />
+    <meta name="description" content="Онлайн-калькулятор объёма бетона: плита, ленточный фундамент, столбы и сваи. Рассчитайте нужный объём в м³ с запасом." />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://www.indigrastroy.by/calculator.html" />
     <meta property="og:type" content="website" />
@@ -409,7 +409,7 @@
 
         <div class="container calc-page">
             <div class="calc-intro">
-                <p>Выберите тип конструкции, укажите размеры — объём в см³ посчитается автоматически. Рекомендуем закладывать запас 5–10%.</p>
+                <p>Выберите тип конструкции, укажите размеры — объём в м³ посчитается автоматически. Рекомендуем закладывать запас 5–10%.</p>
             </div>
 
             <div class="calc-shapes" role="tablist" aria-label="Тип конструкции">
@@ -437,12 +437,12 @@
 
                     <div class="calc-units" role="radiogroup" aria-label="Единицы измерения">
                         <label>
-                            <input type="radio" name="calcUnit" value="cm" checked>
-                            Сантиметры (см)
+                            <input type="radio" name="calcUnit" value="m" checked>
+                            Метры (м)
                         </label>
                         <label>
-                            <input type="radio" name="calcUnit" value="m">
-                            Метры (м)
+                            <input type="radio" name="calcUnit" value="cm">
+                            Сантиметры (см)
                         </label>
                         <label>
                             <input type="radio" name="calcUnit" value="mm">
@@ -474,16 +474,16 @@
                     <div id="calcResultBox" class="calc-result-box">
                         <div class="calc-result-row">
                             <span class="calc-result-label">Чистый объём</span>
-                            <span class="calc-result-value" id="calcResultRaw">—<small>см³</small></span>
+                            <span class="calc-result-value" id="calcResultRaw">—<small>м³</small></span>
                         </div>
                         <div class="calc-result-row calc-result-main">
                             <span class="calc-result-label">С запасом</span>
-                            <span class="calc-result-value" id="calcResultStock">—<small>см³</small></span>
+                            <span class="calc-result-value" id="calcResultStock">—<small>м³</small></span>
                         </div>
                     </div>
 
                     <div id="calcOrderHint" class="calc-order-hint" hidden>
-                        Минимальный заказ — от 500&nbsp;000 см³ (0,5 м³). Уточните марку бетона и доставку у менеджера.
+                        Минимальный заказ — от 0,5 м³. Уточните марку бетона и доставку у менеджера.
                     </div>
 
                     <div class="calc-actions">
