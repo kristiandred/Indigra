@@ -54,7 +54,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .navbar-logo {
-    height: 56px;
+    height: 40px;
     width: auto;
     transition: all 0.3s ease;
 }
@@ -66,34 +66,24 @@ h1, h2, h3, h4, h5, h6 {
 .nav-link {
     color: var(--white) !important;
     font-weight: 500;
-    font-size: 1rem; /* Возвращаем обычный размер */
-    margin: 0 0.5rem;
-    padding: 0.5rem 1rem !important;
-    border-radius: 25px;
+    font-size: 0.88rem;
+    margin: 0 0.05rem;
+    padding: 0.4rem 0.55rem !important;
+    border-radius: 20px;
     transition: all 0.3s ease;
     position: relative;
+    white-space: nowrap;
+    line-height: 1.2;
 }
 
 .nav-link:hover {
     background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-soft);
+    transform: none;
+    box-shadow: none;
 }
 
-.nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 2px;
-    background: var(--white);
-    transition: all 0.3s ease;
-    transform: translateX(-50%);
-}
-
-.nav-link:hover::after {
-    width: 80%;
+.navbar .nav-link::after {
+    display: none;
 }
 
 /* Стили для номеров телефонов в навигации */

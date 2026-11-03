@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140" fill="none">
+  <defs>
+    <linearGradient id="slabFill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#93c5fd"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+  <path d="M30 70 L100 40 L170 70 L100 100 Z" fill="url(#slabFill)" stroke="#1e3a8a" stroke-width="2"/>
+  <path d="M30 70 L30 95 L100 125 L100 100 Z" fill="#60a5fa" stroke="#1e3a8a" stroke-width="2"/>
+  <path d="M100 100 L100 125 L170 95 L170 70 Z" fill="#2563eb" stroke="#1e3a8a" stroke-width="2"/>
+  <path d="M30 70 L100 40" stroke="#1e3a8a" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="100" y="28" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#1e3a8a" font-weight="600">;8=0</text>
+  <text x="178" y="85" font-family="Arial,sans-serif" font-size="12" fill="#1e3a8a" font-weight="600">(8@8=0</text>
+  <text x="18" y="118" font-family="Arial,sans-serif" font-size="12" fill="#1e3a8a" font-weight="600">H</text>
+</svg>

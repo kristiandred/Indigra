@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Калькулятор объёма бетона - ИНДИГРА</title>
+    <meta name="description" content="Онлайн-калькулятор объёма бетона: плита, ленточный фундамент, столбы, сваи и кольца. Рассчитайте нужный объём в м³ с запасом." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://www.indigrastroy.by/calculator.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_BY" />
+    <meta property="og:site_name" content="ИНДИГРА" />
+    <meta property="og:title" content="Калькулятор объёма бетона - ИНДИГРА" />
+    <meta property="og:description" content="Рассчитайте объём бетона для плиты, фундамента, столбов и свай онлайн." />
+    <meta property="og:url" content="https://www.indigrastroy.by/calculator.html" />
+    <meta property="og:image" content="https://www.indigrastroy.by/images/Калькулятор.png" />
+    <link rel="icon" href="https://www.indigrastroy.by/favicon.svg?v=4" type="image/svg+xml" />
+    <link rel="icon" href="https://www.indigrastroy.by/favicon.png?v=4" type="image/png" sizes="120x120" />
+    <link rel="icon" href="https://www.indigrastroy.by/images/favicon-32.png?v=4" type="image/png" sizes="32x32" />
+    <link rel="icon" href="https://www.indigrastroy.by/favicon.ico?v=4" type="image/x-icon" sizes="any" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="css/custom.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <style>
+        .calc-page {
+            padding: 2.5rem 0 4rem;
+        }
+
+        .calc-intro {
+            max-width: 720px;
+            margin: 0 auto 2rem;
+            text-align: center;
+            color: #334155;
+        }
+
+        .calc-intro p {
+            margin-bottom: 0;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .calc-shapes {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .calc-shape-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.9rem 0.5rem;
+            border: 2px solid #dbeafe;
+            border-radius: 12px;
+            background: #fff;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+            color: #1e3a8a;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-align: center;
+            line-height: 1.25;
+        }
+
+        .calc-shape-btn img {
+            width: 72px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .calc-shape-btn:hover {
+            border-color: #60a5fa;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(30, 58, 138, 0.12);
+        }
+
+        .calc-shape-btn.active {
+            border-color: #1e3a8a;
+            background: linear-gradient(180deg, #eff6ff 0%, #fff 100%);
+            box-shadow: 0 6px 16px rgba(30, 58, 138, 0.15);
+        }
+
+        .calc-panel {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .calc-card {
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+            padding: 1.5rem;
+        }
+
+        .calc-card h2 {
+            font-size: 1.25rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .calc-units {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .calc-units label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.85rem;
+            border-radius: 999px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            cursor: pointer;
+            font-weight: 500;
+            color: #334155;
+            margin: 0;
+        }
+
+        .calc-units input {
+            accent-color: #1e3a8a;
+        }
+
+        .calc-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .calc-field label {
+            display: block;
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 0.35rem;
+            font-size: 0.92rem;
+        }
+
+        .calc-unit {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .calc-input {
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            padding: 0.65rem 0.85rem;
+            font-size: 1rem;
+        }
+
+        .calc-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .calc-stock-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: end;
+            margin-top: 0.5rem;
+        }
+
+        .calc-formula {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            background: #eff6ff;
+            border-radius: 10px;
+            color: #1e3a8a;
+            font-size: 0.95rem;
+        }
+
+        .calc-preview {
+            text-align: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .calc-preview img {
+            width: 100%;
+            max-width: 260px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+        }
+
+        .calc-preview-title {
+            font-weight: 700;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .calc-result-box {
+            background: linear-gradient(160deg, #f8fafc 0%, #eff6ff 100%);
+            border: 1px solid #bfdbfe;
+            border-radius: 14px;
+            padding: 1.25rem;
+            transition: background 0.25s, border-color 0.25s;
+        }
+
+        .calc-result-box.has-result {
+            background: linear-gradient(160deg, #dbeafe 0%, #eff6ff 100%);
+            border-color: #3b82f6;
+        }
+
+        .calc-result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .calc-result-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .calc-result-label {
+            color: #475569;
+            font-size: 0.95rem;
+        }
+
+        .calc-result-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #1e3a8a;
+            line-height: 1;
+        }
+
+        .calc-result-value small {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-left: 0.25rem;
+        }
+
+        .calc-result-main .calc-result-value {
+            font-size: 2.25rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .calc-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+
+        .calc-actions .btn {
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.65rem 1.2rem;
+        }
+
+        .calc-order-hint {
+            margin-top: 1rem;
+            padding: 0.9rem 1rem;
+            background: #fff;
+            border-radius: 10px;
+            border-left: 4px solid #1e3a8a;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        .calc-tips {
+            margin-top: 2.5rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .calc-tip {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 1.15rem 1.25rem;
+        }
+
+        .calc-tip h3 {
+            font-size: 1rem;
+            color: #1e3a8a;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+
+        .calc-tip p {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 991px) {
+            .calc-shapes {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .calc-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .calc-shapes {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .calc-fields {
+                grid-template-columns: 1fr;
+            }
+
+            .calc-stock-row {
+                grid-template-columns: 1fr;
+            }
+
+            .calc-tips {
+                grid-template-columns: 1fr;
+            }
+
+            .calc-result-value {
+                font-size: 1.45rem;
+            }
+
+            .calc-result-main .calc-result-value {
+                font-size: 1.85rem;
+            }
+        }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-T6VNYJLXBN"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-T6VNYJLXBN');
+    </script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <div class="navbar-brand-wrapper">
+                    <a class="navbar-brand d-flex align-items-center" href="index.html">
+                        <img src="images/Логотип 1.svg" alt="ИНДИГРА" class="navbar-logo me-2">
+                        <span>ИНДИГРА</span>
+                    </a>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Главная</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="about.html">О компании</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="products.html">Услуги</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="price.html">Прайс</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="calculator.html">Калькулятор</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="delivery.html">Доставка и оплата</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contact.html">Контакты</a>
+                        </li>
+                    </ul>
+                    <div class="ms-lg-3 mt-2 mt-lg-0">
+                        <div class="navbar-phones">
+                            <a href="tel:+375291013385" class="phone-link">📞 +375 29 101-33-85</a>
+                            <a href="tel:+375291083083" class="phone-link">📞 +375 29 108-30-83</a>
+                            <a href="tel:+375291697227" class="phone-link">📞 +375 29 169-72-27</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main">
+        <section class="hero-section delivery-page">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Калькулятор объёма бетона</h1>
+                </div>
+            </div>
+        </section>
+
+        <div class="container calc-page">
+            <div class="calc-intro">
+                <p>Выберите тип конструкции, укажите размеры — объём в м³ посчитается автоматически. Рекомендуем закладывать запас 5–10%.</p>
+            </div>
+
+            <div class="calc-shapes" role="tablist" aria-label="Тип конструкции">
+                <button type="button" class="calc-shape-btn active" data-shape="slab">
+                    <img src="images/calculator/slab.jpg" alt="">
+                    Плита / стяжка
+                </button>
+                <button type="button" class="calc-shape-btn" data-shape="strip">
+                    <img src="images/calculator/strip.jpg" alt="">
+                    Ленточный фундамент
+                </button>
+                <button type="button" class="calc-shape-btn" data-shape="column">
+                    <img src="images/calculator/column.jpg" alt="">
+                    Столб / колонна
+                </button>
+                <button type="button" class="calc-shape-btn" data-shape="cylinder">
+                    <img src="images/calculator/cylinder.svg" alt="">
+                    Круглая свая
+                </button>
+                <button type="button" class="calc-shape-btn" data-shape="ring">
+                    <img src="images/calculator/ring.svg" alt="">
+                    Кольцо / колодец
+                </button>
+            </div>
+
+            <div class="calc-panel">
+                <div class="calc-card">
+                    <h2>Параметры расчёта</h2>
+
+                    <div class="calc-units" role="radiogroup" aria-label="Единицы измерения">
+                        <label>
+                            <input type="radio" name="calcUnit" value="m" checked>
+                            Метры (м)
+                        </label>
+                        <label>
+                            <input type="radio" name="calcUnit" value="cm">
+                            Сантиметры (см)
+                        </label>
+                        <label>
+                            <input type="radio" name="calcUnit" value="mm">
+                            Миллиметры (мм)
+                        </label>
+                    </div>
+
+                    <div id="calcFields" class="calc-fields"></div>
+
+                    <div class="calc-stock-row">
+                        <div class="calc-field">
+                            <label for="calcStock">Запас <span class="calc-unit">(%)</span></label>
+                            <input type="number" id="calcStock" class="form-control calc-input" min="0" max="50" step="1" value="10">
+                        </div>
+                        <button type="button" id="calcReset" class="btn btn-outline-secondary">Сбросить</button>
+                    </div>
+
+                    <div class="calc-formula">
+                        Формула: <strong id="calcFormula">V = Длина × Ширина × Толщина</strong>
+                    </div>
+                </div>
+
+                <div class="calc-card">
+                    <div class="calc-preview">
+                        <img id="calcShapeImage" src="images/calculator/slab.jpg" alt="Плита / стяжка">
+                        <p class="calc-preview-title" id="calcShapeTitle">Плита / стяжка</p>
+                    </div>
+
+                    <div id="calcResultBox" class="calc-result-box">
+                        <div class="calc-result-row">
+                            <span class="calc-result-label">Чистый объём</span>
+                            <span class="calc-result-value" id="calcResultRaw">—<small>м³</small></span>
+                        </div>
+                        <div class="calc-result-row calc-result-main">
+                            <span class="calc-result-label">С запасом</span>
+                            <span class="calc-result-value" id="calcResultStock">—<small>м³</small></span>
+                        </div>
+                    </div>
+
+                    <div id="calcOrderHint" class="calc-order-hint" hidden>
+                        Минимальный заказ — от 0,5 м³. Уточните марку бетона и доставку у менеджера.
+                    </div>
+
+                    <div class="calc-actions">
+                        <a href="contact.html" class="btn btn-primary">Заказать бетон</a>
+                        <a href="price.html" class="btn btn-outline-primary">Смотреть прайс</a>
+                        <a href="tel:+375291013385" class="btn btn-outline-secondary">Позвонить</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calc-tips">
+                <div class="calc-tip">
+                    <h3>Как измерять</h3>
+                    <p>Все размеры вводите в одной единице. Для ленты укажите суммарную длину всех участков фундамента.</p>
+                </div>
+                <div class="calc-tip">
+                    <h3>Запас 5–10%</h3>
+                    <p>Запас компенсирует неровности основания, потери при укладке и погрешности опалубки.</p>
+                </div>
+                <div class="calc-tip">
+                    <h3>Помощь с подбором</h3>
+                    <p>Не уверены в марке или объёме? Позвоните — подскажем по задаче и организуем доставку.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/layout-fixer.js"></script>
+    <script src="js/calculator.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const phones = document.querySelectorAll('a[href^="tel:"]');
+    phones.forEach(function(phone) {
+        phone.addEventListener('click', function() {
+            gtag('event', 'phone_click', {
+                'event_category': 'contacts',
+                'event_label': this.getAttribute('href')
+            });
+        });
+    });
+
+    const buttons = document.querySelectorAll('.btn, .btn-primary, .btn-danger');
+    buttons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            gtag('event', 'button_click', {
+                'event_category': 'buttons',
+                'event_label': this.innerText.trim() || 'button'
+            });
+        });
+    });
+});
+    </script>
+</body>
+</html>
