@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Калькулятор объёма бетона - ИНДИГРА</title>
-    <meta name="description" content="Онлайн-калькулятор объёма бетона: плита, ленточный фундамент, столбы, сваи и кольца. Рассчитайте нужный объём в м³ с запасом." />
+    <meta name="description" content="Онлайн-калькулятор объёма бетона: плита, ленточный фундамент, столбы и сваи. Рассчитайте нужный объём в см³ с запасом." />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://www.indigrastroy.by/calculator.html" />
     <meta property="og:type" content="website" />
@@ -42,7 +42,7 @@
 
         .calc-shapes {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 0.75rem;
             margin-bottom: 1.75rem;
         }
@@ -231,21 +231,22 @@
         }
 
         .calc-result-value {
-            font-size: 1.75rem;
+            font-size: 1.45rem;
             font-weight: 800;
             color: #1e3a8a;
-            line-height: 1;
+            line-height: 1.15;
+            text-align: right;
         }
 
         .calc-result-value small {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             color: #64748b;
             margin-left: 0.25rem;
         }
 
         .calc-result-main .calc-result-value {
-            font-size: 2.25rem;
+            font-size: 1.85rem;
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -305,7 +306,7 @@
 
         @media (max-width: 991px) {
             .calc-shapes {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .calc-panel {
@@ -315,7 +316,7 @@
 
         @media (max-width: 576px) {
             .calc-shapes {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr 1fr;
             }
 
             .calc-fields {
@@ -331,11 +332,11 @@
             }
 
             .calc-result-value {
-                font-size: 1.45rem;
+                font-size: 1.2rem;
             }
 
             .calc-result-main .calc-result-value {
-                font-size: 1.85rem;
+                font-size: 1.45rem;
             }
         }
     </style>
@@ -408,7 +409,7 @@
 
         <div class="container calc-page">
             <div class="calc-intro">
-                <p>Выберите тип конструкции, укажите размеры — объём в м³ посчитается автоматически. Рекомендуем закладывать запас 5–10%.</p>
+                <p>Выберите тип конструкции, укажите размеры — объём в см³ посчитается автоматически. Рекомендуем закладывать запас 5–10%.</p>
             </div>
 
             <div class="calc-shapes" role="tablist" aria-label="Тип конструкции">
@@ -425,12 +426,8 @@
                     Столб / колонна
                 </button>
                 <button type="button" class="calc-shape-btn" data-shape="cylinder">
-                    <img src="images/calculator/cylinder.svg" alt="">
+                    <img src="images/calculator/cylinder.jpg" alt="">
                     Круглая свая
-                </button>
-                <button type="button" class="calc-shape-btn" data-shape="ring">
-                    <img src="images/calculator/ring.svg" alt="">
-                    Кольцо / колодец
                 </button>
             </div>
 
@@ -440,12 +437,12 @@
 
                     <div class="calc-units" role="radiogroup" aria-label="Единицы измерения">
                         <label>
-                            <input type="radio" name="calcUnit" value="m" checked>
-                            Метры (м)
+                            <input type="radio" name="calcUnit" value="cm" checked>
+                            Сантиметры (см)
                         </label>
                         <label>
-                            <input type="radio" name="calcUnit" value="cm">
-                            Сантиметры (см)
+                            <input type="radio" name="calcUnit" value="m">
+                            Метры (м)
                         </label>
                         <label>
                             <input type="radio" name="calcUnit" value="mm">
@@ -477,16 +474,16 @@
                     <div id="calcResultBox" class="calc-result-box">
                         <div class="calc-result-row">
                             <span class="calc-result-label">Чистый объём</span>
-                            <span class="calc-result-value" id="calcResultRaw">—<small>м³</small></span>
+                            <span class="calc-result-value" id="calcResultRaw">—<small>см³</small></span>
                         </div>
                         <div class="calc-result-row calc-result-main">
                             <span class="calc-result-label">С запасом</span>
-                            <span class="calc-result-value" id="calcResultStock">—<small>м³</small></span>
+                            <span class="calc-result-value" id="calcResultStock">—<small>см³</small></span>
                         </div>
                     </div>
 
                     <div id="calcOrderHint" class="calc-order-hint" hidden>
-                        Минимальный заказ — от 0,5 м³. Уточните марку бетона и доставку у менеджера.
+                        Минимальный заказ — от 500&nbsp;000 см³ (0,5 м³). Уточните марку бетона и доставку у менеджера.
                     </div>
 
                     <div class="calc-actions">

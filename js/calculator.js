@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    var UNIT_TO_M = { m: 1, cm: 0.01, mm: 0.001 };
+    // Все размеры приводятся к см, результат — в см³
+    var UNIT_TO_CM = { m: 100, cm: 1, mm: 0.1 };
     var UNIT_LABEL = { m: 'м', cm: 'см', mm: 'мм' };
 
     var SHAPES = {
@@ -10,9 +11,9 @@
             formula: 'V = Длина × Ширина × Толщина',
             image: 'images/calculator/slab.jpg',
             fields: [
-                { id: 'length', label: 'Длина', placeholder: 'например, 6' },
-                { id: 'width', label: 'Ширина', placeholder: 'например, 4' },
-                { id: 'height', label: 'Толщина', placeholder: 'например, 0.15' }
+                { id: 'length', label: 'Длина', placeholder: 'например, 600' },
+                { id: 'width', label: 'Ширина', placeholder: 'например, 400' },
+                { id: 'height', label: 'Толщина', placeholder: 'например, 15' }
             ],
             calc: function (v) { return v.length * v.width * v.height; }
         },
@@ -21,9 +22,9 @@
             formula: 'V = Длина ленты × Ширина × Высота',
             image: 'images/calculator/strip.jpg',
             fields: [
-                { id: 'length', label: 'Длина ленты (периметр)', placeholder: 'например, 36' },
-                { id: 'width', label: 'Ширина ленты', placeholder: 'например, 0.4' },
-                { id: 'height', label: 'Высота / глубина', placeholder: 'например, 0.8' }
+                { id: 'length', label: 'Длина ленты (периметр)', placeholder: 'например, 3600' },
+                { id: 'width', label: 'Ширина ленты', placeholder: 'например, 40' },
+                { id: 'height', label: 'Высота / глубина', placeholder: 'например, 80' }
             ],
             calc: function (v) { return v.length * v.width * v.height; }
         },
@@ -32,9 +33,9 @@
             formula: 'V = A × B × H × Кол-во',
             image: 'images/calculator/column.jpg',
             fields: [
-                { id: 'width', label: 'Сторона A', placeholder: 'например, 0.3' },
-                { id: 'depth', label: 'Сторона B', placeholder: 'например, 0.3' },
-                { id: 'height', label: 'Высота H', placeholder: 'например, 2.5' },
+                { id: 'width', label: 'Сторона A', placeholder: 'например, 30' },
+                { id: 'depth', label: 'Сторона B', placeholder: 'например, 30' },
+                { id: 'height', label: 'Высота H', placeholder: 'например, 250' },
                 { id: 'count', label: 'Количество', placeholder: 'например, 8', unitless: true }
             ],
             calc: function (v) { return v.width * v.depth * v.height * v.count; }
@@ -42,33 +43,40 @@
         cylinder: {
             title: 'Круглая свая / колонна',
             formula: 'V = π × R² × H × Кол-во',
-            image: 'images/calculator/cylinder.svg',
+            image: 'images/calculator/cylinder.jpg',
             fields: [
-                { id: 'radius', label: 'Радиус R', placeholder: 'например, 0.15' },
-                { id: 'height', label: 'Высота H', placeholder: 'например, 3' },
+                { id: 'radius', label: 'Радиус R', placeholder: 'например, 15' },
+                { id: 'height', label: 'Высота H', placeholder: 'например, 300' },
                 { id: 'count', label: 'Количество', placeholder: 'например, 12', unitless: true }
             ],
             calc: function (v) { return Math.PI * v.radius * v.radius * v.height * v.count; }
+        }
+    };
+
+    var PLACEHOLDERS = {
+        m: {
+            slab: { length: 'например, 6', width: 'например, 4', height: 'например, 0.15' },
+            strip: { length: 'например, 36', width: 'например, 0.4', height: 'например, 0.8' },
+            column: { width: 'например, 0.3', depth: 'например, 0.3', height: 'например, 2.5', count: 'например, 8' },
+            cylinder: { radius: 'например, 0.15', height: 'например, 3', count: 'например, 12' }
         },
-        ring: {
-            title: 'Кольцо / колодец',
-            formula: 'V = π × (R² − r²) × H',
-            image: 'images/calculator/ring.svg',
-            fields: [
-                { id: 'outer', label: 'Внешний радиус R', placeholder: 'например, 0.75' },
-                { id: 'inner', label: 'Внутренний радиус r', placeholder: 'например, 0.5' },
-                { id: 'height', label: 'Высота H', placeholder: 'например, 0.9' }
-            ],
-            calc: function (v) {
-                if (v.outer <= v.inner) return NaN;
-                return Math.PI * (v.outer * v.outer - v.inner * v.inner) * v.height;
-            }
+        cm: {
+            slab: { length: 'например, 600', width: 'например, 400', height: 'например, 15' },
+            strip: { length: 'например, 3600', width: 'например, 40', height: 'например, 80' },
+            column: { width: 'например, 30', depth: 'например, 30', height: 'например, 250', count: 'например, 8' },
+            cylinder: { radius: 'например, 15', height: 'например, 300', count: 'например, 12' }
+        },
+        mm: {
+            slab: { length: 'например, 6000', width: 'например, 4000', height: 'например, 150' },
+            strip: { length: 'например, 36000', width: 'например, 400', height: 'например, 800' },
+            column: { width: 'например, 300', depth: 'например, 300', height: 'например, 2500', count: 'например, 8' },
+            cylinder: { radius: 'например, 150', height: 'например, 3000', count: 'например, 12' }
         }
     };
 
     var state = {
         shape: 'slab',
-        unit: 'm'
+        unit: 'cm'
     };
 
     function $(sel) { return document.querySelector(sel); }
@@ -82,16 +90,23 @@
         return isFinite(n) ? n : 0;
     }
 
-    function toMeters(value, unitless) {
+    function toCm(value, unitless) {
         if (unitless) return value;
-        return value * (UNIT_TO_M[state.unit] || 1);
+        return value * (UNIT_TO_CM[state.unit] || 1);
     }
 
     function formatVolume(v) {
         if (!isFinite(v) || v <= 0) return '—';
-        if (v >= 100) return v.toFixed(1);
-        if (v >= 10) return v.toFixed(2);
-        return v.toFixed(3);
+        if (v >= 1) {
+            return Math.round(v).toLocaleString('ru-RU');
+        }
+        return v.toFixed(2).replace('.', ',');
+    }
+
+    function fieldPlaceholder(field) {
+        var byUnit = PLACEHOLDERS[state.unit] || PLACEHOLDERS.cm;
+        var byShape = byUnit[state.shape] || {};
+        return byShape[field.id] || field.placeholder;
     }
 
     function renderFields() {
@@ -110,7 +125,7 @@
                     '<input type="number" inputmode="decimal" min="0" step="any" ' +
                         'id="field-' + field.id + '" data-id="' + field.id + '" ' +
                         (field.unitless ? 'data-unitless="1" ' : '') +
-                        'placeholder="' + field.placeholder + '" class="form-control calc-input">' +
+                        'placeholder="' + fieldPlaceholder(field) + '" class="form-control calc-input">' +
                 '</div>';
         });
 
@@ -134,7 +149,7 @@
         shape.fields.forEach(function (field) {
             var el = document.getElementById('field-' + field.id);
             var raw = parseNum(el);
-            values[field.id] = toMeters(raw, !!field.unitless);
+            values[field.id] = toCm(raw, !!field.unitless);
             if (field.unitless && values[field.id] <= 0) values[field.id] = 1;
         });
         return values;
@@ -150,8 +165,8 @@
 
         var withStock = isFinite(volume) && volume > 0 ? volume * (1 + stock / 100) : NaN;
 
-        $('#calcResultRaw').innerHTML = formatVolume(volume) + '<small>м³</small>';
-        $('#calcResultStock').innerHTML = formatVolume(withStock) + '<small>м³</small>';
+        $('#calcResultRaw').innerHTML = formatVolume(volume) + '<small>см³</small>';
+        $('#calcResultStock').innerHTML = formatVolume(withStock) + '<small>см³</small>';
 
         var resultBox = $('#calcResultBox');
         if (isFinite(withStock) && withStock > 0) {
@@ -178,6 +193,9 @@
                 setShape(btn.getAttribute('data-shape'));
             });
         });
+
+        var unitCm = document.querySelector('input[name="calcUnit"][value="cm"]');
+        if (unitCm) unitCm.checked = true;
 
         $all('input[name="calcUnit"]').forEach(function (radio) {
             radio.addEventListener('change', function () {
