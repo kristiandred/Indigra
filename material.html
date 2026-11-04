@@ -12,7 +12,7 @@
     <meta property="og:title" content="Строительные материалы - ИНДИГРА" />
     <meta property="og:description" content="Бетон, растворы и заполнители с доставкой по Минску и области." />
     <meta property="og:url" content="https://www.indigrastroy.by/material.html" />
-    <meta property="og:image" content="https://www.indigrastroy.by/images/gravii.jpg" />
+    <meta property="og:image" content="https://www.indigrastroy.by/images/%D1%82%D0%BE%D0%B2%D0%B0%D1%80%D0%BD%D1%8B%D0%B9%20%D0%B1%D0%B5%D1%82%D0%BE%D0%BD.webp" />
     <link rel="icon" href="https://www.indigrastroy.by/favicon.svg?v=4" type="image/svg+xml" />
     <link rel="icon" href="https://www.indigrastroy.by/favicon.png?v=4" type="image/png" sizes="120x120" />
     <link rel="icon" href="https://www.indigrastroy.by/images/favicon-32.png?v=4" type="image/png" sizes="32x32" />
@@ -269,25 +269,67 @@
         gtag('js', new Date());
         gtag('config', 'G-T6VNYJLXBN');
     </script>
-    <!-- ИСПРАВЛЕННАЯ микроразметка Schema.org (добавлено поле image) -->
+    <!-- Product schema for Google Merchant Listings -->
     <script type="application/ld+json" id="product-schema">
     {
         "@context": "https://schema.org",
         "@type": "Product",
-        "name": "Бетон",
+        "name": "Товарный бетон",
         "description": "Купить бетон с доставкой в Минске и Минской области. Производство бетона марок М100-М600, высокое качество, выгодные цены.",
-        "image": "images/товарный бетон.webp",
-        "offers": {
-            "@type": "Offer",
-            "priceCurrency": "BYN",
-            "price": "145",
-            "availability": "https://schema.org/InStock",
-            "priceValidUntil": "2026-12-31",
-            "description": "Цена зависит от марки бетона и объёма. Уточняйте по телефону."
-        },
+        "image": [
+            "https://www.indigrastroy.by/images/%D1%82%D0%BE%D0%B2%D0%B0%D1%80%D0%BD%D1%8B%D0%B9%20%D0%B1%D0%B5%D1%82%D0%BE%D0%BD.webp"
+        ],
+        "url": "https://www.indigrastroy.by/material.html?material=%D0%A2%D0%BE%D0%B2%D0%B0%D1%80%D0%BD%D1%8B%D0%B9%20%D0%B1%D0%B5%D1%82%D0%BE%D0%BD",
         "brand": {
             "@type": "Brand",
             "name": "ИНДИГРА"
+        },
+        "offers": {
+            "@type": "Offer",
+            "url": "https://www.indigrastroy.by/material.html?material=%D0%A2%D0%BE%D0%B2%D0%B0%D1%80%D0%BD%D1%8B%D0%B9%20%D0%B1%D0%B5%D1%82%D0%BE%D0%BD",
+            "priceCurrency": "BYN",
+            "price": "145",
+            "availability": "https://schema.org/InStock",
+            "itemCondition": "https://schema.org/NewCondition",
+            "validFrom": "2026-01-01",
+            "priceValidUntil": "2026-12-31",
+            "description": "Цена за м³ без НДС. Доставка по Минску и Минской области рассчитывается отдельно.",
+            "hasMerchantReturnPolicy": {
+                "@type": "MerchantReturnPolicy",
+                "applicableCountry": "BY",
+                "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+                "merchantReturnDays": 0,
+                "returnMethod": "https://schema.org/ReturnInStore",
+                "returnFees": "https://schema.org/ReturnFeesCustomerResponsibility"
+            },
+            "shippingDetails": {
+                "@type": "OfferShippingDetails",
+                "shippingRate": {
+                    "@type": "MonetaryAmount",
+                    "value": "0",
+                    "currency": "BYN"
+                },
+                "shippingDestination": {
+                    "@type": "DefinedRegion",
+                    "addressCountry": "BY",
+                    "addressRegion": "Минская область"
+                },
+                "deliveryTime": {
+                    "@type": "ShippingDeliveryTime",
+                    "handlingTime": {
+                        "@type": "QuantitativeValue",
+                        "minValue": 0,
+                        "maxValue": 1,
+                        "unitCode": "DAY"
+                    },
+                    "transitTime": {
+                        "@type": "QuantitativeValue",
+                        "minValue": 0,
+                        "maxValue": 1,
+                        "unitCode": "DAY"
+                    }
+                }
+            }
         }
     }
     </script>
@@ -688,34 +730,82 @@
                     $('.material-specifications').empty();
                 }
                 
-                // ========== ОБНОВЛЕНИЕ МИКРОРАЗМЕТКИ SCHEMA.ORG (С image) ==========
+                // ========== ОБНОВЛЕНИЕ МИКРОРАЗМЕТКИ SCHEMA.ORG ==========
                 const schemaScript = document.getElementById('product-schema');
                 if (schemaScript && material) {
                     let price = "0";
                     if (material.title.includes('Бетон')) price = "145";
-                    else if (material.title.includes('Раствор')) price = "95";
+                    else if (material.title.includes('Раствор') || material.title.includes('РСГП')) price = "95";
                     else if (material.title.includes('Щебень')) price = "42";
                     else if (material.title.includes('Песок')) price = "18";
                     else if (material.title.includes('Гравий')) price = "55";
-                    
+
+                    function toAbsoluteImageUrl(path) {
+                        if (!path) return 'https://www.indigrastroy.by/images/gravii.jpg';
+                        if (/^https?:\/\//i.test(path)) return path;
+                        const clean = path.replace(/^\//, '');
+                        const encoded = clean.split('/').map(encodeURIComponent).join('/');
+                        return `https://www.indigrastroy.by/${encoded}`;
+                    }
+
+                    const imageUrl = toAbsoluteImageUrl(material.image);
                     const newSchema = {
                         "@context": "https://schema.org",
                         "@type": "Product",
                         "name": material.title,
                         "description": material.description.substring(0, 300),
-                        "image": material.image.startsWith('http') ? material.image : `https://www.indigrastroy.by/${material.image}`,
+                        "image": [imageUrl],
                         "url": pageUrl,
-                        "offers": {
-                            "@type": "Offer",
-                            "priceCurrency": "BYN",
-                            "price": price,
-                            "availability": "https://schema.org/InStock",
-                            "priceValidUntil": "2026-12-31",
-                            "url": pageUrl
-                        },
                         "brand": {
                             "@type": "Brand",
                             "name": "ИНДИГРА"
+                        },
+                        "offers": {
+                            "@type": "Offer",
+                            "url": pageUrl,
+                            "priceCurrency": "BYN",
+                            "price": price,
+                            "availability": "https://schema.org/InStock",
+                            "itemCondition": "https://schema.org/NewCondition",
+                            "validFrom": "2026-01-01",
+                            "priceValidUntil": "2026-12-31",
+                            "description": "Цена за м³ без НДС. Доставка по Минску и Минской области рассчитывается отдельно.",
+                            "hasMerchantReturnPolicy": {
+                                "@type": "MerchantReturnPolicy",
+                                "applicableCountry": "BY",
+                                "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+                                "merchantReturnDays": 0,
+                                "returnMethod": "https://schema.org/ReturnInStore",
+                                "returnFees": "https://schema.org/ReturnFeesCustomerResponsibility"
+                            },
+                            "shippingDetails": {
+                                "@type": "OfferShippingDetails",
+                                "shippingRate": {
+                                    "@type": "MonetaryAmount",
+                                    "value": "0",
+                                    "currency": "BYN"
+                                },
+                                "shippingDestination": {
+                                    "@type": "DefinedRegion",
+                                    "addressCountry": "BY",
+                                    "addressRegion": "Минская область"
+                                },
+                                "deliveryTime": {
+                                    "@type": "ShippingDeliveryTime",
+                                    "handlingTime": {
+                                        "@type": "QuantitativeValue",
+                                        "minValue": 0,
+                                        "maxValue": 1,
+                                        "unitCode": "DAY"
+                                    },
+                                    "transitTime": {
+                                        "@type": "QuantitativeValue",
+                                        "minValue": 0,
+                                        "maxValue": 1,
+                                        "unitCode": "DAY"
+                                    }
+                                }
+                            }
                         }
                     };
                     schemaScript.textContent = JSON.stringify(newSchema);
